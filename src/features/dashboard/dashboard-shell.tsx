@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   DashboardIcon,
   HistoryIcon,
@@ -17,6 +18,10 @@ import { useAuth } from "@/features/auth/auth-context";
 import { useRouter } from "next/navigation";
 import { useOrders } from "@/features/orders/order-context";
 import { NewOrderToast } from "@/features/dashboard/new-order-toast";
+import {
+  getRestaurantPresence,
+  type RestaurantPresence,
+} from "@/services/commercial-service";
 
 const navigation = [
   { href: "/restaurant/dashboard", label: "Overview", icon: DashboardIcon },
@@ -34,8 +39,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { settings, restaurantOpen } = useRestaurantSettings();
   const { profile, signOut } = useAuth();
+  const [presence, setPresence] = useState<RestaurantPresence | null>(null);
   const { orders, realtimeConnected } = useOrders();
   const newOrdersCount = orders.filter((order) => order.status === "Nouă").length;
+
+  useEffect(() => {
+    if (!profile?.restaurantId) return;
+    void getRestaurantPresence(profile.restaurantId).then(setPresence);
+  }, [profile?.restaurantId]);
+
+  const restaurantName = presence?.name || restaurant.name;
+  const restaurantInitials = restaurantName.slice(0, 2).toUpperCase();
 
   const logout = async () => {
     await signOut();
@@ -47,10 +61,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden min-h-screen border-r border-black/5 bg-[#171411] p-5 text-white lg:sticky lg:top-0 lg:block lg:h-screen">
         <div className="flex items-center gap-3 px-2 py-3">
           <div className="grid size-11 place-items-center rounded-xl bg-[#ff5a1f] text-sm font-black">
-            {restaurant.initials}
+            {restaurantInitials}
           </div>
           <div>
-            <p className="text-sm font-black">{restaurant.name}</p>
+            <p className="text-sm font-black">{restaurantName}</p>
             <p className="mt-1 text-[11px] text-white/50">Restaurant dashboard</p>
           </div>
         </div>
@@ -96,10 +110,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-black/5 bg-white/90 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <div className="grid size-10 place-items-center rounded-xl bg-[#171411] text-xs font-black text-white lg:hidden">
-              {restaurant.initials}
+              {restaurantInitials}
             </div>
             <div>
-              <p className="text-sm font-black">{restaurant.name}</p>
+              <p className="text-sm font-black">{restaurantName}</p>
               <p className="text-[11px] text-[#8b8580]">
                 <span className={`mr-1 inline-block size-2 rounded-full ${restaurantOpen ? "bg-emerald-500" : "bg-red-500"}`} />
                 Restaurant {restaurantOpen ? "deschis" : "închis"} · {settings.openingTime}-{settings.closingTime}
@@ -116,7 +130,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <Link
-            href="/"
+            href={presence?.publicUrl || "/"}
             className="rounded-xl bg-[#f3f0ed] px-3 py-2 text-xs font-black text-[#5e5852]"
           >
             Aplicație

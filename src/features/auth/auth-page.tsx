@@ -200,5 +200,8 @@ function translateAuthError(message: string) {
   if (message.includes("User already registered")) {
     return "Există deja un cont cu acest email.";
   }
+  if (message.includes("Email not confirmed")) {
+    return "Contul nu este confirmat. Pentru MVP, aplica ultima migrare Supabase.";
+  }
   return message;
 }

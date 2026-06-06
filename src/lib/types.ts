@@ -189,6 +189,52 @@ export type AdminRestaurant = {
   orderCount: number;
 };
 
+export type AdminRestaurantDetails = AdminRestaurant & {
+  address: string;
+  phone: string;
+  email: string;
+  clientUrl: string;
+  dashboardUrl: string;
+  qrUrl: string;
+  categories: Array<{
+    id: string;
+    name: string;
+    active: boolean;
+    sortOrder: number;
+  }>;
+  products: Array<{
+    id: string;
+    name: string;
+    categoryName: string;
+    price: number;
+    active: boolean;
+    soldOut: boolean;
+  }>;
+  orders: Array<{
+    id: string;
+    orderNumber: string;
+    total: number;
+    status: string;
+    createdAt: string;
+  }>;
+  users: Array<{
+    id: string;
+    email: string;
+    fullName: string;
+    role: UserRole;
+    createdAt: string;
+  }>;
+};
+
+export type RestaurantOnboardingResult = {
+  restaurantId: string;
+  slug: string;
+  clientUrl: string;
+  dashboardUrl: string;
+  qrUrl: string;
+  ownerRequiresEmailConfirmation: boolean;
+};
+
 export type RestaurantOnboardingInput = {
   name: string;
   slug: string;

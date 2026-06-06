@@ -39,7 +39,16 @@ export function CategoriesDashboardPage() {
 
   const add = async (event: FormEvent) => {
     event.preventDefault();
-    if (!restaurantId || !name.trim()) return;
+    if (!restaurantId) {
+      setError(
+        "Contul nu este legat de un restaurant. Verifica asocierea ownerului in Super Admin.",
+      );
+      return;
+    }
+    if (!name.trim()) {
+      setError("Introdu un nume pentru categorie.");
+      return;
+    }
     setError(null);
     try {
       await createCategory(restaurantId, {
@@ -118,6 +127,12 @@ export function CategoriesDashboardPage() {
           Adaugă
         </button>
       </form>
+
+      {!restaurantId && (
+        <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
+          Profilul autentificat nu are un restaurant asociat.
+        </p>
+      )}
 
       {error && (
         <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700">

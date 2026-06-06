@@ -182,7 +182,7 @@ export async function getRestaurantPresence(restaurantId: string) {
       data.seo_description ||
       `Comandă online de la ${data.name} prin ALL4HORECA.`,
     socialImageUrl: data.social_image_url,
-    publicUrl: qrResult.data?.public_url || `/r/${data.slug}`,
+    publicUrl: qrResult.data?.public_url || `/clienti/${data.slug}`,
   } satisfies RestaurantPresence;
 }
 

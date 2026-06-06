@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ChartIcon, ProductsIcon } from "@/components/icons";
 import type { AdminRestaurant } from "@/lib/types";
@@ -125,7 +126,7 @@ export function AdminPage() {
             {restaurants.map((item) => (
               <article
                 key={item.id}
-                className="grid gap-4 p-5 sm:grid-cols-[1fr_auto_auto] sm:items-center"
+                className="grid gap-4 p-5 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -143,6 +144,12 @@ export function AdminPage() {
                   <p className="text-xs font-bold text-[#8b8580]">Comenzi</p>
                   <p className="mt-1 text-lg font-black">{item.orderCount}</p>
                 </div>
+                <Link
+                  href={`/admin/restaurante/${item.id}`}
+                  className="rounded-xl bg-[#171411] px-4 py-3 text-center text-xs font-black text-white"
+                >
+                  Deschide
+                </Link>
                 <button
                   type="button"
                   disabled={savingId === item.id}

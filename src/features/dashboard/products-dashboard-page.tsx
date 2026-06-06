@@ -110,8 +110,17 @@ export function ProductsDashboardPage() {
             />
             <button
               type="button"
-              onClick={() => setEditing("new")}
-              className="rounded-xl bg-[#ff5a1f] px-4 py-3 text-xs font-black text-white"
+              disabled={!restaurantId}
+              onClick={() => {
+                if (!restaurantId) {
+                  setActionError(
+                    "Contul nu este legat de un restaurant. Verifica asocierea ownerului in Super Admin.",
+                  );
+                  return;
+                }
+                setEditing("new");
+              }}
+              className="rounded-xl bg-[#ff5a1f] px-4 py-3 text-xs font-black text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               Adaugă produs
             </button>
@@ -128,6 +137,12 @@ export function ProductsDashboardPage() {
       {(error || actionError) && (
         <p className="mt-5 rounded-2xl bg-red-50 p-4 text-sm font-bold text-red-700">
           {actionError || error}
+        </p>
+      )}
+      {!restaurantId && (
+        <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-800">
+          Profilul autentificat nu are un restaurant asociat. Adaugarea manuala
+          este disponibila imediat dupa asocierea contului owner.
         </p>
       )}
 

@@ -1,5 +1,10 @@
 import { getSupabaseClient } from "@/lib/supabase/client";
-import type { AdminRestaurant, RestaurantOnboardingInput } from "@/lib/types";
+import type {
+  AdminRestaurant,
+  AdminRestaurantDetails,
+  RestaurantOnboardingInput,
+  RestaurantOnboardingResult,
+} from "@/lib/types";
 
 type RestaurantRow = {
   id: string;
@@ -76,12 +81,118 @@ export async function createRestaurantWithOwner(
   });
   const payload = (await response.json()) as {
     restaurantId?: string;
+    slug?: string;
+    clientUrl?: string;
+    dashboardUrl?: string;
+    qrUrl?: string;
+    ownerRequiresEmailConfirmation?: boolean;
     error?: string;
   };
   if (!response.ok) {
     throw new Error(payload.error || "Restaurantul nu a putut fi creat.");
   }
-  return payload.restaurantId!;
+  return payload as RestaurantOnboardingResult;
+}
+
+export async function getAdminRestaurantDetails(
+  restaurantId: string,
+): Promise<AdminRestaurantDetails> {
+  const supabase = getSupabaseClient();
+  if (!supabase) throw new Error("Supabase nu este configurat.");
+
+  const [restaurantResult, categoriesResult, productsResult, ordersResult, usersResult, qrResult] =
+    await Promise.all([
+      supabase
+        .from("restaurants")
+        .select("id, name, slug, logo_url, primary_color, secondary_color, address, phone, email, is_active, created_at")
+        .eq("id", restaurantId)
+        .single(),
+      supabase
+        .from("categories")
+        .select("id, name, active, sort_order")
+        .eq("restaurant_id", restaurantId)
+        .order("sort_order"),
+      supabase
+        .from("products")
+        .select("id, name, price, active, sold_out, categories(name)")
+        .eq("restaurant_id", restaurantId)
+        .order("sort_order"),
+      supabase
+        .from("orders")
+        .select("id, order_number, total, status, created_at")
+        .eq("restaurant_id", restaurantId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("id, email, full_name, role, created_at")
+        .eq("restaurant_id", restaurantId)
+        .order("created_at"),
+      supabase
+        .from("restaurant_qr_codes")
+        .select("public_url")
+        .eq("restaurant_id", restaurantId)
+        .maybeSingle(),
+    ]);
+
+  const failure = [
+    restaurantResult,
+    categoriesResult,
+    productsResult,
+    ordersResult,
+    usersResult,
+    qrResult,
+  ].find((result) => result.error);
+  if (failure?.error) throw new Error(failure.error.message);
+
+  const item = restaurantResult.data;
+  if (!item) throw new Error("Restaurantul nu exista.");
+  const clientUrl = qrResult.data?.public_url || `/clienti/${item.slug}`;
+  return {
+    id: item.id,
+    name: item.name,
+    slug: item.slug,
+    logoUrl: item.logo_url,
+    primaryColor: item.primary_color,
+    secondaryColor: item.secondary_color,
+    address: item.address,
+    phone: item.phone,
+    email: item.email,
+    isActive: item.is_active,
+    createdAt: item.created_at,
+    orderCount: ordersResult.data?.length ?? 0,
+    clientUrl,
+    dashboardUrl: `/restaurant/${item.slug}`,
+    qrUrl: clientUrl,
+    categories: (categoriesResult.data ?? []).map((category) => ({
+      id: category.id,
+      name: category.name,
+      active: category.active,
+      sortOrder: category.sort_order,
+    })),
+    products: (productsResult.data ?? []).map((product) => ({
+      id: product.id,
+      name: product.name,
+      categoryName:
+        (product.categories as { name?: string } | null)?.name || "Fara categorie",
+      price: Number(product.price),
+      active: product.active,
+      soldOut: product.sold_out,
+    })),
+    orders: (ordersResult.data ?? []).map((order) => ({
+      id: order.id,
+      orderNumber: order.order_number,
+      total: Number(order.total),
+      status: order.status,
+      createdAt: order.created_at,
+    })),
+    users: (usersResult.data ?? []).map((user) => ({
+      id: user.id,
+      email: user.email,
+      fullName: user.full_name,
+      role: user.role,
+      createdAt: user.created_at,
+    })),
+  };
 }
 
 export async function uploadRestaurantAsset(file: File) {

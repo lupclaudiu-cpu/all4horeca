@@ -1,4 +1,4 @@
-const CACHE_NAME = "all4horeca-v1";
+const CACHE_NAME = "all4horeca-v2";
 const APP_SHELL = [
   "/",
   "/comenzi",

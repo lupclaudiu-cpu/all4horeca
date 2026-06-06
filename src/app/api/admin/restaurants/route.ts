@@ -138,12 +138,29 @@ export async function POST(request: Request) {
     );
   }
 
+  const clientUrl = `/clienti/${input.slug.trim()}`;
+  const { error: qrError } = await authClient
+    .from("restaurant_qr_codes")
+    .upsert(
+      {
+        restaurant_id: restaurantId,
+        public_url: clientUrl,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "restaurant_id" },
+    );
+  if (qrError) {
+    return NextResponse.json({ error: qrError.message }, { status: 400 });
+  }
+
   return NextResponse.json(
     {
       restaurantId,
-      ownerRequiresEmailConfirmation:
-        !serviceRoleKey &&
-        (!("session" in ownerResult.data) || !ownerResult.data.session),
+      slug: input.slug.trim(),
+      clientUrl,
+      dashboardUrl: `/restaurant/${input.slug.trim()}`,
+      qrUrl: clientUrl,
+      ownerRequiresEmailConfirmation: false,
     },
     { status: 201 },
   );
