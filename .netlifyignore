@@ -1,0 +1,12 @@
+.git
+.next
+.netlify
+.netlify-home
+.npm-cache
+.supabase-home
+_netlify_source
+_netlify_upload
+node_modules
+coverage
+*.log
+supabase-projects.json

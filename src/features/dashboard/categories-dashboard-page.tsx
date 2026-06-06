@@ -1,0 +1,201 @@
+"use client";
+
+import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/features/auth/auth-context";
+import { DashboardHeader } from "@/features/dashboard/dashboard-header";
+import type { Category } from "@/lib/types";
+import {
+  createCategory,
+  deleteCategory,
+  getDashboardCategories,
+  updateCategory,
+} from "@/services/commercial-service";
+
+export function CategoriesDashboardPage() {
+  const { profile } = useAuth();
+  const restaurantId = profile?.restaurantId;
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!restaurantId) return;
+    setLoading(true);
+    try {
+      setCategories(await getDashboardCategories(restaurantId));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Încărcare eșuată.");
+    } finally {
+      setLoading(false);
+    }
+  }, [restaurantId]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
+
+  const add = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!restaurantId || !name.trim()) return;
+    setError(null);
+    try {
+      await createCategory(restaurantId, {
+        name,
+        active: true,
+        sortOrder: categories.length + 1,
+      });
+      setName("");
+      await load();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Creare eșuată.");
+    }
+  };
+
+  const update = async (
+    category: Category,
+    changes: { name?: string; sortOrder?: number; active?: boolean },
+  ) => {
+    setPendingId(category.id);
+    setError(null);
+    try {
+      await updateCategory(category.id, changes);
+      setCategories((current) =>
+        current
+          .map((item) =>
+            item.id === category.id ? { ...item, ...changes } : item,
+          )
+          .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+      );
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Actualizare eșuată.");
+    } finally {
+      setPendingId(null);
+    }
+  };
+
+  const remove = async (category: Category) => {
+    if (!window.confirm(`Ștergi categoria „${category.name}”?`)) return;
+    setPendingId(category.id);
+    try {
+      await deleteCategory(category.id);
+      setCategories((current) =>
+        current.filter((item) => item.id !== category.id),
+      );
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Ștergere eșuată.");
+    } finally {
+      setPendingId(null);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-5xl">
+      <DashboardHeader
+        eyebrow="Catalog"
+        title="Categorii"
+        description="Controlează ordinea și vizibilitatea categoriilor din meniul public."
+        action={
+          <span className="rounded-full bg-orange-100 px-3 py-2 text-xs font-black text-orange-700">
+            {categories.filter((item) => item.active !== false).length} active
+          </span>
+        }
+      />
+
+      <form
+        onSubmit={add}
+        className="mt-6 flex gap-3 rounded-2xl bg-white p-4 shadow-[0_10px_30px_rgba(24,18,12,0.04)]"
+      >
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Nume categorie"
+          className="min-w-0 flex-1 rounded-xl border border-[#e6e0db] px-4 py-3 text-sm outline-none focus:border-[#ff5a1f]"
+        />
+        <button className="rounded-xl bg-[#ff5a1f] px-5 py-3 text-xs font-black text-white">
+          Adaugă
+        </button>
+      </form>
+
+      {error && (
+        <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+          {error}
+        </p>
+      )}
+
+      <section className="mt-5 overflow-hidden rounded-[1.75rem] bg-white shadow-[0_10px_30px_rgba(24,18,12,0.04)]">
+        {loading ? (
+          <div className="h-72 animate-pulse bg-[#f8f5f2]" />
+        ) : (
+          <div className="divide-y divide-[#eee9e4]">
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className="grid gap-3 p-4 sm:grid-cols-[70px_1fr_auto_auto] sm:items-center"
+              >
+                <label>
+                  <span className="text-[10px] font-bold text-[#8b8580]">Ordine</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={category.sortOrder ?? 0}
+                    onChange={(event) =>
+                      setCategories((current) =>
+                        current.map((item) =>
+                          item.id === category.id
+                            ? { ...item, sortOrder: Number(event.target.value) }
+                            : item,
+                        ),
+                      )
+                    }
+                    onBlur={() =>
+                      void update(category, { sortOrder: category.sortOrder ?? 0 })
+                    }
+                    className="mt-1 w-full rounded-lg border border-[#e6e0db] px-2 py-2 text-sm"
+                  />
+                </label>
+                <input
+                  value={category.name}
+                  onChange={(event) =>
+                    setCategories((current) =>
+                      current.map((item) =>
+                        item.id === category.id
+                          ? { ...item, name: event.target.value }
+                          : item,
+                      ),
+                    )
+                  }
+                  onBlur={() => void update(category, { name: category.name })}
+                  className="rounded-xl border border-transparent px-3 py-3 text-sm font-black outline-none hover:border-[#e6e0db] focus:border-[#ff5a1f]"
+                />
+                <button
+                  type="button"
+                  disabled={pendingId === category.id}
+                  onClick={() =>
+                    void update(category, { active: category.active === false })
+                  }
+                  className={`rounded-xl px-4 py-2 text-xs font-black ${
+                    category.active === false
+                      ? "bg-zinc-100 text-zinc-500"
+                      : "bg-emerald-50 text-emerald-700"
+                  }`}
+                >
+                  {category.active === false ? "Inactivă" : "Activă"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void remove(category)}
+                  className="rounded-xl bg-red-50 px-4 py-2 text-xs font-black text-red-600"
+                >
+                  Șterge
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
