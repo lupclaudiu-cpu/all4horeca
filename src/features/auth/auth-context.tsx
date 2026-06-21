@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { getSupabaseClient } from "@/lib/supabase/client";
+import { publishDataFlowDebug } from "@/lib/debug/data-flow-debug";
 import type { UserProfile } from "@/lib/types";
 
 type AuthContextValue = {
@@ -35,6 +36,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    publishDataFlowDebug({
+      provider: "AuthProvider",
+      providerMounted: true,
+      authStatus: "mounted",
+      lastStep: "AuthProvider mounted",
+    });
+  }, []);
 
   const loadProfile = useCallback(async (userId: string) => {
     const supabase = getSupabaseClient();
@@ -63,6 +73,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loadProfile, session]);
 
   useEffect(() => {
+    publishDataFlowDebug({
+      provider: "AuthProvider",
+      providerMounted: true,
+      loading,
+      restaurantId: profile?.restaurantId ?? null,
+      user: session?.user?.email ?? session?.user?.id ?? null,
+      authStatus:
+        loading ? "loading" : session?.user ? "authenticated" : "anonymous",
+      error,
+    });
+  }, [error, loading, profile?.restaurantId, session?.user]);
+
+  useEffect(() => {
     const supabase = getSupabaseClient();
     if (!supabase) {
       const timer = window.setTimeout(() => {
@@ -73,18 +96,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     let active = true;
-    void supabase.auth.getSession().then(async ({ data }) => {
+    const loadingTimeout = window.setTimeout(() => {
       if (!active) return;
-      setSession(data.session);
-      if (data.session?.user) {
-        try {
-          setProfile(await loadProfile(data.session.user.id));
-        } catch (reason) {
-          setError(reason instanceof Error ? reason.message : "Profil indisponibil.");
-        }
-      }
+      console.warn("[ANTORIA data-flow] Supabase auth session timed out.");
       setLoading(false);
-    });
+    }, 8000);
+
+    void supabase.auth.getSession()
+      .then(async ({ data }) => {
+        if (!active) return;
+        window.clearTimeout(loadingTimeout);
+        setSession(data.session);
+        if (data.session?.user) {
+          try {
+            setProfile(await loadProfile(data.session.user.id));
+          } catch (reason) {
+            setError(
+              reason instanceof Error ? reason.message : "Profil indisponibil.",
+            );
+          }
+        }
+        setLoading(false);
+      })
+      .catch((reason) => {
+        if (!active) return;
+        window.clearTimeout(loadingTimeout);
+        console.warn("[ANTORIA data-flow] Supabase auth session failed.", reason);
+        setError(
+          reason instanceof Error ?
+             reason.message
+            : "Sesiunea nu a putut fi citită.",
+        );
+        setLoading(false);
+      });
 
     const {
       data: { subscription },
@@ -111,6 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       active = false;
+      window.clearTimeout(loadingTimeout);
       subscription.unsubscribe();
     };
   }, [loadProfile]);

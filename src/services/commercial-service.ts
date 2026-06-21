@@ -4,6 +4,8 @@ import type {
   Category,
   ProductInput,
   ProductOptionGroup,
+  Promotion,
+  PromotionInput,
 } from "@/lib/types";
 
 export async function getDashboardCategories(restaurantId: string) {
@@ -59,8 +61,8 @@ export async function deleteCategory(categoryId: string) {
     .eq("id", categoryId);
   if (error) {
     throw new Error(
-      error.code === "23503"
-        ? "Categoria are produse și nu poate fi ștearsă."
+      error.code === "23503" ?
+         "Categoria are produse și nu poate fi ștearsă."
         : error.message,
     );
   }
@@ -180,7 +182,7 @@ export async function getRestaurantPresence(restaurantId: string) {
     seoTitle: data.seo_title || `${data.name} | Comandă online`,
     seoDescription:
       data.seo_description ||
-      `Comandă online de la ${data.name} prin ALL4HORECA.`,
+      `Comandă online de la ${data.name} prin ANTORIA.`,
     socialImageUrl: data.social_image_url,
     publicUrl: qrResult.data?.public_url || `/clienti/${data.slug}`,
   } satisfies RestaurantPresence;
@@ -232,7 +234,7 @@ export async function getProductOptionGroups(productId: string) {
   const { data, error } = await requireSupabase()
     .from("product_option_groups")
     .select(
-      "id, name, selection_type, required, active, sort_order, product_options(id, name, price_delta, active, sort_order)",
+      "id, name, selection_type, required, active, sort_order, product_options(id, name, price_delta, multiply_by_product_quantity, active, sort_order)",
     )
     .eq("product_id", productId)
     .order("sort_order");
@@ -250,6 +252,7 @@ export async function getProductOptionGroups(productId: string) {
         id: option.id,
         name: option.name,
         priceDelta: Number(option.price_delta),
+        multiplyByProductQuantity: option.multiply_by_product_quantity,
         active: option.active,
         sortOrder: option.sort_order,
       })),
@@ -294,6 +297,7 @@ export async function saveProductOptionGroup(
         group_id: resolvedId,
         name: option.name.trim(),
         price_delta: option.priceDelta,
+        multiply_by_product_quantity: option.multiplyByProductQuantity,
         active: option.active,
         sort_order: option.sortOrder,
       })),
@@ -409,6 +413,124 @@ export async function importProductsFile(
   }
 
   return imported;
+}
+
+export async function getPromotions(
+  restaurantId: string,
+): Promise<Promotion[]> {
+  const { data, error } = await requireSupabase()
+    .from("promotions")
+    .select(
+      "id, restaurant_id, name, description, promotion_type, discount_percent, trigger_order_number, starts_at, ends_at, valid_from, valid_until, active, sort_order, promotion_products(product_id)",
+    )
+    .eq("restaurant_id", restaurantId)
+    .order("sort_order")
+    .order("created_at");
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((promotion) => ({
+    id: promotion.id,
+    restaurantId: promotion.restaurant_id,
+    name: promotion.name,
+    description: promotion.description,
+    type: promotion.promotion_type,
+    discountPercent: Number(promotion.discount_percent),
+    triggerOrderNumber: promotion.trigger_order_number,
+    startsAt: promotion.starts_at?.slice(0, 5) ?? null,
+    endsAt: promotion.ends_at?.slice(0, 5) ?? null,
+    validFrom: promotion.valid_from ?? null,
+    validUntil: promotion.valid_until ?? null,
+    active: promotion.active,
+    sortOrder: promotion.sort_order,
+    productIds: promotion.promotion_products.map((item) => item.product_id),
+  }));
+}
+
+export async function savePromotion(
+  restaurantId: string,
+  input: PromotionInput,
+  promotionId?: string,
+) {
+  const supabase = requireSupabase();
+  const payload = {
+    restaurant_id: restaurantId,
+    name: input.name.trim(),
+    description: input.description.trim(),
+    promotion_type: input.type,
+    discount_percent: input.discountPercent,
+    trigger_order_number:
+      input.type === "loyalty" || input.type === "first_order" ?
+         input.triggerOrderNumber
+        : null,
+    starts_at: input.type === "happy_hour" ? input.startsAt : null,
+    ends_at: input.type === "happy_hour" ? input.endsAt : null,
+    valid_from: input.validFrom || null,
+    valid_until: input.validUntil || null,
+    active: input.active,
+    sort_order: input.sortOrder,
+    updated_at: new Date().toISOString(),
+  };
+
+  let resolvedId = promotionId;
+  if (promotionId) {
+    const { error } = await supabase
+      .from("promotions")
+      .update(payload)
+      .eq("id", promotionId)
+      .eq("restaurant_id", restaurantId);
+    if (error) throw new Error(error.message);
+  } else {
+    const { data, error } = await supabase
+      .from("promotions")
+      .insert(payload)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    resolvedId = data.id;
+  }
+
+  const { error: clearError } = await supabase
+    .from("promotion_products")
+    .delete()
+    .eq("promotion_id", resolvedId!);
+  if (clearError) throw new Error(clearError.message);
+
+  if (input.type === "product_discount" && input.productIds.length) {
+    const { error } = await supabase.from("promotion_products").insert(
+      input.productIds.map((productId) => ({
+        promotion_id: resolvedId,
+        product_id: productId,
+      })),
+    );
+    if (error) throw new Error(error.message);
+  }
+
+  return resolvedId!;
+}
+
+export async function updatePromotionActive(
+  restaurantId: string,
+  promotionId: string,
+  active: boolean,
+) {
+  const { error } = await requireSupabase()
+    .from("promotions")
+    .update({ active, updated_at: new Date().toISOString() })
+    .eq("id", promotionId)
+    .eq("restaurant_id", restaurantId);
+  if (error) throw new Error(error.message);
+}
+
+export async function deletePromotion(
+  restaurantId: string,
+  promotionId: string,
+) {
+  const { error } = await requireSupabase()
+    .from("promotions")
+    .delete()
+    .eq("id", promotionId)
+    .eq("restaurant_id", restaurantId);
+  if (error) throw new Error(error.message);
 }
 
 function requireSupabase() {

@@ -1,6 +1,6 @@
-# ALL4HORECA
+# ANTORIA
 
-MVP PWA mobile-first pentru o platformă HORECA multi-restaurant.
+Platformă PWA mobile-first pentru comenzi și management HORECA.
 
 ## Pornire locală
 
@@ -150,4 +150,32 @@ rolurilor sunt în [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
 
 Produsele, comenzile și setările restaurantului sunt sincronizate prin
 Supabase. Preferințele sunt păstrate și local pentru pornire rapidă. Plățile
-reale, notificările push și tracking-ul live nu sunt încă integrate.
+reale și tracking-ul live nu sunt încă integrate.
+
+## ANTORIA Phase 2
+
+Aplică migrarea pentru promoții publice, profil client și notificări push:
+
+```powershell
+npx.cmd supabase db push
+```
+
+Generează cheile VAPID:
+
+```powershell
+npm.cmd run vapid:generate
+```
+
+Copiază rezultatul în `.env.local` și în variabilele de mediu ale platformei
+de hosting:
+
+```env
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=...
+VAPID_PRIVATE_KEY=...
+VAPID_SUBJECT=mailto:contact@antoria.ro
+```
+
+Notificările push necesită HTTPS în producție. Pe calculator pot fi testate
+prin `localhost`. Clienții autentificați activează notificările din
+`/cont/notificari`, iar restaurantul trimite broadcasturi din
+`/restaurant/dashboard/notificari`.

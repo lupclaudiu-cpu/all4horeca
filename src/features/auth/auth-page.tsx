@@ -2,144 +2,221 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@/features/auth/auth-context";
+import {
+  getLocalCustomerProfile,
+  saveLocalCustomerProfile,
+} from "@/services/customer-profile-service";
 
 export function AuthPage({ mode }: { mode: "login" | "register" }) {
+  return mode === "login" ? <StaffLogin /> : <ClientRegister />;
+}
+
+function StaffLogin() {
   const router = useRouter();
-  const { signIn, signUp } = useAuth();
-  const [fullName, setFullName] = useState("");
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
-    setMessage(null);
     try {
-      if (mode === "login") {
-        const profile = await signIn(email.trim(), password);
-        router.replace(
-          profile.role === "super_admin"
-            ? "/admin"
-            : profile.role === "restaurant_owner"
-              ? "/restaurant/dashboard"
-              : "/",
-        );
+      const profile = await signIn(email.trim(), password);
+      if (profile.role === "super_admin") {
+        router.replace("/admin");
+      } else if (profile.role === "restaurant_owner") {
+        router.replace("/restaurant/dashboard");
       } else {
-        const result = await signUp(fullName.trim(), email.trim(), password);
-        if (result.requiresEmailConfirmation) {
-          setMessage("Verifică emailul pentru confirmarea contului.");
-        } else {
-          router.replace("/");
-        }
+        router.replace("/");
       }
     } catch (reason) {
       setError(
-        reason instanceof Error
-          ? translateAuthError(reason.message)
-          : "Operațiunea nu a putut fi finalizată.",
+        reason instanceof Error ?
+           translateAuthError(reason.message)
+          : "Autentificarea nu a putut fi finalizată.",
       );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const isLogin = mode === "login";
+  return (
+    <AuthLayout
+      eyebrow="Acces profesional"
+      title="Proprietar restaurant / Administrator"
+      description="Autentificare securizată cu email și parolă pentru administrarea platformei."
+    >
+      <form onSubmit={submit}>
+        <div className="space-y-4">
+          <AuthField
+            label="Email"
+            value={email}
+            onChange={setEmail}
+            type="email"
+            autoComplete="email"
+          />
+          <AuthField
+            label="Parolă"
+            value={password}
+            onChange={setPassword}
+            type="password"
+            autoComplete="current-password"
+          />
+        </div>
+        {error && <Notice text={error} />}
+        <button
+          type="submit"
+          disabled={submitting || !email.trim() || password.length < 6}
+          className="mt-6 w-full rounded-2xl bg-slate-950 px-5 py-4 text-sm font-black text-white disabled:opacity-50"
+        >
+          {submitting ? "Se autentifică..." : "Intră în dashboard"}
+        </button>
+        <Link
+          href="/owner/register"
+          className="mt-3 block rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-center text-sm font-black text-blue-700 transition hover:bg-blue-100"
+        >
+          Creeaz cont restaurant
+        </Link>
+        <p className="mt-5 text-center text-xs leading-5 text-slate-500">
+          Clienții pot accesa meniul și plasa comenzi fără autentificare.
+        </p>
+        <Link
+          href="/"
+          className="mt-3 block text-center text-sm font-black text-blue-600"
+        >
+          Deschide meniul restaurantului
+        </Link>
+      </form>
+    </AuthLayout>
+  );
+}
+
+function ClientRegister() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const profile = getLocalCustomerProfile();
+      setName(profile?.name ?? "");
+      setPhone(profile?.phone ?? "");
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!/^[0-9+\s()-]{8,16}$/.test(phone.trim())) {
+      setError("Introdu un număr de telefon valid.");
+      return;
+    }
+    saveLocalCustomerProfile({
+      name: name.trim(),
+      phone: phone.trim(),
+      email: getLocalCustomerProfile()?.email ?? "",
+      address: getLocalCustomerProfile()?.address ?? "",
+    });
+    router.replace("/cont");
+  };
 
   return (
-    <main className="grid min-h-screen bg-[#f8f5f2] lg:grid-cols-2">
-      <section className="hidden bg-[#171411] p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        <Link href="/" className="text-xl font-black">ALL4HORECA</Link>
+    <AuthLayout
+      eyebrow="Profil client local"
+      title="Finalizare mai rapid?"
+      description="Salvează telefonul și, opțional, numele. Nu este necesar email, parolă sau cod SMS."
+    >
+      <form onSubmit={submit}>
+        <div className="space-y-4">
+          <AuthField
+            label="Telefon"
+            value={phone}
+            onChange={setPhone}
+            type="tel"
+            autoComplete="tel"
+          />
+          <AuthField
+            label="Nume opțional"
+            value={name}
+            onChange={setName}
+            type="text"
+            autoComplete="name"
+            required={false}
+          />
+        </div>
+        {error && <Notice text={error} />}
+        <button
+          type="submit"
+          disabled={phone.trim().length < 8}
+          className="mt-6 w-full rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-4 text-sm font-black text-white disabled:opacity-50"
+        >
+          Salvează profilul client
+        </button>
+        <p className="mt-4 text-center text-[11px] leading-5 text-slate-400">
+          Datele sunt păstrate local și completează automat checkout-ul.
+        </p>
+        {/* TODO: Enable Phone OTP only after the launch SMS provider is configured. */}
+        <Link
+          href="/login"
+          className="mt-4 block text-center text-xs font-black text-slate-600"
+        >
+          Acces owner / administrator
+        </Link>
+      </form>
+    </AuthLayout>
+  );
+}
+
+function AuthLayout({
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <main className="grid min-h-screen bg-slate-50 lg:grid-cols-2">
+      <section className="antoria-gradient hidden p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <Link href="/" className="text-xl font-black">
+          ALL4HORECA
+        </Link>
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-[#ff5a1f]">
-            Platformă HORECA
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+            by ANTORIA
           </p>
           <h1 className="mt-4 max-w-xl text-5xl font-black tracking-[-0.06em]">
-            Comenzi, restaurant și administrare într-un singur loc.
+            Comenzi publice și administrare profesională, fără fluxuri amestecate.
           </h1>
         </div>
-        <p className="text-sm text-white/40">ALL4HORECA · acces securizat</p>
+        <p className="text-sm text-white/40">ALL4HORECA by ANTORIA · acces securizat</p>
       </section>
 
       <section className="grid place-items-center px-5 py-10">
-        <form
-          onSubmit={submit}
-          className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-[0_20px_60px_rgba(26,18,12,0.08)] sm:p-8"
-        >
-          <Link href="/" className="text-lg font-black lg:hidden">ALL4HORECA</Link>
-          <p className="mt-8 text-xs font-black uppercase tracking-[0.16em] text-[#ff5a1f] lg:mt-0">
-            {isLogin ? "Bine ai revenit" : "Cont client"}
+        <div className="antoria-card w-full max-w-md rounded-[2rem] p-6 sm:p-8">
+          <Link href="/" className="text-lg font-black lg:hidden">
+            ALL4HORECA
+          </Link>
+          <p className="mt-8 text-xs font-black uppercase tracking-[0.16em] text-cyan-600 lg:mt-0">
+            {eyebrow}
           </p>
           <h1 className="mt-1 text-3xl font-black tracking-[-0.05em]">
-            {isLogin ? "Autentificare" : "Creează cont"}
+            {title}
           </h1>
-          <p className="mt-2 text-sm leading-6 text-[#7a746e]">
-            {isLogin
-              ? "Accesul se adaptează automat rolului contului."
-              : "Înregistrarea publică creează un cont de client final."}
+          <p className="mb-7 mt-2 text-sm leading-6 text-slate-500">
+            {description}
           </p>
-
-          <div className="mt-7 space-y-4">
-            {!isLogin && (
-              <AuthField
-                label="Nume complet"
-                value={fullName}
-                onChange={setFullName}
-                type="text"
-                autoComplete="name"
-              />
-            )}
-            <AuthField
-              label="Email"
-              value={email}
-              onChange={setEmail}
-              type="email"
-              autoComplete="email"
-            />
-            <AuthField
-              label="Parolă"
-              value={password}
-              onChange={setPassword}
-              type="password"
-              autoComplete={isLogin ? "current-password" : "new-password"}
-            />
-          </div>
-
-          {error && <Notice text={error} tone="error" />}
-          {message && <Notice text={message} tone="success" />}
-
-          <button
-            type="submit"
-            disabled={
-              submitting ||
-              !email.trim() ||
-              password.length < 6 ||
-              (!isLogin && fullName.trim().length < 2)
-            }
-            className="mt-6 w-full rounded-2xl bg-[#ff5a1f] px-5 py-4 text-sm font-black text-white disabled:opacity-50"
-          >
-            {submitting
-              ? "Se procesează..."
-              : isLogin
-                ? "Intră în cont"
-                : "Creează cont"}
-          </button>
-
-          <p className="mt-5 text-center text-sm text-[#7a746e]">
-            {isLogin ? "Nu ai cont?" : "Ai deja cont?"}{" "}
-            <Link
-              href={isLogin ? "/register" : "/login"}
-              className="font-black text-[#ff5a1f]"
-            >
-              {isLogin ? "Înregistrează-te" : "Autentifică-te"}
-            </Link>
-          </p>
-        </form>
+          {children}
+        </div>
       </section>
     </main>
   );
@@ -151,12 +228,14 @@ function AuthField({
   onChange,
   type,
   autoComplete,
+  required = true,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   type: string;
   autoComplete: string;
+  required?: boolean;
 }) {
   return (
     <label className="block">
@@ -166,28 +245,16 @@ function AuthField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         autoComplete={autoComplete}
-        required
-        className="mt-2 w-full rounded-2xl border border-[#e6e0db] bg-[#fcfaf8] px-4 py-3 text-sm outline-none focus:border-[#ff5a1f] focus:ring-4 focus:ring-[#ff5a1f]/10"
+        required={required}
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
       />
     </label>
   );
 }
 
-function Notice({
-  text,
-  tone,
-}: {
-  text: string;
-  tone: "error" | "success";
-}) {
+function Notice({ text }: { text: string }) {
   return (
-    <p
-      className={`mt-4 rounded-xl px-4 py-3 text-sm font-bold ${
-        tone === "error"
-          ? "bg-red-50 text-red-700"
-          : "bg-emerald-50 text-emerald-700"
-      }`}
-    >
+    <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
       {text}
     </p>
   );
@@ -197,11 +264,8 @@ function translateAuthError(message: string) {
   if (message.includes("Invalid login credentials")) {
     return "Email sau parolă incorectă.";
   }
-  if (message.includes("User already registered")) {
-    return "Există deja un cont cu acest email.";
-  }
   if (message.includes("Email not confirmed")) {
-    return "Contul nu este confirmat. Pentru MVP, aplica ultima migrare Supabase.";
+    return "Contul profesional nu este confirmat.";
   }
   return message;
 }

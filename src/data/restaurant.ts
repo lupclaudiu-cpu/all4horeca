@@ -1,10 +1,11 @@
 import type { Category, Product, Restaurant } from "@/lib/types";
+export { formatPrice } from "@/lib/money";
 
 export const restaurant: Restaurant = {
   id: "11111111-1111-4111-8111-111111111111",
   slug: "all4horeca",
-  name: "ALL4HORECA",
-  initials: "A4H",
+  name: "ANTORIA",
+  initials: "AN",
   schedule: "10:00 - 23:30",
   deliveryTime: "25-35 min",
   rating: 4.8,
@@ -56,8 +57,3 @@ export const products: Product[] = [
     price: 22, image: "/products/lava-cake.svg", featured: true, prepTime: "10-15 min",
   },
 ];
-
-export const formatPrice = (price: number) =>
-  new Intl.NumberFormat("ro-RO", {
-    style: "currency", currency: "RON", maximumFractionDigits: 0,
-  }).format(price);

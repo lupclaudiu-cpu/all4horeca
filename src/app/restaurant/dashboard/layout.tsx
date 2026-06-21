@@ -3,7 +3,7 @@ import { DashboardShell } from "@/features/dashboard/dashboard-shell";
 import { requireServerRole } from "@/lib/auth/server-role";
 
 export const metadata: Metadata = {
-  title: { default: "Dashboard Restaurant", template: "%s | Dashboard Restaurant" },
+  title: { default: "Panou restaurant", template: "%s | Panou restaurant" },
   robots: { index: false, follow: false },
 };
 

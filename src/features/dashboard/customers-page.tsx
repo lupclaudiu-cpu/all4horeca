@@ -5,6 +5,7 @@ import { formatPrice } from "@/data/restaurant";
 import { formatDashboardDate } from "@/features/dashboard/dashboard-utils";
 import { DashboardHeader } from "@/features/dashboard/dashboard-header";
 import { useOrders } from "@/features/orders/order-context";
+import { addMoney } from "@/lib/money";
 
 type CustomerSummary = {
   name: string;
@@ -43,7 +44,7 @@ export function CustomersPage() {
           customers.map((customer) => (
             <article
               key={customer.phone}
-              className="rounded-[1.75rem] border border-black/5 bg-white p-5 shadow-[0_10px_30px_rgba(24,18,12,0.04)]"
+              className="rounded-[1.75rem] border border-black/5 bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)]"
             >
               <div className="flex items-center gap-3">
                 <div className="grid size-12 place-items-center rounded-xl bg-violet-50 text-violet-600">
@@ -51,7 +52,7 @@ export function CustomersPage() {
                 </div>
                 <div className="min-w-0">
                   <h2 className="truncate text-base font-black">{customer.name}</h2>
-                  <p className="mt-1 flex items-center gap-1.5 text-xs text-[#8b8580]">
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-[#64748b]">
                     <PhoneIcon className="size-3.5" />
                     {customer.phone}
                   </p>
@@ -67,8 +68,8 @@ export function CustomersPage() {
                   value={formatPrice(customer.totalValue)}
                 />
               </div>
-              <div className="mt-4 border-t border-[#eee9e4] pt-4">
-                <p className="text-[10px] font-black uppercase tracking-wide text-[#8b8580]">
+              <div className="mt-4 border-t border-[#e2e8f0] pt-4">
+                <p className="text-[10px] font-black uppercase tracking-wide text-[#64748b]">
                   Ultima comandă
                 </p>
                 <p className="mt-1 text-xs font-bold">
@@ -82,7 +83,7 @@ export function CustomersPage() {
             <div>
               <UserIcon className="mx-auto size-12 text-[#c5bfb9]" />
               <h2 className="mt-4 text-xl font-black">Nu există clienți încă</h2>
-              <p className="mt-2 text-sm text-[#8b8580]">
+              <p className="mt-2 text-sm text-[#64748b]">
                 Clienții vor apărea după plasarea comenzilor.
               </p>
             </div>
@@ -112,7 +113,9 @@ function aggregateCustomers(
     }
 
     current.orderCount += 1;
-    if (order.status !== "Anulată") current.totalValue += order.total;
+    if (order.status !== "Anulată") {
+      current.totalValue = addMoney(current.totalValue, order.total);
+    }
     if (new Date(order.createdAt) > new Date(current.lastOrder)) {
       current.lastOrder = order.createdAt;
       current.name = order.customer.name;
@@ -126,8 +129,8 @@ function aggregateCustomers(
 
 function CustomerMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-[#f8f5f2] p-3">
-      <p className="text-[10px] font-bold text-[#8b8580]">{label}</p>
+    <div className="rounded-xl bg-[#f8fafc] p-3">
+      <p className="text-[10px] font-bold text-[#64748b]">{label}</p>
       <p className="mt-1 text-sm font-black">{value}</p>
     </div>
   );

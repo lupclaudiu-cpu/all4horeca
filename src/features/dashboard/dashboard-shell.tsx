@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import {
+  ChartIcon,
   DashboardIcon,
   HistoryIcon,
   LogoutIcon,
@@ -12,24 +12,24 @@ import {
   SettingsIcon,
   UserIcon,
 } from "@/components/icons";
-import { restaurant } from "@/data/restaurant";
 import { useRestaurantSettings } from "@/features/settings/settings-context";
 import { useAuth } from "@/features/auth/auth-context";
 import { useRouter } from "next/navigation";
 import { useOrders } from "@/features/orders/order-context";
 import { NewOrderToast } from "@/features/dashboard/new-order-toast";
-import {
-  getRestaurantPresence,
-  type RestaurantPresence,
-} from "@/services/commercial-service";
+import { useRestaurant } from "@/features/restaurant/restaurant-context";
+import { AntoriaBrand } from "@/components/antoria-brand";
 
 const navigation = [
-  { href: "/restaurant/dashboard", label: "Overview", icon: DashboardIcon },
+  { href: "/restaurant/dashboard", label: "Prezentare", icon: DashboardIcon },
   { href: "/restaurant/dashboard/comenzi", label: "Comenzi live", icon: OrdersIcon },
   { href: "/restaurant/dashboard/istoric", label: "Istoric", icon: HistoryIcon },
+  { href: "/restaurant/dashboard/rapoarte", label: "Rapoarte", icon: ChartIcon },
   { href: "/restaurant/dashboard/clienti", label: "Clienți", icon: UserIcon },
   { href: "/restaurant/dashboard/categorii", label: "Categorii", icon: ProductsIcon },
   { href: "/restaurant/dashboard/produse", label: "Produse", icon: ProductsIcon },
+  { href: "/restaurant/dashboard/promotii", label: "Promoții", icon: ProductsIcon },
+  { href: "/restaurant/dashboard/notificari", label: "Notificări", icon: OrdersIcon },
   { href: "/restaurant/dashboard/prezenta", label: "QR & SEO", icon: SettingsIcon },
   { href: "/restaurant/dashboard/setari", label: "Setări", icon: SettingsIcon },
 ];
@@ -39,17 +39,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { settings, restaurantOpen } = useRestaurantSettings();
   const { profile, signOut } = useAuth();
-  const [presence, setPresence] = useState<RestaurantPresence | null>(null);
+  const { currentRestaurant } = useRestaurant();
   const { orders, realtimeConnected } = useOrders();
   const newOrdersCount = orders.filter((order) => order.status === "Nouă").length;
 
-  useEffect(() => {
-    if (!profile?.restaurantId) return;
-    void getRestaurantPresence(profile.restaurantId).then(setPresence);
-  }, [profile?.restaurantId]);
-
-  const restaurantName = presence?.name || restaurant.name;
+  const restaurantName = currentRestaurant?.name || "ALL4HORECA";
   const restaurantInitials = restaurantName.slice(0, 2).toUpperCase();
+  const accessLocked = currentRestaurant?.accessLocked;
+  const navigationHref = (href: string) =>
+    profile?.role === "super_admin" && currentRestaurant
+      ? `${href}?restaurant=${currentRestaurant.id}`
+      : href;
 
   const logout = async () => {
     await signOut();
@@ -57,18 +57,21 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f4f2] text-[#171411] lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="hidden min-h-screen border-r border-black/5 bg-[#171411] p-5 text-white lg:sticky lg:top-0 lg:block lg:h-screen">
-        <div className="flex items-center gap-3 px-2 py-3">
-          <div className="grid size-11 place-items-center rounded-xl bg-[#ff5a1f] text-sm font-black">
+    <div className="min-h-screen bg-slate-50 text-slate-900 lg:grid lg:grid-cols-[272px_1fr]">
+      <aside className="antoria-gradient relative hidden min-h-screen flex-col overflow-y-auto border-r border-white/5 p-5 text-white lg:sticky lg:top-0 lg:flex lg:h-screen">
+        <div className="border-b border-white/10 px-2 pb-6 pt-2">
+          <AntoriaBrand inverse />
+        </div>
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur">
+          <div className="grid size-11 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 text-sm font-black shadow-lg shadow-blue-950/30">
             {restaurantInitials}
           </div>
           <div>
             <p className="text-sm font-black">{restaurantName}</p>
-            <p className="mt-1 text-[11px] text-white/50">Restaurant dashboard</p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-cyan-100/60">Panou de control</p>
           </div>
         </div>
-        <nav className="mt-8 space-y-2">
+        <nav className="mt-6 flex-1 space-y-1.5 pb-4">
           {navigation.map((item) => {
             const active =
               item.href === "/restaurant/dashboard"
@@ -78,11 +81,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             return (
               <Link
                 key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition ${
-                  active
-                    ? "bg-[#ff5a1f] text-white"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
+                href={navigationHref(item.href)}
+                className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-bold transition ${
+                  active ?
+                     "bg-white text-slate-950 shadow-xl shadow-blue-950/20"
+                    : "text-slate-300 hover:bg-white/8 hover:text-white"
                 }`}
               >
                 <Icon className="size-5" />
@@ -99,7 +102,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <button
           type="button"
           onClick={() => void logout()}
-          className="absolute bottom-6 left-5 right-5 flex items-center gap-3 rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-white/60 transition hover:bg-white/5 hover:text-white"
+          className="mt-3 flex shrink-0 items-center gap-3 rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-white/60 transition hover:bg-white/5 hover:text-white"
         >
           <LogoutIcon className="size-5" />
           Ieșire din cont
@@ -107,18 +110,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-black/5 bg-white/90 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 py-3 shadow-sm backdrop-blur-2xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-xl bg-[#171411] text-xs font-black text-white lg:hidden">
-              {restaurantInitials}
-            </div>
+            <div className="lg:hidden"><AntoriaBrand compact /></div>
             <div>
               <p className="text-sm font-black">{restaurantName}</p>
-              <p className="text-[11px] text-[#8b8580]">
+              <p className="text-[11px] text-[#64748b]">
                 <span className={`mr-1 inline-block size-2 rounded-full ${restaurantOpen ? "bg-emerald-500" : "bg-red-500"}`} />
                 Restaurant {restaurantOpen ? "deschis" : "închis"} · {settings.openingTime}-{settings.closingTime}
               </p>
-              <p className="mt-0.5 text-[10px] text-[#aaa39d]">
+              <p className="mt-0.5 text-[10px] text-[#94a3b8]">
                 {profile?.fullName || profile?.email}
                 <span
                   className={`ml-2 inline-block size-1.5 rounded-full ${
@@ -130,18 +131,25 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <Link
-            href={presence?.publicUrl || "/"}
-            className="rounded-xl bg-[#f3f0ed] px-3 py-2 text-xs font-black text-[#5e5852]"
+            href={
+              currentRestaurant ? `/clienti/${currentRestaurant.slug}` : "/admin"
+            }
+            className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-black text-blue-700 transition hover:bg-blue-100"
           >
             Aplicație
           </Link>
         </header>
 
         <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-8">
+          {accessLocked && (
+            <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-bold text-amber-800">
+              Perioada gratuit a expirat. Contacteaz ANTORIA pentru activarea contului.
+            </div>
+          )}
           {children}
         </main>
 
-        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-black/5 bg-white/95 px-1 pt-2 backdrop-blur-xl lg:hidden">
+        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-slate-200/80 bg-white/90 px-1 pt-2 shadow-[0_-12px_35px_rgba(15,23,42,.06)] backdrop-blur-2xl lg:hidden">
           {navigation.map((item) => {
             const active =
               item.href === "/restaurant/dashboard"
@@ -151,9 +159,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={navigationHref(item.href)}
                 className={`flex min-w-[76px] flex-1 flex-col items-center gap-1 py-2 text-[10px] font-bold ${
-                  active ? "text-[#ff5a1f]" : "text-[#8b8580]"
+                  active ? "text-blue-600" : "text-slate-400"
                 }`}
               >
                 <Icon className="size-5" />

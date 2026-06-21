@@ -40,5 +40,5 @@ export default async function RestaurantSlugDashboardRoute({
   ) {
     redirect("/403");
   }
-  redirect("/restaurant/dashboard");
+  redirect(`/restaurant/dashboard?restaurant=${restaurant.id}`);
 }

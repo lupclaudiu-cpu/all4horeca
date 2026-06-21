@@ -1,6 +1,5 @@
-import { RestaurantHeader } from "@/components/layout/restaurant-header";
-import { MenuPage } from "@/components/menu-page";
+import { AntoriaHomePage } from "@/features/public-restaurant/antoria-home-page";
 
 export default function Home() {
-  return <><RestaurantHeader /><MenuPage /></>;
+  return <AntoriaHomePage />;
 }

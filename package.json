@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "build:netlify": "next build --webpack",
+    "vapid:generate": "node scripts/generate-vapid-keys.mjs",
     "start": "next start",
     "lint": "eslint"
   },

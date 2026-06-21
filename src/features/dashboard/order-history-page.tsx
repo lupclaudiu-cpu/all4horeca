@@ -8,6 +8,7 @@ import {
 } from "@/features/dashboard/dashboard-utils";
 import { DashboardHeader } from "@/features/dashboard/dashboard-header";
 import { useOrders } from "@/features/orders/order-context";
+import { sumMoney } from "@/lib/money";
 
 type Period = "today" | "week" | "month" | "all";
 
@@ -24,9 +25,11 @@ export function OrderHistoryPage() {
   const filteredOrders = orders.filter((order) =>
     isInsidePeriod(order.createdAt, period),
   );
-  const filteredTotal = filteredOrders
-    .filter((order) => order.status !== "Anulată")
-    .reduce((sum, order) => sum + order.total, 0);
+  const filteredTotal = sumMoney(
+    filteredOrders
+      .filter((order) => order.status !== "Anulată")
+      .map((order) => order.total),
+  );
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -43,9 +46,9 @@ export function OrderHistoryPage() {
               key={filter.id}
               onClick={() => setPeriod(filter.id)}
               className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-black transition ${
-                period === filter.id
-                  ? "bg-[#171411] text-white"
-                  : "bg-[#f5f2ef] text-[#6f6862]"
+                period === filter.id ?
+                   "bg-[#0f172a] text-white"
+                  : "bg-[#f1f5f9] text-[#64748b]"
               }`}
             >
               {filter.label}
@@ -53,17 +56,17 @@ export function OrderHistoryPage() {
           ))}
         </div>
         <div className="flex items-center justify-between gap-6 text-xs">
-          <span className="font-bold text-[#8b8580]">
+          <span className="font-bold text-[#64748b]">
             {filteredOrders.length} comenzi
           </span>
-          <span className="text-base font-black text-[#ff5a1f]">
+          <span className="text-base font-black text-[#2563eb]">
             {formatPrice(filteredTotal)}
           </span>
         </div>
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-[0_10px_30px_rgba(24,18,12,0.04)]">
-        <div className="hidden grid-cols-[1.1fr_1fr_1.2fr_.7fr_.7fr] gap-4 border-b border-[#eee9e4] bg-[#fcfaf8] px-5 py-4 text-[10px] font-black uppercase tracking-wide text-[#8b8580] md:grid">
+      <div className="mt-5 overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+        <div className="hidden grid-cols-[1.1fr_1fr_1.2fr_.7fr_.7fr] gap-4 border-b border-[#e2e8f0] bg-[#f8fafc] px-5 py-4 text-[10px] font-black uppercase tracking-wide text-[#64748b] md:grid">
           <span>Comandă</span>
           <span>Client</span>
           <span>Produse</span>
@@ -71,9 +74,9 @@ export function OrderHistoryPage() {
           <span className="text-right">Total</span>
         </div>
         {!hydrated ? (
-          <div className="h-64 animate-pulse bg-[#f8f5f2]" />
+          <div className="h-64 animate-pulse bg-[#f8fafc]" />
         ) : filteredOrders.length ? (
-          <div className="divide-y divide-[#eee9e4]">
+          <div className="divide-y divide-[#e2e8f0]">
             {filteredOrders.map((order) => (
               <div
                 key={order.id}
@@ -81,17 +84,17 @@ export function OrderHistoryPage() {
               >
                 <div>
                   <p className="text-sm font-black">{order.orderNumber}</p>
-                  <p className="mt-1 text-[11px] text-[#8b8580]">
+                  <p className="mt-1 text-[11px] text-[#64748b]">
                     {formatDashboardDate(order.createdAt)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm font-bold">{order.customer.name}</p>
-                  <p className="mt-1 text-[11px] text-[#8b8580]">
+                  <p className="mt-1 text-[11px] text-[#64748b]">
                     {order.customer.phone}
                   </p>
                 </div>
-                <p className="text-xs leading-5 text-[#6f6862]">
+                <p className="text-xs leading-5 text-[#64748b]">
                   {order.items
                     .map((item) => `${item.quantity}× ${item.name}`)
                     .join(", ")}
@@ -103,14 +106,14 @@ export function OrderHistoryPage() {
                     {order.status}
                   </span>
                 </div>
-                <p className="text-lg font-black text-[#ff5a1f] md:text-right">
+                <p className="text-lg font-black text-[#2563eb] md:text-right">
                   {formatPrice(order.total)}
                 </p>
               </div>
             ))}
           </div>
         ) : (
-          <div className="px-5 py-20 text-center text-sm font-bold text-[#8b8580]">
+          <div className="px-5 py-20 text-center text-sm font-bold text-[#64748b]">
             Nu există comenzi în perioada selectată.
           </div>
         )}

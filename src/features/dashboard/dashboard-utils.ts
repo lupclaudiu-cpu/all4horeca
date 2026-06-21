@@ -1,4 +1,5 @@
 import type { Order, OrderStatus } from "@/lib/types";
+import { fromCents, sumMoney, toCents } from "@/lib/money";
 
 export const activeStatuses: OrderStatus[] = [
   "Nouă",
@@ -8,12 +9,12 @@ export const activeStatuses: OrderStatus[] = [
 ];
 
 export const statusStyles: Record<OrderStatus, string> = {
-  "Nouă": "bg-orange-100 text-orange-700",
-  "Acceptată": "bg-blue-100 text-blue-700",
-  "În preparare": "bg-amber-100 text-amber-700",
-  "În livrare": "bg-violet-100 text-violet-700",
-  "Finalizată": "bg-emerald-100 text-emerald-700",
-  "Anulată": "bg-red-100 text-red-700",
+  "Nouă": "bg-red-100 text-red-700 ring-1 ring-red-200",
+  "Acceptată": "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
+  "În preparare": "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
+  "În livrare": "bg-blue-100 text-blue-700 ring-1 ring-blue-200",
+  "Finalizată": "bg-teal-100 text-teal-700 ring-1 ring-teal-200",
+  "Anulată": "bg-slate-200 text-slate-700 ring-1 ring-slate-300",
 };
 
 export const isToday = (value: string) => {
@@ -59,7 +60,7 @@ export const formatOrderTimer = (value: string, now = Date.now()) => {
 
 export const calculateOrderMetrics = (orders: Order[]) => {
   const completed = orders.filter((order) => order.status !== "Anulată");
-  const totalSales = completed.reduce((sum, order) => sum + order.total, 0);
+  const totalSales = sumMoney(completed.map((order) => order.total));
   const productTotals = new Map<string, number>();
 
   completed.forEach((order) => {
@@ -78,7 +79,9 @@ export const calculateOrderMetrics = (orders: Order[]) => {
   return {
     totalSales,
     orderCount: orders.length,
-    averageOrder: completed.length ? totalSales / completed.length : 0,
+    averageOrder: completed.length ?
+       fromCents(Math.round(toCents(totalSales) / completed.length))
+      : 0,
     topProducts,
   };
 };

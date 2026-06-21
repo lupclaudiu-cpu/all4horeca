@@ -31,10 +31,28 @@ export type Product = {
   optionGroups?: ProductOptionGroup[];
 };
 
+export type ScheduleDay = {
+  day: number;
+  enabled: boolean;
+  openingTime: string;
+  closingTime: string;
+};
+
+export type DeliveryZone = {
+  id: string;
+  restaurantId?: string;
+  name: string;
+  areas: string[];
+  deliveryFee: number;
+  active: boolean;
+  sortOrder: number;
+};
+
 export type ProductOption = {
   id: string;
   name: string;
   priceDelta: number;
+  multiplyByProductQuantity: boolean;
   active: boolean;
   sortOrder: number;
 };
@@ -55,6 +73,8 @@ export type SelectedProductOption = {
   optionId: string;
   optionName: string;
   priceDelta: number;
+  quantity: number;
+  multiplyByProductQuantity: boolean;
 };
 
 export type Restaurant = {
@@ -65,6 +85,25 @@ export type Restaurant = {
   schedule: string;
   deliveryTime: string;
   rating: number;
+};
+
+export type CurrentRestaurant = {
+  id: string;
+  slug: string;
+  name: string;
+  logoUrl: string | null;
+  primaryColor: string;
+  secondaryColor: string;
+  address: string;
+  phone: string;
+  isActive: boolean;
+  status: "trial" | "active" | "suspended" | "deleted";
+  trialActive: boolean;
+  trialStartedAt: string | null;
+  trialExpiresAt: string | null;
+  contractSigned: boolean;
+  trialExpired: boolean;
+  accessLocked: boolean;
 };
 
 export type CartItem = {
@@ -118,6 +157,7 @@ export type OrderItem = {
   image: string;
   unitPrice: number;
   quantity: number;
+  lineTotal: number;
   selectedOptions: SelectedProductOption[];
 };
 
@@ -135,6 +175,11 @@ export type Order = {
   orderType: OrderType;
   tracking?: DeliveryTracking;
   status: OrderStatus;
+  estimatedMinutes: number | null;
+  acceptedAt: string | null;
+  preparationStartedAt: string | null;
+  deliveryStartedAt: string | null;
+  completedAt: string | null;
 };
 
 export type CreateOrderInput = {
@@ -153,6 +198,11 @@ export type RestaurantSettings = {
   acceptsCard: boolean;
   deliveryFee: number;
   freeDeliveryThreshold: number;
+  minimumOrderValue: number;
+  estimatedDeliveryTime: string;
+  blockOrdersOutsideSchedule: boolean;
+  schedule: ScheduleDay[];
+  deliveryZones: DeliveryZone[];
   openingTime: string;
   closingTime: string;
   notificationsEnabled: boolean;
@@ -187,6 +237,18 @@ export type AdminRestaurant = {
   isActive: boolean;
   createdAt: string;
   orderCount: number;
+  totalRevenue?: number;
+  companyName?: string;
+  vatCui?: string;
+  city?: string;
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  status?: "trial" | "active" | "suspended" | "deleted";
+  trialActive?: boolean;
+  trialStartedAt?: string | null;
+  trialExpiresAt?: string | null;
+  contractSigned?: boolean;
 };
 
 export type AdminRestaurantDetails = AdminRestaurant & {
@@ -258,6 +320,19 @@ export type RestaurantOnboardingInput = {
   ownerPassword: string;
 };
 
+export type OwnerSelfRegistrationInput = {
+  contactName: string;
+  phone: string;
+  email: string;
+  restaurantName: string;
+  companyName: string;
+  vatCui: string;
+  city: string;
+  address: string;
+  password: string;
+  confirmPassword: string;
+};
+
 export type ProductInput = {
   name: string;
   description: string;
@@ -277,3 +352,32 @@ export type ProductInput = {
   imageUrl?: string;
   recommendationIds: string[];
 };
+
+export const PROMOTION_TYPES = [
+  "first_order",
+  "loyalty",
+  "product_discount",
+  "happy_hour",
+  "custom",
+] as const;
+
+export type PromotionType = (typeof PROMOTION_TYPES)[number];
+
+export type Promotion = {
+  id: string;
+  restaurantId: string;
+  name: string;
+  description: string;
+  type: PromotionType;
+  discountPercent: number;
+  triggerOrderNumber: number | null;
+  startsAt: string | null;
+  endsAt: string | null;
+  validFrom: string | null;
+  validUntil: string | null;
+  active: boolean;
+  sortOrder: number;
+  productIds: string[];
+};
+
+export type PromotionInput = Omit<Promotion, "id" | "restaurantId">;

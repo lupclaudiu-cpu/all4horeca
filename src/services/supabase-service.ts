@@ -1,5 +1,3 @@
-import { categories as mockCategories, products as mockProducts } from "@/data/restaurant";
-import { restaurant } from "@/data/restaurant";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type {
   Category,
@@ -11,6 +9,8 @@ import type {
   ProductOptionGroup,
   SelectedProductOption,
 } from "@/lib/types";
+import { calculateCartItemTotal } from "@/lib/cart-pricing";
+import { addMoney, sumMoney } from "@/lib/money";
 
 type ProductRow = {
   id: string;
@@ -44,6 +44,7 @@ type ProductRow = {
       id: string;
       name: string;
       price_delta: number | string;
+      multiply_by_product_quantity: boolean;
       active: boolean;
       sort_order: number;
     }>;
@@ -60,6 +61,11 @@ type OrderRow = {
   notes: string;
   status: OrderStatus;
   created_at: string;
+  estimated_minutes: number | null;
+  accepted_at: string | null;
+  preparation_started_at: string | null;
+  delivery_started_at: string | null;
+  completed_at: string | null;
   customers: {
     id: string;
     name: string;
@@ -79,6 +85,8 @@ type OrderRow = {
       group_name: string;
       option_name: string;
       price_delta: number | string;
+      quantity: number;
+      multiply_by_product_quantity: boolean;
     }>;
   }>;
 };
@@ -94,8 +102,22 @@ export type CustomerRecord = {
 export type ProductCatalog = {
   products: Product[];
   categories: Category[];
-  source: "supabase" | "mock";
+  source: "supabase";
 };
+
+function debugSupabaseRequest(payload: Record<string, unknown>) {
+  if (
+    process.env.NODE_ENV !== "development" ||
+    typeof window === "undefined"
+  ) {
+    return;
+  }
+  console.info("[DEBUG]", {
+    provider: "SupabaseService",
+    ...payload,
+    updatedAt: new Date().toISOString(),
+  });
+}
 
 const categoryIcon = (name: string) => {
   const normalized = name.toLocaleLowerCase("ro-RO");
@@ -108,22 +130,35 @@ const categoryIcon = (name: string) => {
 };
 
 export async function getProducts(
-  restaurantId = restaurant.id,
+  restaurantId: string,
 ): Promise<ProductCatalog> {
   const supabase = getSupabaseClient();
-  if (!supabase) {
-    return {
-      products: mockProducts,
-      categories: mockCategories,
-      source: "mock",
-    };
-  }
+  if (!supabase) throw new Error("Supabase nu este configurat.");
+
+  debugSupabaseRequest({
+    query: "getProducts:start",
+    step: "restaurant-id-received",
+    restaurantId,
+    loading: true,
+    queryStarted: false,
+    queryFinished: false,
+    queryError: null,
+  });
+
+  debugSupabaseRequest({
+    query: "getProducts:query-start",
+    restaurantId,
+    loading: true,
+    queryStarted: true,
+    queryFinished: false,
+    queryError: null,
+  });
 
   const [productsResult, categoriesResult] = await Promise.all([
     supabase
     .from("products")
     .select(
-      "id, restaurant_id, category_id, name, description, image_url, price, active, sold_out, weight, ingredients, allergens, prep_time, vat_rate, is_recommended, is_bestseller, is_new, sort_order, categories(id, name, sort_order), product_recommendations!product_recommendations_product_id_fkey(recommended_product_id), product_option_groups(id, name, selection_type, required, active, sort_order, product_options(id, name, price_delta, active, sort_order))",
+      "id, restaurant_id, category_id, name, description, image_url, price, active, sold_out, weight, ingredients, allergens, prep_time, vat_rate, is_recommended, is_bestseller, is_new, sort_order, categories(id, name, sort_order), product_recommendations!product_recommendations_product_id_fkey(recommended_product_id), product_option_groups(id, name, selection_type, required, active, sort_order, product_options(id, name, price_delta, multiply_by_product_quantity, active, sort_order))",
     )
     .eq("restaurant_id", restaurantId)
     .order("sort_order", { ascending: true }),
@@ -133,6 +168,29 @@ export async function getProducts(
       .eq("restaurant_id", restaurantId)
       .order("sort_order"),
   ]);
+
+  if (productsResult.error) {
+    debugSupabaseRequest({
+      query: "getProducts:products-error",
+      restaurantId,
+      loading: false,
+      error: productsResult.error.message,
+      queryStarted: true,
+      queryFinished: true,
+      queryError: productsResult.error.message,
+    });
+  }
+  if (categoriesResult.error) {
+    debugSupabaseRequest({
+      query: "getProducts:categories-error",
+      restaurantId,
+      loading: false,
+      error: categoriesResult.error.message,
+      queryStarted: true,
+      queryFinished: true,
+      queryError: categoriesResult.error.message,
+    });
+  }
 
   if (productsResult.error) throw new Error(`Produsele nu au putut fi încărcate: ${productsResult.error.message}`);
   if (categoriesResult.error) throw new Error(`Categoriile nu au putut fi încărcate: ${categoriesResult.error.message}`);
@@ -187,11 +245,25 @@ export async function getProducts(
             id: option.id,
             name: option.name,
             priceDelta: Number(option.price_delta),
+            multiplyByProductQuantity: option.multiply_by_product_quantity,
             active: option.active,
             sortOrder: option.sort_order,
           })),
       })),
   }));
+
+  debugSupabaseRequest({
+    query: "getProducts:success",
+    restaurantId,
+    loading: false,
+    productsCount: products.length,
+    categoriesCount: categories.length,
+    productsReturned: products.length,
+    queryStarted: true,
+    queryFinished: true,
+    queryError: null,
+    error: null,
+  });
 
   return { products, categories, source: "supabase" };
 }
@@ -200,19 +272,16 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
   const supabase = getSupabaseClient();
   if (!supabase) return createMemoryOrder(input);
 
-  const subtotal = input.items.reduce(
-    (sum, item) => sum + item.unitPrice * item.quantity,
-    0,
-  );
+  const subtotal = sumMoney(input.items.map(calculateCartItemTotal));
   const orderNumber = createOrderNumber();
   const payload = {
     restaurant_id: input.restaurantId,
     order_number: orderNumber,
-    total: subtotal + input.deliveryFee,
+    total: addMoney(subtotal, input.deliveryFee),
     payment_method: input.paymentMethod,
     delivery_address:
-      input.orderType === "pickup"
-        ? "Ridicare din locație"
+      input.orderType === "pickup" ?
+         "Ridicare din locație"
         : input.customer.address,
     notes: input.customer.notes,
     customer: {
@@ -225,13 +294,15 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
       product_name: item.product.name,
       quantity: item.quantity,
       unit_price: item.unitPrice,
-      line_total: item.unitPrice * item.quantity,
+      line_total: calculateCartItemTotal(item),
       options: item.selectedOptions.map((option) => ({
         group_id: option.groupId,
         group_name: option.groupName,
         option_id: option.optionId,
         option_name: option.optionName,
         price_delta: option.priceDelta,
+        quantity: option.quantity,
+        multiply_by_product_quantity: option.multiplyByProductQuantity,
       })),
     })),
   };
@@ -254,34 +325,65 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
       image: item.product.image,
       unitPrice: item.unitPrice,
       quantity: item.quantity,
+      lineTotal: calculateCartItemTotal(item),
       selectedOptions: item.selectedOptions,
     })),
     subtotal,
     deliveryFee: input.deliveryFee,
-    total: subtotal + input.deliveryFee,
+    total: addMoney(subtotal, input.deliveryFee),
     paymentMethod: input.paymentMethod,
     orderType: input.orderType,
     status: "Nouă",
+    estimatedMinutes: null,
+    acceptedAt: null,
+    preparationStartedAt: null,
+    deliveryStartedAt: null,
+    completedAt: null,
   };
 }
 
 export async function getOrders(
-  restaurantId = restaurant.id,
+  restaurantId: string,
 ): Promise<Order[]> {
   const supabase = getSupabaseClient();
-  if (!supabase) return memoryOrders;
+  if (!supabase) {
+    return memoryOrders.filter((order) => order.restaurantId === restaurantId);
+  }
+
+  debugSupabaseRequest({
+    query: "getOrders:start",
+    restaurantId,
+    loading: true,
+  });
 
   const { data, error } = await supabase
     .from("orders")
     .select(
-      "id, restaurant_id, order_number, total, payment_method, delivery_address, notes, status, created_at, customers(id, name, phone, email), order_items(product_id, product_name, quantity, unit_price, line_total, products(image_url), order_item_options(option_group_id, option_id, group_name, option_name, price_delta))",
+      "id, restaurant_id, order_number, total, payment_method, delivery_address, notes, status, created_at, estimated_minutes, accepted_at, preparation_started_at, delivery_started_at, completed_at, customers(id, name, phone, email), order_items(product_id, product_name, quantity, unit_price, line_total, products(image_url), order_item_options(option_group_id, option_id, group_name, option_name, price_delta, quantity, multiply_by_product_quantity))",
     )
     .eq("restaurant_id", restaurantId)
     .order("created_at", { ascending: false });
 
+  if (error) {
+    debugSupabaseRequest({
+      query: "getOrders:error",
+      restaurantId,
+      loading: false,
+      error: error.message,
+    });
+  }
+
   if (error) throw new Error(`Comenzile nu au putut fi încărcate: ${error.message}`);
 
-  return ((data ?? []) as unknown as OrderRow[]).map(mapOrderRow);
+  const orders = ((data ?? []) as unknown as OrderRow[]).map(mapOrderRow);
+  debugSupabaseRequest({
+    query: "getOrders:success",
+    restaurantId,
+    loading: false,
+    ordersCount: orders.length,
+    error: null,
+  });
+  return orders;
 }
 
 export async function getOrderById(orderId: string): Promise<Order> {
@@ -295,7 +397,7 @@ export async function getOrderById(orderId: string): Promise<Order> {
   const { data, error } = await supabase
     .from("orders")
     .select(
-      "id, restaurant_id, order_number, total, payment_method, delivery_address, notes, status, created_at, customers(id, name, phone, email), order_items(product_id, product_name, quantity, unit_price, line_total, products(image_url), order_item_options(option_group_id, option_id, group_name, option_name, price_delta))",
+      "id, restaurant_id, order_number, total, payment_method, delivery_address, notes, status, created_at, estimated_minutes, accepted_at, preparation_started_at, delivery_started_at, completed_at, customers(id, name, phone, email), order_items(product_id, product_name, quantity, unit_price, line_total, products(image_url), order_item_options(option_group_id, option_id, group_name, option_name, price_delta, quantity, multiply_by_product_quantity))",
     )
     .eq("id", orderId)
     .single();
@@ -309,12 +411,12 @@ export async function getOrderById(orderId: string): Promise<Order> {
 export function subscribeToOrders({
   restaurantId,
   onNewOrder,
-  onStatusChange,
+  onOrderUpdated,
   onConnectionChange,
 }: {
   restaurantId: string;
   onNewOrder: (order: Order) => void;
-  onStatusChange: (orderId: string, status: OrderStatus) => void;
+  onOrderUpdated: (order: Order) => void;
   onConnectionChange?: (connected: boolean) => void;
 }) {
   const supabase = getSupabaseClient();
@@ -344,10 +446,9 @@ export function subscribeToOrders({
         filter: `restaurant_id=eq.${restaurantId}`,
       },
       (payload) => {
-        onStatusChange(
-          String(payload.new.order_id),
-          payload.new.new_status as OrderStatus,
-        );
+        void getOrderById(String(payload.new.order_id))
+          .then(onOrderUpdated)
+          .catch(() => undefined);
       },
     )
     .subscribe((status) => {
@@ -362,21 +463,48 @@ export function subscribeToOrders({
 export async function updateOrderStatus(
   orderId: string,
   status: OrderStatus,
-): Promise<void> {
+  estimatedMinutes?: number,
+): Promise<Order> {
   const supabase = getSupabaseClient();
   if (!supabase) {
-    memoryOrders = memoryOrders.map((order) =>
-      order.id === orderId ? { ...order, status } : order,
-    );
-    return;
+    const now = new Date().toISOString();
+    let updatedOrder: Order | undefined;
+    memoryOrders = memoryOrders.map((order) => {
+      if (order.id !== orderId) return order;
+      updatedOrder = {
+        ...order,
+        status,
+        estimatedMinutes:
+          status === "Acceptată" ?
+             (estimatedMinutes ?? order.estimatedMinutes)
+            : order.estimatedMinutes,
+        acceptedAt:
+          status === "Acceptată" ? order.acceptedAt ?? now : order.acceptedAt,
+        preparationStartedAt:
+          status === "În preparare" ?
+             order.preparationStartedAt ?? now
+            : order.preparationStartedAt,
+        deliveryStartedAt:
+          status === "În livrare" ?
+             order.deliveryStartedAt ?? now
+            : order.deliveryStartedAt,
+        completedAt:
+          status === "Finalizată" ? order.completedAt ?? now : order.completedAt,
+      };
+      return updatedOrder;
+    });
+    if (!updatedOrder) throw new Error("Comanda nu a fost găsită.");
+    return updatedOrder;
   }
 
-  const { error } = await supabase
-    .from("orders")
-    .update({ status })
-    .eq("id", orderId);
+  const { error } = await supabase.rpc("transition_order_status", {
+    order_id_input: orderId,
+    status_input: status,
+    estimated_minutes_input: estimatedMinutes ?? null,
+  });
 
   if (error) throw new Error(`Statusul nu a putut fi actualizat: ${error.message}`);
+  return getOrderById(orderId);
 }
 
 export async function getCustomers(): Promise<CustomerRecord[]> {
@@ -441,6 +569,7 @@ function mapOrderRow(row: OrderRow): Order {
     image: item.products?.image_url || "/products/burger-classic.svg",
     unitPrice: Number(item.unit_price),
     quantity: item.quantity,
+    lineTotal: Number(item.line_total),
     selectedOptions: item.order_item_options.map<SelectedProductOption>(
       (option) => ({
         groupId: option.option_group_id || option.group_name,
@@ -448,13 +577,13 @@ function mapOrderRow(row: OrderRow): Order {
         optionId: option.option_id || option.option_name,
         optionName: option.option_name,
         priceDelta: Number(option.price_delta),
+        quantity: option.quantity ?? 1,
+        multiplyByProductQuantity:
+          option.multiply_by_product_quantity ?? false,
       }),
     ),
   }));
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.unitPrice * item.quantity,
-    0,
-  );
+  const subtotal = sumMoney(items.map((item) => item.lineTotal));
 
   return {
     id: row.id,
@@ -470,26 +599,28 @@ function mapOrderRow(row: OrderRow): Order {
     },
     items,
     subtotal,
-    deliveryFee: Math.max(0, Number(row.total) - subtotal),
+    deliveryFee: Math.max(0, addMoney(Number(row.total), -subtotal)),
     total: Number(row.total),
     paymentMethod: row.payment_method,
     orderType,
     status: row.status,
+    estimatedMinutes: row.estimated_minutes,
+    acceptedAt: row.accepted_at,
+    preparationStartedAt: row.preparation_started_at,
+    deliveryStartedAt: row.delivery_started_at,
+    completedAt: row.completed_at,
   };
 }
 
 function createOrderNumber() {
   const datePart = new Date().toISOString().slice(2, 10).replaceAll("-", "");
-  return `A4H-${datePart}-${Math.floor(1000 + Math.random() * 9000)}`;
+  return `ANT-${datePart}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
 let memoryOrders: Order[] = [];
 
 function createMemoryOrder(input: CreateOrderInput) {
-  const subtotal = input.items.reduce(
-    (sum, item) => sum + item.unitPrice * item.quantity,
-    0,
-  );
+  const subtotal = sumMoney(input.items.map(calculateCartItemTotal));
   const order: Order = {
     id: crypto.randomUUID(),
     orderNumber: createOrderNumber(),
@@ -502,14 +633,20 @@ function createMemoryOrder(input: CreateOrderInput) {
       image: item.product.image,
       unitPrice: item.unitPrice,
       quantity: item.quantity,
+      lineTotal: calculateCartItemTotal(item),
       selectedOptions: item.selectedOptions,
     })),
     subtotal,
     deliveryFee: input.deliveryFee,
-    total: subtotal + input.deliveryFee,
+    total: addMoney(subtotal, input.deliveryFee),
     paymentMethod: input.paymentMethod,
     orderType: input.orderType,
     status: "Nouă",
+    estimatedMinutes: null,
+    acceptedAt: null,
+    preparationStartedAt: null,
+    deliveryStartedAt: null,
+    completedAt: null,
   };
   memoryOrders = [order, ...memoryOrders];
   return order;

@@ -6,9 +6,13 @@ import {
 import type { CreateOrderInput, Order, OrderStatus } from "@/lib/types";
 
 export interface OrderRepository {
-  list(restaurantId?: string): Promise<Order[]>;
+  list(restaurantId: string): Promise<Order[]>;
   create(input: CreateOrderInput): Promise<Order>;
-  updateStatus(orderId: string, status: OrderStatus): Promise<void>;
+  updateStatus(
+    orderId: string,
+    status: OrderStatus,
+    estimatedMinutes?: number,
+  ): Promise<Order>;
 }
 
 export const supabaseOrderRepository: OrderRepository = {

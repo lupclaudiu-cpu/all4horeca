@@ -15,6 +15,17 @@ type RestaurantRow = {
   secondary_color?: string;
   is_active: boolean;
   created_at: string;
+  company_name?: string;
+  vat_cui?: string;
+  city?: string;
+  contact_name?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  status?: "trial" | "active" | "suspended" | "deleted";
+  trial_active?: boolean;
+  trial_started_at?: string | null;
+  trial_expires_at?: string | null;
+  contract_signed?: boolean;
 };
 
 export async function getAdminRestaurants(): Promise<AdminRestaurant[]> {
@@ -24,9 +35,10 @@ export async function getAdminRestaurants(): Promise<AdminRestaurant[]> {
   const [restaurantsResult, ordersResult] = await Promise.all([
     supabase
       .from("restaurants")
-      .select("id, name, slug, logo_url, primary_color, secondary_color, is_active, created_at")
+      .select("id, name, slug, logo_url, primary_color, secondary_color, is_active, created_at, company_name, vat_cui, city, contact_name, contact_phone, contact_email, status, trial_active, trial_started_at, trial_expires_at, contract_signed")
+      .neq("status", "deleted")
       .order("created_at", { ascending: false }),
-    supabase.from("orders").select("restaurant_id"),
+    supabase.from("orders").select("restaurant_id, total, status"),
   ]);
 
   if (restaurantsResult.error) {
@@ -35,11 +47,18 @@ export async function getAdminRestaurants(): Promise<AdminRestaurant[]> {
   if (ordersResult.error) throw new Error(ordersResult.error.message);
 
   const counts = new Map<string, number>();
+  const revenue = new Map<string, number>();
   (ordersResult.data ?? []).forEach((order) => {
     counts.set(
       order.restaurant_id,
       (counts.get(order.restaurant_id) ?? 0) + 1,
     );
+    if (order.status !== "Anulată") {
+      revenue.set(
+        order.restaurant_id,
+        (revenue.get(order.restaurant_id) ?? 0) + Number(order.total ?? 0),
+      );
+    }
   });
 
   return ((restaurantsResult.data ?? []) as RestaurantRow[]).map((item) => ({
@@ -52,6 +71,18 @@ export async function getAdminRestaurants(): Promise<AdminRestaurant[]> {
     isActive: item.is_active,
     createdAt: item.created_at,
     orderCount: counts.get(item.id) ?? 0,
+    totalRevenue: revenue.get(item.id) ?? 0,
+    companyName: item.company_name,
+    vatCui: item.vat_cui,
+    city: item.city,
+    contactName: item.contact_name,
+    contactPhone: item.contact_phone,
+    contactEmail: item.contact_email,
+    status: item.status,
+    trialActive: item.trial_active,
+    trialStartedAt: item.trial_started_at,
+    trialExpiresAt: item.trial_expires_at,
+    contractSigned: item.contract_signed,
   }));
 }
 
@@ -219,6 +250,48 @@ export async function updateRestaurantActive(
     .from("restaurants")
     .update({ is_active: isActive })
     .eq("id", restaurantId);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateRestaurantCommercialStatus(
+  restaurantId: string,
+  action: "activate" | "suspend" | "extend_trial" | "convert_paid",
+) {
+  const supabase = getSupabaseClient();
+  if (!supabase) throw new Error("Supabase nu este configurat.");
+  const payload =
+    action === "activate" ?
+       { is_active: true, status: "trial", trial_active: true }
+      : action === "suspend" ?
+        { is_active: false, status: "suspended", trial_active: false }
+        : action === "extend_trial"
+          ? {
+              is_active: true,
+              status: "trial",
+              trial_active: true,
+              trial_expires_at: new Date(
+                Date.now() + 7 * 24 * 60 * 60 * 1000,
+              ).toISOString(),
+            }
+          : {
+              is_active: true,
+              status: "active",
+              trial_active: false,
+              contract_signed: true,
+            };
+  const { error } = await supabase
+    .from("restaurants")
+    .update(payload)
+    .eq("id", restaurantId);
+  if (error) throw new Error(error.message);
+}
+
+export async function softDeleteRestaurant(restaurantId: string) {
+  const supabase = getSupabaseClient();
+  if (!supabase) throw new Error("Supabase nu este configurat.");
+  const { error } = await supabase.rpc("soft_delete_restaurant", {
+    target_restaurant_id: restaurantId,
+  });
   if (error) throw new Error(error.message);
 }
 

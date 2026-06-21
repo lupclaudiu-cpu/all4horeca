@@ -72,13 +72,13 @@ export function AddressAutocomplete({
           onChange={(event) => onChange(event.target.value)}
           placeholder="Începe să scrii strada și numărul"
           autoComplete="street-address"
-          className={`mt-2 w-full rounded-2xl border bg-[#fcfaf8] px-4 py-3 pr-24 text-sm outline-none transition placeholder:text-[#aaa39d] focus:ring-4 ${
-            error
-              ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-              : "border-[#e6e0db] focus:border-[#ff5a1f] focus:ring-[#ff5a1f]/10"
+          className={`mt-2 w-full rounded-2xl border bg-[#f8fafc] px-4 py-3 pr-24 text-sm outline-none transition placeholder:text-[#94a3b8] focus:ring-4 ${
+            error ?
+               "border-red-400 focus:border-red-400 focus:ring-red-100"
+              : "border-[#cbd5e1] focus:border-[#2563eb] focus:ring-[#2563eb]/10"
           }`}
         />
-        <span className="pointer-events-none absolute right-3 top-1/2 mt-1 -translate-y-1/2 text-[10px] font-black uppercase tracking-wide text-[#8b8580]">
+        <span className="pointer-events-none absolute right-3 top-1/2 mt-1 -translate-y-1/2 text-[10px] font-black uppercase tracking-wide text-[#64748b]">
           {loading ? "Se încarcă" : location ? "Adresă aleasă" : "Google"}
         </span>
       </div>
@@ -88,7 +88,7 @@ export function AddressAutocomplete({
         </span>
       )}
       {!getGoogleMapsApiKey() && (
-        <span className="mt-1.5 block text-xs text-[#8b8580]">
+        <span className="mt-1.5 block text-xs text-[#64748b]">
           Autocomplete-ul va fi activ după configurarea cheii Google Maps.
         </span>
       )}

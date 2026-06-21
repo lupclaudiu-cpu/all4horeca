@@ -65,11 +65,11 @@ export function InstallApp() {
 
   return (
     <>
-      <aside className="fixed bottom-[86px] left-3 right-3 z-30 mx-auto max-w-md rounded-[1.5rem] border border-[#eee9e4] bg-white p-4 shadow-[0_18px_50px_rgba(24,18,12,0.2)]">
+      <aside className="fixed bottom-[86px] left-3 right-3 z-30 mx-auto max-w-md rounded-[1.5rem] border border-[#e2e8f0] bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.2)]">
         <button
           onClick={dismiss}
           aria-label="Închide"
-          className="absolute right-3 top-3 grid size-8 place-items-center rounded-full bg-[#f5f2ef] text-[#7a746e]"
+          className="absolute right-3 top-3 grid size-8 place-items-center rounded-full bg-[#f1f5f9] text-[#64748b]"
         >
           <CloseIcon className="size-4" />
         </button>
@@ -83,14 +83,14 @@ export function InstallApp() {
           />
           <div>
             <p className="text-sm font-black">Instalează ALL4HORECA</p>
-            <p className="mt-1 text-xs leading-4 text-[#7a746e]">
+            <p className="mt-1 text-xs leading-4 text-[#64748b]">
               Acces rapid, direct de pe ecranul principal.
             </p>
           </div>
         </div>
         <button
           onClick={install}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5a1f] px-4 py-3 text-sm font-black text-white"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-black text-white"
         >
           <PlusIcon className="size-4" />
           Adaugă pe ecranul principal
@@ -107,32 +107,32 @@ export function InstallApp() {
           <section className="relative w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl">
             <button
               onClick={() => setShowHelp(false)}
-              className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-[#f5f2ef]"
+              className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-[#f1f5f9]"
             >
               <CloseIcon className="size-4" />
             </button>
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#ff5a1f]">
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
               {isIos ? "iPhone / iPad" : "Android"}
             </p>
             <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">
               Adaugă aplicația în 3 pași
             </h2>
             {isIos ? (
-              <ol className="mt-5 space-y-4 text-sm leading-6 text-[#5e5852]">
-                <li><strong className="text-[#171411]">1.</strong> Deschide această pagină în Safari.</li>
-                <li><strong className="text-[#171411]">2.</strong> Apasă butonul Partajează din bara Safari.</li>
-                <li><strong className="text-[#171411]">3.</strong> Alege „Adăugați la ecranul principal”.</li>
+              <ol className="mt-5 space-y-4 text-sm leading-6 text-[#475569]">
+                <li><strong className="text-[#0f172a]">1.</strong> Deschide această pagină în Safari.</li>
+                <li><strong className="text-[#0f172a]">2.</strong> Apasă butonul Partajează din bara Safari.</li>
+                <li><strong className="text-[#0f172a]">3.</strong> Alege „Adăugați la ecranul principal”.</li>
               </ol>
             ) : (
-              <ol className="mt-5 space-y-4 text-sm leading-6 text-[#5e5852]">
-                <li><strong className="text-[#171411]">1.</strong> Deschide pagina în Chrome.</li>
-                <li><strong className="text-[#171411]">2.</strong> Apasă meniul cu trei puncte.</li>
-                <li><strong className="text-[#171411]">3.</strong> Alege „Instalează aplicația” sau „Adaugă pe ecranul principal”.</li>
+              <ol className="mt-5 space-y-4 text-sm leading-6 text-[#475569]">
+                <li><strong className="text-[#0f172a]">1.</strong> Deschide pagina în Chrome.</li>
+                <li><strong className="text-[#0f172a]">2.</strong> Apasă meniul cu trei puncte.</li>
+                <li><strong className="text-[#0f172a]">3.</strong> Alege „Instalează aplicația” sau „Adaugă pe ecranul principal”.</li>
               </ol>
             )}
             <button
               onClick={() => setShowHelp(false)}
-              className="mt-6 w-full rounded-xl bg-[#171411] px-4 py-3 font-black text-white"
+              className="mt-6 w-full rounded-xl bg-[#0f172a] px-4 py-3 font-black text-white"
             >
               Am înțeles
             </button>

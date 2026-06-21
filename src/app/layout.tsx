@@ -1,17 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { AppShell } from "@/components/layout/app-shell";
-import { CartProvider } from "@/features/cart/cart-context";
-import { PwaRegister } from "@/components/pwa-register";
-import { OrderProvider } from "@/features/orders/order-context";
-import { CatalogProvider } from "@/features/catalog/catalog-context";
-import { SettingsProvider } from "@/features/settings/settings-context";
-import { AuthProvider } from "@/features/auth/auth-context";
+import { AppProviders } from "@/components/app-providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "ALL4HORECA", template: "%s | ALL4HORECA" },
-  description: "Comandă rapid prin ALL4HORECA.",
-  applicationName: "ALL4HORECA",
+  title: { default: "ALL4HORECA by ANTORIA", template: "%s | ALL4HORECA" },
+  description: "Software HORECA pentru comenzi si management by ANTORIA.",
+  applicationName: "ALL4HORECA by ANTORIA",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
@@ -31,7 +25,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ff5a1f",
+  themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -42,18 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ro">
       <body>
-        <AuthProvider>
-          <CartProvider>
-            <SettingsProvider>
-              <CatalogProvider>
-                <OrderProvider>
-                  <AppShell>{children}</AppShell>
-                </OrderProvider>
-              </CatalogProvider>
-            </SettingsProvider>
-          </CartProvider>
-        </AuthProvider>
-        <PwaRegister />
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

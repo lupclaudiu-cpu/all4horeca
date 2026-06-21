@@ -45,7 +45,6 @@ export async function POST(request: Request) {
   const input = (await request.json()) as RestaurantOnboardingInput;
   if (
     !input.name?.trim() ||
-    !input.slug?.trim() ||
     !input.ownerName?.trim() ||
     !input.ownerEmail?.trim() ||
     input.ownerPassword?.length < 8
@@ -97,7 +96,6 @@ export async function POST(request: Request) {
 
   const restaurantPayload = {
     name: input.name.trim(),
-    slug: input.slug.trim(),
     logo_url: input.logoUrl,
     primary_color: input.primaryColor,
     secondary_color: input.secondaryColor,
@@ -105,7 +103,7 @@ export async function POST(request: Request) {
     phone: input.phone.trim(),
     email: input.email.trim(),
     seo_title: `${input.name.trim()} | Comanda online`,
-    seo_description: `Comanda online de la ${input.name.trim()} prin ALL4HORECA.`,
+    seo_description: `Comanda online de la ${input.name.trim()} prin ANTORIA.`,
     social_image_url: input.logoUrl,
     opening_time: input.openingTime,
     closing_time: input.closingTime,
@@ -138,27 +136,32 @@ export async function POST(request: Request) {
     );
   }
 
-  const clientUrl = `/clienti/${input.slug.trim()}`;
-  const { error: qrError } = await authClient
-    .from("restaurant_qr_codes")
-    .upsert(
+  const { data: createdRestaurant, error: createdRestaurantError } =
+    await authClient
+      .from("restaurants")
+      .select("slug")
+      .eq("id", restaurantId)
+      .single();
+  if (createdRestaurantError || !createdRestaurant) {
+    return NextResponse.json(
       {
-        restaurant_id: restaurantId,
-        public_url: clientUrl,
-        updated_at: new Date().toISOString(),
+        error:
+          createdRestaurantError?.message ||
+          "Restaurantul a fost creat, dar slugul nu a putut fi citit.",
       },
-      { onConflict: "restaurant_id" },
+      { status: 500 },
     );
-  if (qrError) {
-    return NextResponse.json({ error: qrError.message }, { status: 400 });
   }
+
+  const resolvedSlug = createdRestaurant.slug;
+  const clientUrl = `/clienti/${resolvedSlug}`;
 
   return NextResponse.json(
     {
       restaurantId,
-      slug: input.slug.trim(),
+      slug: resolvedSlug,
       clientUrl,
-      dashboardUrl: `/restaurant/${input.slug.trim()}`,
+      dashboardUrl: `/restaurant/${resolvedSlug}`,
       qrUrl: clientUrl,
       ownerRequiresEmailConfirmation: false,
     },
