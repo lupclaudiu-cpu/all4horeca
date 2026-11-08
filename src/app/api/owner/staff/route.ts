@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
-// Patronul creează un cont de personal (email + parolă) pentru locația lui.
+// Administratorul creează un cont de personal (email + parolă) pentru locația lui.
 export async function POST(request: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     .eq("id", userData.user.id)
     .single();
   if (!profile || profile.role !== "restaurant_owner" || !profile.restaurant_id) {
-    return NextResponse.json({ error: "Doar patronul poate crea conturi de personal." }, { status: 403 });
+    return NextResponse.json({ error: "Doar administratorul poate crea conturi de personal." }, { status: 403 });
   }
 
   const body = (await request.json()) as { email?: string; password?: string; name?: string };
