@@ -277,7 +277,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
   const payload = {
     restaurant_id: input.restaurantId,
     order_number: orderNumber,
-    total: addMoney(subtotal, input.deliveryFee),
+    total: Math.round((addMoney(subtotal, input.deliveryFee) - (input.discount ?? 0)) * 100) / 100,
     payment_method: input.paymentMethod,
     delivery_address:
       input.orderType === "pickup" ?

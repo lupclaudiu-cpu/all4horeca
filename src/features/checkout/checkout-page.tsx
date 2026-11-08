@@ -26,6 +26,7 @@ import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import { calculateCartItemTotal } from "@/lib/cart-pricing";
 import { addMoney } from "@/lib/money";
 import { useAuth } from "@/features/auth/auth-context";
+import { useOrderDiscount } from "@/features/cart/use-order-discount";
 import { PhoneLogin } from "@/features/auth/phone-login";
 import { useCatalog } from "@/features/catalog/catalog-context";
 import {
@@ -152,7 +153,11 @@ export function CheckoutPage() {
       subtotal < checkoutSettings.freeDeliveryThreshold) ?
        baseDeliveryFee
       : 0;
-  const total = addMoney(subtotal, deliveryFee);
+  const orderDiscount = useOrderDiscount(orderRestaurantId, items);
+  const total = Math.max(
+    0,
+    Math.round((addMoney(subtotal, deliveryFee) - orderDiscount.amount) * 100) / 100,
+  );
   const freeDeliveryUnlocked =
     selectedOrderType === "delivery" &&
     checkoutSettings.freeDeliveryThreshold > 0 &&
@@ -285,6 +290,7 @@ export function CheckoutPage() {
         },
         items,
         deliveryFee,
+        discount: orderDiscount.amount,
         paymentMethod: selectedPaymentMethod,
         orderType: selectedOrderType,
       });
@@ -579,6 +585,12 @@ export function CheckoutPage() {
           <div className="my-5 h-px bg-[#e2e8f0]" />
           <div className="space-y-3 text-sm">
             <PriceRow label="Subtotal" value={subtotal} />
+            {orderDiscount.amount > 0 && (
+              <PriceRow
+                label={`Promoție: ${orderDiscount.name ?? ""}`}
+                value={-orderDiscount.amount}
+              />
+            )}
             <PriceRow
               label={
                 selectedOrderType === "pickup" ?

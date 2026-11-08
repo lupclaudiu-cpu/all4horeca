@@ -187,6 +187,7 @@ export type CreateOrderInput = {
   customer: CustomerDetails;
   items: CartItem[];
   deliveryFee: number;
+  discount?: number;
   paymentMethod: PaymentMethod;
   orderType: OrderType;
 };
