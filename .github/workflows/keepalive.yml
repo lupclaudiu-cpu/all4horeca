@@ -1,0 +1,15 @@
+name: Supabase keep-alive
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping database (public read through the API)
+        run: |
+          curl -fsS --retry 3 \
+            -H "apikey: sb_publishable_UV_kmgRT54HK3E3RHlGhFw_-teUUokO" \
+            "https://niavcqvhmeferakuerfs.supabase.co/rest/v1/restaurants?select=id&limit=1" > /dev/null
+          echo "Supabase ping OK"
