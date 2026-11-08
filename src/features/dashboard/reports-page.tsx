@@ -10,6 +10,7 @@ import {
   exportReportXlsx,
   type ReportExportRow,
 } from "@/features/dashboard/reports-export";
+import { InsightsPanel } from "@/features/dashboard/insights-panel";
 import { useOrders } from "@/features/orders/order-context";
 
 type ReportType =
@@ -17,7 +18,8 @@ type ReportType =
   | "products"
   | "categories"
   | "customers"
-  | "operational";
+  | "operational"
+  | "insights";
 
 type PeriodId =
   | "today"
@@ -35,6 +37,7 @@ const reportTabs: Array<{ id: ReportType; label: string }> = [
   { id: "categories", label: "Categorii" },
   { id: "customers", label: "Clienți" },
   { id: "operational", label: "Operațional" },
+  { id: "insights", label: "Ore și tendințe" },
 ];
 
 export function ReportsPage() {
@@ -146,6 +149,8 @@ export function ReportsPage() {
 
       {!hydrated || !clientReady ? (
         <div className="mt-6 h-96 animate-pulse rounded-[1.75rem] bg-white" />
+      ) : reportType === "insights" ? (
+        <InsightsPanel orders={orders} range={range} />
       ) : (
         <ReportContent type={reportType} analytics={analytics} />
       )}
