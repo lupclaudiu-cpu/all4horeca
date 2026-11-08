@@ -25,9 +25,21 @@ type AuthContextValue = {
     email: string,
     password: string,
   ) => Promise<{ requiresEmailConfirmation: boolean }>;
+  requestPhoneCode: (phone: string) => Promise<void>;
+  verifyPhoneCode: (phone: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<UserProfile | null>;
 };
+
+/** 07xxxxxxxx / 00407... / +407... -> +407xxxxxxxx (E.164, as required by SMS login). */
+export function normalizeRomanianPhone(input: string) {
+  const digits = input.replace(/[^\d+]/g, "");
+  if (digits.startsWith("+")) return digits;
+  if (digits.startsWith("00")) return `+${digits.slice(2)}`;
+  if (digits.startsWith("40")) return `+${digits}`;
+  if (digits.startsWith("0")) return `+40${digits.slice(1)}`;
+  return `+40${digits}`;
+}
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -192,6 +204,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const requestPhoneCode = useCallback(async (phone: string) => {
+    const supabase = getSupabaseClient();
+    if (!supabase) throw new Error("Supabase nu este configurat.");
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      phone: normalizeRomanianPhone(phone),
+    });
+    if (otpError) throw new Error(otpError.message);
+  }, []);
+
+  const verifyPhoneCode = useCallback(
+    async (phone: string, code: string) => {
+      const supabase = getSupabaseClient();
+      if (!supabase) throw new Error("Supabase nu este configurat.");
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+        phone: normalizeRomanianPhone(phone),
+        token: code.trim(),
+        type: "sms",
+      });
+      if (verifyError) throw new Error(verifyError.message);
+      setSession(data.session);
+    },
+    [],
+  );
+
   const signOut = useCallback(async () => {
     const supabase = getSupabaseClient();
     if (supabase) await supabase.auth.signOut();
@@ -208,6 +244,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       error,
       signIn,
       signUp,
+      requestPhoneCode,
+      verifyPhoneCode,
       signOut,
       refreshProfile,
     }),
@@ -218,6 +256,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       error,
       signIn,
       signUp,
+      requestPhoneCode,
+      verifyPhoneCode,
       signOut,
       refreshProfile,
     ],

@@ -26,6 +26,7 @@ import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import { calculateCartItemTotal } from "@/lib/cart-pricing";
 import { addMoney } from "@/lib/money";
 import { useAuth } from "@/features/auth/auth-context";
+import { PhoneLogin } from "@/features/auth/phone-login";
 import { useCatalog } from "@/features/catalog/catalog-context";
 import {
   getDatabaseCustomerProfile,
@@ -49,7 +50,7 @@ type FieldErrors = Partial<Record<keyof CustomerDetails, string>>;
 
 export function CheckoutPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { items, total: subtotal, clearCart, removeItem, addItem } = useCart();
   const { createOrder } = useOrders();
   const { settings, restaurantOpen } = useRestaurantSettings();
@@ -97,6 +98,13 @@ export function CheckoutPage() {
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const accountPhone = user?.phone;
+    if (!accountPhone) return;
+    const local = accountPhone.replace(/^\+?40/, "0");
+    setCustomer((current) => (current.phone ? current : { ...current, phone: local }));
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -338,9 +346,15 @@ export function CheckoutPage() {
         </div>
       </header>
 
+      {!authLoading && !user && (
+        <div className="mx-auto max-w-md px-4 py-6">
+          <PhoneLogin />
+        </div>
+      )}
+
       <form
         onSubmit={submitOrder}
-        className="mx-auto grid max-w-5xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_380px] lg:items-start"
+        className={`mx-auto max-w-5xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_380px] lg:items-start ${user ? "grid" : "hidden"}`}
       >
         <div className="space-y-5">
           <section className="antoria-card rounded-[1.75rem] p-5 sm:p-6">
