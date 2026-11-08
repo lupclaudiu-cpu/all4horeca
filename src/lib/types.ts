@@ -239,6 +239,9 @@ export type AdminRestaurant = {
   createdAt: string;
   orderCount: number;
   totalRevenue?: number;
+  orders7d?: number;
+  orders30d?: number;
+  lastOrderAt?: string | null;
   companyName?: string;
   vatCui?: string;
   city?: string;

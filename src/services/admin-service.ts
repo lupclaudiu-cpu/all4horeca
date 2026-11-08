@@ -38,7 +38,7 @@ export async function getAdminRestaurants(): Promise<AdminRestaurant[]> {
       .select("id, name, slug, logo_url, primary_color, secondary_color, is_active, created_at, company_name, vat_cui, city, contact_name, contact_phone, contact_email, status, trial_active, trial_started_at, trial_expires_at, contract_signed")
       .neq("status", "deleted")
       .order("created_at", { ascending: false }),
-    supabase.from("orders").select("restaurant_id, total, status"),
+    supabase.from("orders").select("restaurant_id, total, status, created_at"),
   ]);
 
   if (restaurantsResult.error) {
@@ -48,7 +48,16 @@ export async function getAdminRestaurants(): Promise<AdminRestaurant[]> {
 
   const counts = new Map<string, number>();
   const revenue = new Map<string, number>();
+  const orders7 = new Map<string, number>();
+  const orders30 = new Map<string, number>();
+  const lastOrder = new Map<string, string>();
+  const nowMs = Date.now();
   (ordersResult.data ?? []).forEach((order) => {
+    const ageDays = (nowMs - new Date(order.created_at).getTime()) / 86_400_000;
+    if (ageDays <= 30) orders30.set(order.restaurant_id, (orders30.get(order.restaurant_id) ?? 0) + 1);
+    if (ageDays <= 7) orders7.set(order.restaurant_id, (orders7.get(order.restaurant_id) ?? 0) + 1);
+    const prevLast = lastOrder.get(order.restaurant_id);
+    if (!prevLast || order.created_at > prevLast) lastOrder.set(order.restaurant_id, order.created_at);
     counts.set(
       order.restaurant_id,
       (counts.get(order.restaurant_id) ?? 0) + 1,
@@ -72,6 +81,9 @@ export async function getAdminRestaurants(): Promise<AdminRestaurant[]> {
     createdAt: item.created_at,
     orderCount: counts.get(item.id) ?? 0,
     totalRevenue: revenue.get(item.id) ?? 0,
+    orders7d: orders7.get(item.id) ?? 0,
+    orders30d: orders30.get(item.id) ?? 0,
+    lastOrderAt: lastOrder.get(item.id) ?? null,
     companyName: item.company_name,
     vatCui: item.vat_cui,
     city: item.city,

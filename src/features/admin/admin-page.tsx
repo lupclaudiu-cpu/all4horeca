@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ChartIcon, ProductsIcon } from "@/components/icons";
 import { formatPrice } from "@/data/restaurant";
+import { ClientHealth } from "@/features/admin/client-health";
 import { RestaurantWizard } from "@/features/admin/restaurant-wizard";
 import type { AdminRestaurant } from "@/lib/types";
 import {
@@ -188,6 +189,8 @@ export function AdminPage() {
           </button>
         </div>
       </section>
+
+      <ClientHealth restaurants={restaurants} now={now} />
 
       <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
         <AdminMetric
