@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: 24
       - run: npm ci
-      - run: npm install --no-save @opennextjs/cloudflare@latest wrangler@latest
+      - run: npm install --no-save "next@>=16.4.5 <17" @opennextjs/cloudflare@latest wrangler@latest
       - name: OpenNext build
         run: npx opennextjs-cloudflare build
         env:
