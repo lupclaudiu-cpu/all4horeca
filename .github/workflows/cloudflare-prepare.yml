@@ -1,6 +1,8 @@
 name: Cloudflare prepare (upgrade deps, commit lockfile)
 on:
-  workflow_dispatch:
+  push:
+    branches: [ops/cloudflare-test]
+    paths: [.github/workflows/cloudflare-prepare.yml]
 permissions:
   contents: write
 jobs:
