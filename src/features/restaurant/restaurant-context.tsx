@@ -176,7 +176,7 @@ export function RestaurantProvider({
 
       if (pathname.startsWith("/restaurant/dashboard")) {
         const selectedId =
-          profile?.role === "restaurant_owner" ?
+          profile?.role === "restaurant_owner" || profile?.role === "restaurant_staff" ?
              profile.restaurantId
             : profile?.role === "super_admin" ?
                getSelectedRestaurantId()

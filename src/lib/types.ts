@@ -214,6 +214,7 @@ export type RestaurantSettings = {
 export const USER_ROLES = [
   "customer",
   "restaurant_owner",
+  "restaurant_staff",
   "super_admin",
 ] as const;
 

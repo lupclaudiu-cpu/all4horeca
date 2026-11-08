@@ -29,6 +29,8 @@ function StaffLogin() {
       const profile = await signIn(email.trim(), password);
       if (profile.role === "super_admin") {
         router.replace("/admin");
+      } else if (profile.role === "restaurant_staff") {
+        router.replace("/restaurant/dashboard/locatie");
       } else if (profile.role === "restaurant_owner") {
         router.replace("/restaurant/dashboard");
       } else {

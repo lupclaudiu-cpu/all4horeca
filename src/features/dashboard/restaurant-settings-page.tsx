@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { StaffManager } from "@/features/dashboard/staff-manager";
 import { useRestaurantSettings } from "@/features/settings/settings-context";
 import { unlockNotificationSound } from "@/features/orders/notification-sound";
 import type { DeliveryZone, ScheduleDay } from "@/lib/types";
@@ -405,6 +406,7 @@ export function RestaurantSettingsPage() {
           {saving ? "Se salveaza..." : "Salveaza modificarile"}
         </button>
       </div>
+      <StaffManager />
     </div>
   );
 }
