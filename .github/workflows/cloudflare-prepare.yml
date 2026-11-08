@@ -1,0 +1,32 @@
+name: Cloudflare prepare (upgrade deps, commit lockfile)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ops/cloudflare-test
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Upgrade Next.js and add Cloudflare adapter
+        run: |
+          npm install --save "next@>=16.4.5 <17" "eslint-config-next@>=16.4.5 <17"
+          npm install --save-dev @opennextjs/cloudflare@latest wrangler@latest
+          npm pkg set scripts.cf:build="opennextjs-cloudflare build" scripts.cf:deploy="opennextjs-cloudflare build && opennextjs-cloudflare deploy" scripts.cf:preview="opennextjs-cloudflare build && opennextjs-cloudflare preview"
+      - name: Build check
+        run: npx opennextjs-cloudflare build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://niavcqvhmeferakuerfs.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_UV_kmgRT54HK3E3RHlGhFw_-teUUokO
+      - name: Commit package files
+        run: |
+          git config user.name "claude-bot"
+          git config user.email "noreply@anthropic.com"
+          git add package.json package-lock.json
+          git commit -m "Upgrade Next.js and add Cloudflare adapter" || echo "nothing to commit"
+          git push origin HEAD:ops/cloudflare-test
