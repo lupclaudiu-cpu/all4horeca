@@ -364,6 +364,11 @@ export function PublicRestaurantPage({
             )}
           </section>
         </div>
+        <footer className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-1 px-3 pb-4 text-xs font-bold text-slate-600">
+          <a href="/termeni" className="underline">Termeni</a>
+          <a href="/confidentialitate" className="underline">Confidențialitate</a>
+          <a href="/cookie-uri" className="underline">Cookie-uri</a>
+        </footer>
       </div>
     </main>
   );
