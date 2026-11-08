@@ -6,11 +6,12 @@ import { getActivePromotions } from "@/services/public-promotions-service";
 
 export function PromotionCarousel({
   restaurantId,
+  accent = "#0e7490",
 }: {
   restaurantId: string;
+  accent?: string;
 }) {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -26,61 +27,38 @@ export function PromotionCarousel({
     };
   }, [restaurantId]);
 
-  useEffect(() => {
-    if (promotions.length < 2) return;
-    const interval = window.setInterval(
-      () => setActiveIndex((index) => (index + 1) % promotions.length),
-      5500,
-    );
-    return () => window.clearInterval(interval);
-  }, [promotions.length]);
-
   if (!promotions.length) return null;
-  const promotion = promotions[activeIndex] ?? promotions[0];
 
   return (
-    <section className="mx-auto max-w-6xl px-4 pt-5">
-      <div className="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 p-5 text-white shadow-xl shadow-blue-600/15 sm:p-7">
-        <div className="absolute -right-10 -top-14 size-44 rounded-full border border-white/20" />
-        <div className="absolute -bottom-16 right-16 size-32 rounded-full bg-white/10 blur-xl" />
-        <div className="relative max-w-xl">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-100">
-            Ofertă activă
-          </p>
-          <div className="mt-2 flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-black tracking-[-0.04em]">
+    <section aria-label="Promoții active" className="pt-4">
+      <h2 className="px-3 pb-2 text-sm font-black text-slate-950">
+        Promoții active
+      </h2>
+      <div className="hide-scrollbar flex gap-2 overflow-x-auto px-3">
+        {promotions.map((promotion) => (
+          <div
+            key={promotion.id}
+            className="flex w-60 shrink-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2.5"
+          >
+            <span
+              className="min-w-14 shrink-0 rounded-xl px-2 py-2.5 text-center text-base font-black text-white"
+              style={{ backgroundColor: accent }}
+            >
+              −{promotion.discountPercent}%
+            </span>
+            <div className="min-w-0">
+              <p className="line-clamp-1 text-sm font-black text-slate-950">
                 {promotion.name}
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-blue-50/85">
+              </p>
+              <p className="line-clamp-2 text-xs leading-snug text-slate-600">
                 {promotion.description || promotionDetail(promotion)}
+                {promotion.type === "happy_hour" && promotion.startsAt
+                  ? ` ${promotion.startsAt}–${promotion.endsAt}`
+                  : ""}
               </p>
             </div>
-            <span className="shrink-0 rounded-2xl bg-white px-3 py-2 text-lg font-black text-blue-700 shadow-lg">
-              -{promotion.discountPercent}%
-            </span>
           </div>
-          {promotion.type === "happy_hour" && promotion.startsAt && (
-            <p className="mt-3 text-xs font-black text-cyan-100">
-              {promotion.startsAt} - {promotion.endsAt}
-            </p>
-          )}
-        </div>
-        {promotions.length > 1 && (
-          <div className="relative mt-5 flex gap-2">
-            {promotions.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveIndex(index)}
-                aria-label={`Afișează promoția ${item.name}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  index === activeIndex ? "w-8 bg-white" : "w-3 bg-white/35"
-                }`}
-              />
-            ))}
-          </div>
-        )}
+        ))}
       </div>
     </section>
   );
@@ -91,7 +69,7 @@ function promotionDetail(promotion: Promotion) {
   if (promotion.type === "loyalty") {
     return `Reducere la comanda ${promotion.triggerOrderNumber ?? 11}.`;
   }
-  if (promotion.type === "happy_hour") return "Ofertă disponibilă în intervalul promoțional.";
+  if (promotion.type === "happy_hour") return "Ofertă în intervalul promoțional.";
   if (promotion.type === "product_discount") return "Reducere la produsele selectate.";
-  return "Promoție specială ALL4HORECA.";
+  return "Promoție specială.";
 }
