@@ -187,6 +187,7 @@ export type CreateOrderInput = {
   customer: CustomerDetails;
   items: CartItem[];
   deliveryFee: number;
+  discount?: number;
   paymentMethod: PaymentMethod;
   orderType: OrderType;
 };
@@ -213,6 +214,7 @@ export type RestaurantSettings = {
 export const USER_ROLES = [
   "customer",
   "restaurant_owner",
+  "restaurant_staff",
   "super_admin",
 ] as const;
 
@@ -238,6 +240,9 @@ export type AdminRestaurant = {
   createdAt: string;
   orderCount: number;
   totalRevenue?: number;
+  orders7d?: number;
+  orders30d?: number;
+  lastOrderAt?: string | null;
   companyName?: string;
   vatCui?: string;
   city?: string;

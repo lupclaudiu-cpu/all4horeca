@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { StaffManager } from "@/features/dashboard/staff-manager";
 import { useRestaurantSettings } from "@/features/settings/settings-context";
 import { unlockNotificationSound } from "@/features/orders/notification-sound";
 import type { DeliveryZone, ScheduleDay } from "@/lib/types";
@@ -184,7 +185,7 @@ export function RestaurantSettingsPage() {
           />
         </SettingsCard>
 
-        <SettingsCard title="Metode de plata" subtitle="Disponibile in checkout">
+        <SettingsCard title="Metode de plată" subtitle="Disponibile la finalizarea comenzii">
           <Toggle
             label="Cash"
             checked={settings.acceptsCash}
@@ -249,7 +250,7 @@ export function RestaurantSettingsPage() {
 
         <SettingsCard title="Livrare" subtitle="Taxe și praguri">
           <NumberField
-            label="Taxa livrare implicita"
+            label="Taxă de livrare implicită"
             value={settings.deliveryFee}
             onChange={(value) => updateNumber("deliveryFee", value)}
           />
@@ -341,7 +342,7 @@ export function RestaurantSettingsPage() {
             ))}
             {!settings.deliveryZones.length && (
               <p className="rounded-xl bg-[#f8fafc] px-4 py-3 text-xs font-bold text-[#64748b]">
-                Nu exista zone definite. Se foloseste taxa implicita de livrare.
+                Nu există zone definite. Se folosește taxa de livrare implicită.
               </p>
             )}
           </div>
@@ -405,6 +406,7 @@ export function RestaurantSettingsPage() {
           {saving ? "Se salveaza..." : "Salveaza modificarile"}
         </button>
       </div>
+      <StaffManager />
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
 import { useRestaurantSettings } from "@/features/settings/settings-context";
 import { useAuth } from "@/features/auth/auth-context";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useOrders } from "@/features/orders/order-context";
 import { NewOrderToast } from "@/features/dashboard/new-order-toast";
 import { useRestaurant } from "@/features/restaurant/restaurant-context";
@@ -34,6 +35,10 @@ const navigation = [
   { href: "/restaurant/dashboard/setari", label: "Setări", icon: SettingsIcon },
 ];
 
+const staffNavigation = [
+  { href: "/restaurant/dashboard/locatie", label: "Locație", icon: OrdersIcon },
+];
+
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -50,6 +55,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     profile?.role === "super_admin" && currentRestaurant
       ? `${href}?restaurant=${currentRestaurant.id}`
       : href;
+
+  const isStaff = profile?.role === "restaurant_staff";
+  const visibleNavigation = isStaff ? staffNavigation : navigation;
+  useEffect(() => {
+    if (isStaff && !pathname.startsWith("/restaurant/dashboard/locatie")) {
+      router.replace("/restaurant/dashboard/locatie");
+    }
+  }, [isStaff, pathname, router]);
 
   const logout = async () => {
     await signOut();
@@ -72,7 +85,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <nav className="mt-6 flex-1 space-y-1.5 pb-4">
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const active =
               item.href === "/restaurant/dashboard"
                 ? pathname === item.href
@@ -150,7 +163,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </main>
 
         <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-slate-200/80 bg-white/90 px-1 pt-2 shadow-[0_-12px_35px_rgba(15,23,42,.06)] backdrop-blur-2xl lg:hidden">
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const active =
               item.href === "/restaurant/dashboard"
                 ? pathname === item.href

@@ -13,7 +13,7 @@ export default async function RestaurantDashboardLayout({
   children: React.ReactNode;
 }) {
   await requireServerRole(
-    ["restaurant_owner", "super_admin"],
+    ["restaurant_owner", "restaurant_staff", "super_admin"],
     "/restaurant/dashboard",
   );
   return (

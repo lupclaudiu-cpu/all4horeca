@@ -122,7 +122,7 @@ function validateInput(input: OwnerSelfRegistrationInput) {
   if (!input.city?.trim()) return "Orasul este obligatoriu.";
   if (!input.address?.trim()) return "Adresa este obligatorie.";
   if (!input.password || input.password.length < 8) {
-    return "Parola trebuie sa aiba minimum 8 caractere.";
+    return "Parola trebuie să aibă minimum 8 caractere.";
   }
   if (input.password !== input.confirmPassword) {
     return "Parolele nu coincid.";

@@ -211,6 +211,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
         if (
           profileRole !== "restaurant_owner" &&
+          profileRole !== "restaurant_staff" &&
           profileRole !== "super_admin"
         ) {
           return;

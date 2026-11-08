@@ -11,6 +11,8 @@ import {
 import { SafeImage } from "@/components/safe-image";
 import { formatPrice } from "@/data/restaurant";
 import { useCart } from "@/features/cart/cart-context";
+import { useOrderDiscount } from "@/features/cart/use-order-discount";
+import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import { useRestaurantSettings } from "@/features/settings/settings-context";
 import { calculateCartItemTotal } from "@/lib/cart-pricing";
 
@@ -24,7 +26,12 @@ export function CartDrawer() {
     settings.freeDeliveryThreshold - total,
   );
   const minimumRemaining = Math.max(0, settings.minimumOrderValue - total);
-  const promotionSavings = 0;
+  const { currentRestaurant } = useRestaurant();
+  const orderDiscount = useOrderDiscount(
+    currentRestaurant?.id ?? items[0]?.product.restaurantId,
+    items,
+  );
+  const promotionSavings = orderDiscount.amount;
 
   const goToCheckout = () => {
     closeCart();
@@ -142,9 +149,9 @@ export function CartDrawer() {
               <div className="mb-4 space-y-3 rounded-2xl bg-slate-50 p-4">
                 <SummaryRow label="Subtotal" value={formatPrice(total)} />
                 <SummaryRow
-                  label="Economii promoții"
-                  value={formatPrice(promotionSavings)}
-                  muted
+                  label={orderDiscount.name ? `Promoție: ${orderDiscount.name}` : "Economii promoții"}
+                  value={promotionSavings > 0 ? `-${formatPrice(promotionSavings)}` : formatPrice(0)}
+                  muted={promotionSavings === 0}
                 />
                 {settings.minimumOrderValue > 0 && minimumRemaining > 0 && (
                   <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-800">

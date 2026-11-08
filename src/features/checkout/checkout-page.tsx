@@ -26,6 +26,8 @@ import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import { calculateCartItemTotal } from "@/lib/cart-pricing";
 import { addMoney } from "@/lib/money";
 import { useAuth } from "@/features/auth/auth-context";
+import { useOrderDiscount } from "@/features/cart/use-order-discount";
+import { PhoneLogin } from "@/features/auth/phone-login";
 import { useCatalog } from "@/features/catalog/catalog-context";
 import {
   getDatabaseCustomerProfile,
@@ -49,7 +51,7 @@ type FieldErrors = Partial<Record<keyof CustomerDetails, string>>;
 
 export function CheckoutPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { items, total: subtotal, clearCart, removeItem, addItem } = useCart();
   const { createOrder } = useOrders();
   const { settings, restaurantOpen } = useRestaurantSettings();
@@ -99,6 +101,13 @@ export function CheckoutPage() {
   }, []);
 
   useEffect(() => {
+    const accountPhone = user?.phone;
+    if (!accountPhone) return;
+    const local = accountPhone.replace(/^\+?40/, "0");
+    setCustomer((current) => (current.phone ? current : { ...current, phone: local }));
+  }, [user]);
+
+  useEffect(() => {
     if (!user) return;
     let active = true;
     void getDatabaseCustomerProfile()
@@ -144,7 +153,11 @@ export function CheckoutPage() {
       subtotal < checkoutSettings.freeDeliveryThreshold) ?
        baseDeliveryFee
       : 0;
-  const total = addMoney(subtotal, deliveryFee);
+  const orderDiscount = useOrderDiscount(orderRestaurantId, items);
+  const total = Math.max(
+    0,
+    Math.round((addMoney(subtotal, deliveryFee) - orderDiscount.amount) * 100) / 100,
+  );
   const freeDeliveryUnlocked =
     selectedOrderType === "delivery" &&
     checkoutSettings.freeDeliveryThreshold > 0 &&
@@ -277,6 +290,7 @@ export function CheckoutPage() {
         },
         items,
         deliveryFee,
+        discount: orderDiscount.amount,
         paymentMethod: selectedPaymentMethod,
         orderType: selectedOrderType,
       });
@@ -338,9 +352,15 @@ export function CheckoutPage() {
         </div>
       </header>
 
+      {!authLoading && !user && (
+        <div className="mx-auto max-w-md px-4 py-6">
+          <PhoneLogin />
+        </div>
+      )}
+
       <form
         onSubmit={submitOrder}
-        className="mx-auto grid max-w-5xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_380px] lg:items-start"
+        className={`mx-auto max-w-5xl gap-5 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_380px] lg:items-start ${user ? "grid" : "hidden"}`}
       >
         <div className="space-y-5">
           <section className="antoria-card rounded-[1.75rem] p-5 sm:p-6">
@@ -565,6 +585,12 @@ export function CheckoutPage() {
           <div className="my-5 h-px bg-[#e2e8f0]" />
           <div className="space-y-3 text-sm">
             <PriceRow label="Subtotal" value={subtotal} />
+            {orderDiscount.amount > 0 && (
+              <PriceRow
+                label={`Promoție: ${orderDiscount.name ?? ""}`}
+                value={-orderDiscount.amount}
+              />
+            )}
             <PriceRow
               label={
                 selectedOrderType === "pickup" ?

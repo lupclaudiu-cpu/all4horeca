@@ -97,7 +97,7 @@ function DetailList({ title, children }: { title: string; children: React.ReactN
     <section className="overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,.06)]">
       <h2 className="border-b border-[#e2e8f0] p-5 text-xl font-black">{title}</h2>
       <div className="divide-y divide-[#e2e8f0]">
-        {children || <p className="p-5 text-sm text-[#64748b]">Nu exista date.</p>}
+        {children || <p className="p-5 text-sm text-[#64748b]">Nu există date.</p>}
       </div>
     </section>
   );
