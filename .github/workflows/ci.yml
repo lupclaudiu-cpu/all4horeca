@@ -15,6 +15,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
         continue-on-error: true
+      - run: npm test
       - run: npm run build:netlify
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://niavcqvhmeferakuerfs.supabase.co
