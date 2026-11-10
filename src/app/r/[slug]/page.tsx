@@ -29,7 +29,7 @@ export async function generateMetadata({
     title: restaurant.seo_title || restaurant.name,
     description:
       restaurant.seo_description ||
-      `Comandă online de la ${restaurant.name} prin ANTORIA.`,
+      `Comandă online de la ${restaurant.name}.`,
     openGraph: restaurant.social_image_url ?
        { images: [restaurant.social_image_url] }
       : undefined,

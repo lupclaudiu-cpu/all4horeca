@@ -182,7 +182,7 @@ export async function getRestaurantPresence(restaurantId: string) {
     seoTitle: data.seo_title || `${data.name} | Comandă online`,
     seoDescription:
       data.seo_description ||
-      `Comandă online de la ${data.name} prin ANTORIA.`,
+      `Comandă online de la ${data.name}.`,
     socialImageUrl: data.social_image_url,
     publicUrl: qrResult.data?.public_url || `/clienti/${data.slug}`,
   } satisfies RestaurantPresence;

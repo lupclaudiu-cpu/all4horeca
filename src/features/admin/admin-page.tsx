@@ -170,7 +170,7 @@ export function AdminPage() {
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-              ALL4HORECA <span className="text-white/45">by ANTORIA</span>
+              ALL4HORECA
             </p>
             <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-[-0.06em] sm:text-5xl">
               Centru de control SaaS pentru restaurante.

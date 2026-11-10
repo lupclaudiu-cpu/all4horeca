@@ -12,4 +12,4 @@ const toBase64Url = (value) =>
 
 console.log(`NEXT_PUBLIC_VAPID_PUBLIC_KEY=${toBase64Url(keys.getPublicKey())}`);
 console.log(`VAPID_PRIVATE_KEY=${toBase64Url(keys.getPrivateKey())}`);
-console.log("VAPID_SUBJECT=mailto:contact@antoria.ro");
+console.log("VAPID_SUBJECT=mailto:contact@all4horeca.ro");

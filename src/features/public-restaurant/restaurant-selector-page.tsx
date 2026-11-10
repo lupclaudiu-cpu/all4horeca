@@ -62,7 +62,7 @@ export function RestaurantSelectorPage() {
           <AntoriaBrand inverse />
           <div className="max-w-3xl pb-10 pt-20 sm:pt-28">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">
-              ALL4HORECA by ANTORIA
+              ALL4HORECA
             </p>
             <h1 className="mt-5 text-4xl font-black tracking-[-0.06em] sm:text-6xl">
               Selector intern de aplicatii restaurant.

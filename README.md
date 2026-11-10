@@ -1,4 +1,4 @@
-# ANTORIA
+# ALL4HORECA
 
 Platformă PWA mobile-first pentru comenzi și management HORECA.
 
@@ -152,7 +152,7 @@ Produsele, comenzile și setările restaurantului sunt sincronizate prin
 Supabase. Preferințele sunt păstrate și local pentru pornire rapidă. Plățile
 reale și tracking-ul live nu sunt încă integrate.
 
-## ANTORIA Phase 2
+## ALL4HORECA Phase 2
 
 Aplică migrarea pentru promoții publice, profil client și notificări push:
 
@@ -172,7 +172,7 @@ de hosting:
 ```env
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=...
 VAPID_PRIVATE_KEY=...
-VAPID_SUBJECT=mailto:contact@antoria.ro
+VAPID_SUBJECT=mailto:contact@all4horeca.ro
 ```
 
 Notificările push necesită HTTPS în producție. Pe calculator pot fi testate

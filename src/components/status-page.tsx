@@ -16,7 +16,7 @@ export function StatusPage({
           {code}
         </div>
         <p className="mt-6 text-xs font-black uppercase tracking-[0.18em] text-[#2563eb]">
-          ALL4HORECA by ANTORIA
+          ALL4HORECA
         </p>
         <h1 className="mt-2 text-3xl font-black tracking-[-0.05em]">
           {title}

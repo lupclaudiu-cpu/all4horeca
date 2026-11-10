@@ -3,9 +3,9 @@ import { AppProviders } from "@/components/app-providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "ALL4HORECA by ANTORIA", template: "%s | ALL4HORECA" },
-  description: "Software HORECA pentru comenzi si management by ANTORIA.",
-  applicationName: "ALL4HORECA by ANTORIA",
+  title: { default: "ALL4HORECA", template: "%s | ALL4HORECA" },
+  description: "Aplicație de comenzi online pentru restaurante, cafenele și fast-food.",
+  applicationName: "ALL4HORECA",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [

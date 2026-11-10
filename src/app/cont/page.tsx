@@ -79,7 +79,7 @@ export default function AccountPage() {
       hasLocalProfile: Boolean(localProfile),
       hasAuthProfile: Boolean(profile),
       user: user?.email ?? user?.id ?? null,
-      renderedName: localProfile?.name || profile?.fullName || "Client ANTORIA",
+      renderedName: localProfile?.name || profile?.fullName || "Client",
       renderedContact:
         localProfile?.phone || localProfile?.email || profile?.email || "",
     });
@@ -108,7 +108,7 @@ export default function AccountPage() {
                 ["Local loaded", String(localProfileLoaded)],
                 ["Local profile", String(Boolean(localProfile))],
                 ["Auth profile", String(Boolean(profile))],
-                ["Rendered name", "Client ANTORIA"],
+                ["Rendered name", "Client"],
                 ["Rendered contact", "-"],
               ]}
             />
@@ -131,7 +131,7 @@ export default function AccountPage() {
   }
 
   const displayName =
-    localProfile?.name || profile?.fullName || "Client ANTORIA";
+    localProfile?.name || profile?.fullName || "Client";
   const displayContact =
     localProfile?.phone || localProfile?.email || profile?.email || "";
   const initials = displayName

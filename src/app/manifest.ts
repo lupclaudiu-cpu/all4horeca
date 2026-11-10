@@ -3,9 +3,9 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "ALL4HORECA by ANTORIA",
+    name: "ALL4HORECA",
     short_name: "ALL4HORECA",
-    description: "Software HORECA pentru comenzi si management by ANTORIA",
+    description: "Aplicație de comenzi online pentru restaurante, cafenele și fast-food",
     start_url: "/",
     scope: "/",
     display: "standalone",

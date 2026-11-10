@@ -42,7 +42,7 @@ export function CategoriesDashboardPage() {
     event.preventDefault();
     if (accessLocked) {
       setError(
-        "Perioada gratuit a expirat. Contacteaz ANTORIA pentru activarea contului.",
+        "Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.",
       );
       return;
     }
@@ -76,7 +76,7 @@ export function CategoriesDashboardPage() {
   ) => {
     if (accessLocked) {
       setError(
-        "Perioada gratuit a expirat. Contacteaz ANTORIA pentru activarea contului.",
+        "Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.",
       );
       return;
     }
@@ -101,7 +101,7 @@ export function CategoriesDashboardPage() {
   const remove = async (category: Category) => {
     if (accessLocked) {
       setError(
-        "Perioada gratuit a expirat. Contacteaz ANTORIA pentru activarea contului.",
+        "Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.",
       );
       return;
     }
@@ -134,7 +134,7 @@ export function CategoriesDashboardPage() {
 
       {accessLocked && (
         <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-          Perioada gratuit a expirat. Contacteaz ANTORIA pentru activarea contului.
+          Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.
         </p>
       )}
 

@@ -4,8 +4,8 @@ export { formatPrice } from "@/lib/money";
 export const restaurant: Restaurant = {
   id: "11111111-1111-4111-8111-111111111111",
   slug: "all4horeca",
-  name: "ANTORIA",
-  initials: "AN",
+  name: "ALL4HORECA",
+  initials: "A4",
   schedule: "10:00 - 23:30",
   deliveryTime: "25-35 min",
   rating: 4.8,

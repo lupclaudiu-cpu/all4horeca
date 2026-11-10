@@ -3,7 +3,7 @@ export type LegalSection = { heading: string; paragraphs: string[] };
 export type LegalDocument = { title: string; updated: string; sections: LegalSection[] };
 
 const OPERATOR =
-  "LUCANTO 2020 DISTRIBUTION SRL, care activează sub marca ANTORIA DIGITAL, cu sediul în Orăștie, str. Pricazului nr. 6, jud. Hunedoara, CUI RO43334187, J20/1255/2020, e-mail contact@antoria.ro, telefon 0746 322 673 („ALL4HORECA”, „noi”)";
+  "LUCANTO 2020 DISTRIBUTION SRL, care activează sub marca ALL4HORECA, cu sediul în Orăștie, str. Pricazului nr. 6, jud. Hunedoara, CUI RO43334187, J20/1255/2020, e-mail contact@all4horeca.ro, telefon 0746 322 673 („ALL4HORECA”, „noi”)";
 
 export const termsDocument: LegalDocument = {
   title: "Termeni și condiții de utilizare",
@@ -26,7 +26,7 @@ export const termsDocument: LegalDocument = {
       heading: "3. Contul",
       paragraphs: [
         "Pentru a comanda ai nevoie de un cont, creat cu numărul tău de telefon. La prima autentificare, și apoi pe dispozitive noi, primești un cod prin SMS. Nu folosim parolă.",
-        "Ești responsabil de numărul de telefon folosit și de accesul la dispozitivul tău. Dacă pierzi numărul sau dispozitivul, anunță-ne la contact@antoria.ro.",
+        "Ești responsabil de numărul de telefon folosit și de accesul la dispozitivul tău. Dacă pierzi numărul sau dispozitivul, anunță-ne la contact@all4horeca.ro.",
       ],
     },
     {
@@ -48,7 +48,7 @@ export const termsDocument: LegalDocument = {
     {
       heading: "6. Reclamații",
       paragraphs: [
-        "Pentru orice problemă cu o comandă, contactează mai întâi restaurantul (datele lui sunt în aplicație). Poți scrie și nouă la contact@antoria.ro pentru probleme legate de aplicație.",
+        "Pentru orice problemă cu o comandă, contactează mai întâi restaurantul (datele lui sunt în aplicație). Poți scrie și nouă la contact@all4horeca.ro pentru probleme legate de aplicație.",
         "Ca consumator, te poți adresa și Autorității Naționale pentru Protecția Consumatorilor (anpc.ro).",
       ],
     },
@@ -85,7 +85,7 @@ export const privacyDocument: LegalDocument = {
       heading: "1. Cine prelucrează datele tale",
       paragraphs: [
         `Pentru datele din comenzi, operatorul este restaurantul de la care comanzi; ${OPERATOR} acționează ca împuternicit al restaurantului, furnizând platforma.`,
-        "Pentru contul tău și securitatea platformei (autentificare, prevenirea abuzurilor), operatorul este LUCANTO 2020 DISTRIBUTION SRL. Contact pentru date personale: contact@antoria.ro.",
+        "Pentru contul tău și securitatea platformei (autentificare, prevenirea abuzurilor), operatorul este LUCANTO 2020 DISTRIBUTION SRL. Contact pentru date personale: contact@all4horeca.ro.",
       ],
     },
     {
@@ -114,13 +114,13 @@ export const privacyDocument: LegalDocument = {
     {
       heading: "5. Cât păstrăm datele",
       paragraphs: [
-        "Cât timp ai cont activ, plus termenele impuse de lege pentru documentele comerciale și fiscale ale restaurantului. Poți cere ștergerea contului oricând, la contact@antoria.ro; datele pe care legea ne obligă să le păstrăm rămân doar cât este necesar.",
+        "Cât timp ai cont activ, plus termenele impuse de lege pentru documentele comerciale și fiscale ale restaurantului. Poți cere ștergerea contului oricând, la contact@all4horeca.ro; datele pe care legea ne obligă să le păstrăm rămân doar cât este necesar.",
       ],
     },
     {
       heading: "6. Drepturile tale",
       paragraphs: [
-        "Ai dreptul de acces, rectificare, ștergere, restricționare, portabilitate și opoziție, precum și dreptul de a retrage consimțământul. Scrie-ne la contact@antoria.ro; răspundem în cel mult 30 de zile.",
+        "Ai dreptul de acces, rectificare, ștergere, restricționare, portabilitate și opoziție, precum și dreptul de a retrage consimțământul. Scrie-ne la contact@all4horeca.ro; răspundem în cel mult 30 de zile.",
         "Ai dreptul să depui plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (dataprotection.ro).",
       ],
     },

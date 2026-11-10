@@ -154,9 +154,36 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-8">
+          {!accessLocked &&
+            currentRestaurant?.status === "trial" &&
+            currentRestaurant.trialExpiresAt && (
+              <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-bold text-blue-900">
+                <p>
+                  Perioadă de testare: mai ai{" "}
+                  {Math.max(
+                    0,
+                    Math.ceil(
+                      (new Date(currentRestaurant.trialExpiresAt).getTime() -
+                        Date.now()) /
+                        86400000,
+                    ),
+                  )}{" "}
+                  zile (până la{" "}
+                  {new Date(currentRestaurant.trialExpiresAt).toLocaleDateString(
+                    "ro-RO",
+                  )}
+                  ). Configurează produsele, promoțiile și programul.
+                </p>
+                <p className="mt-2 font-semibold text-blue-800">
+                  Ca să încerci o comandă, deschide link-ul public al
+                  restaurantului și intră cu telefonul 0770 111 111, codul
+                  123456. Comenzile reale și SMS-urile se activează la lansare.
+                </p>
+              </div>
+            )}
           {accessLocked && (
             <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-bold text-amber-800">
-              Perioada gratuit a expirat. Contacteaz ANTORIA pentru activarea contului.
+              Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.
             </div>
           )}
           {children}

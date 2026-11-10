@@ -3,7 +3,7 @@ import { AdminShell } from "@/features/admin/admin-shell";
 import { requireServerRole } from "@/lib/auth/server-role";
 
 export const metadata: Metadata = {
-  title: { default: "Super administrator", template: "%s | ANTORIA Administrare" },
+  title: { default: "Super administrator", template: "%s | ALL4HORECA Administrare" },
   robots: { index: false, follow: false },
 };
 

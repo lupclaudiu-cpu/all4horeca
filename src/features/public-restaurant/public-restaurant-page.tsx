@@ -10,6 +10,7 @@ import { useAuth } from "@/features/auth/auth-context";
 import { useCart } from "@/features/cart/cart-context";
 import { useCatalog } from "@/features/catalog/catalog-context";
 import { useRestaurantSettings } from "@/features/settings/settings-context";
+import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import { publishDataFlowDebug } from "@/lib/debug/data-flow-debug";
 import type { Category, CurrentRestaurant, Product } from "@/lib/types";
 
@@ -28,6 +29,7 @@ export function PublicRestaurantPage({
 }) {
   const router = useRouter();
   const { user } = useAuth();
+  const { currentRestaurant } = useRestaurant();
   const { addItem, openCart } = useCart();
   const { settings, restaurantOpen, restaurantStatus } =
     useRestaurantSettings();
@@ -175,6 +177,11 @@ export function PublicRestaurantPage({
 
   return (
     <main className="min-h-screen bg-slate-100 pb-28">
+      {currentRestaurant?.status === "trial" && (
+        <div className="bg-amber-100 px-4 py-2 text-center text-xs font-black text-amber-900">
+          Restaurant în mod test. Comenzile reale nu sunt active încă.
+        </div>
+      )}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-3 py-2.5">
           <div

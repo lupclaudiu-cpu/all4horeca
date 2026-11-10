@@ -193,14 +193,11 @@ function AuthLayout({
           ALL4HORECA
         </Link>
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
-            by ANTORIA
-          </p>
           <h1 className="mt-4 max-w-xl text-5xl font-black tracking-[-0.06em]">
             Comenzi publice și administrare profesională, fără fluxuri amestecate.
           </h1>
         </div>
-        <p className="text-sm text-white/40">ALL4HORECA by ANTORIA · acces securizat</p>
+        <p className="text-sm text-white/40">ALL4HORECA · acces securizat</p>
       </section>
 
       <section className="grid place-items-center px-5 py-10">

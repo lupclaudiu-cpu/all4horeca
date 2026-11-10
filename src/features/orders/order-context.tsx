@@ -261,7 +261,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     if (currentRestaurant?.accessLocked) {
       const message =
-        "Perioada gratuita a expirat. Contacteaza ANTORIA pentru activarea contului.";
+        "Restaurantul nu poate primi comenzi online momentan. Încearcă mai târziu sau contactează restaurantul.";
       setError(message);
       throw new Error(message);
     }

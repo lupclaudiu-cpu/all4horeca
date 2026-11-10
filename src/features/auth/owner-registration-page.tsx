@@ -15,6 +15,8 @@ const initialData: OwnerSelfRegistrationInput = {
   address: "",
   password: "",
   confirmPassword: "",
+  acceptTerms: false,
+  website: "",
 };
 
 const OWNER_REGISTER_DRAFT_KEY = "all4horeca-owner-register-draft";
@@ -96,15 +98,14 @@ export function OwnerRegistrationPage() {
           <Link href="/login" className="text-xl font-black">
             ALL4HORECA
           </Link>
-          <p className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-200">
-            by ANTORIA
-          </p>
           <h1 className="mt-16 text-4xl font-black tracking-[-0.06em]">
-            Creează cont restaurant cu 7 zile gratuite.
+            Creează cont restaurant și testează 14 zile.
           </h1>
           <p className="mt-5 max-w-md text-sm leading-7 text-slate-300">
-            Primești automat meniu demo, panou de control, link public și
-            perioadă de testare. După perioada gratuită, datele rămân păstrate.
+            Primești meniu demo, panou de control și link public. Configurezi
+            singur produsele, promoțiile și programul, fără obligații și fără
+            card. Comenzile reale și SMS-urile se activează la lansare. După
+            cele 14 zile de testare, datele rămân păstrate.
           </p>
         </div>
 
@@ -129,6 +130,36 @@ export function OwnerRegistrationPage() {
             <Field label="Confirmă parola" value={data.confirmPassword} onChange={(value) => update("confirmPassword", value)} type="password" />
           </div>
 
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="hidden"
+            value={data.website ?? ""}
+            onChange={(event) => update("website", event.target.value)}
+          />
+          <label className="mt-5 flex items-start gap-3 text-xs font-bold text-slate-600">
+            <input
+              type="checkbox"
+              checked={Boolean(data.acceptTerms)}
+              onChange={(event) => update("acceptTerms", event.target.checked)}
+              className="mt-0.5 size-4"
+            />
+            <span>
+              Am citit și accept{" "}
+              <Link href="/termeni" className="text-blue-700 underline">
+                Termenii și condițiile
+              </Link>{" "}
+              și{" "}
+              <Link href="/confidentialitate" className="text-blue-700 underline">
+                Politica de confidențialitate
+              </Link>
+              .
+            </span>
+          </label>
+
           {error && (
             <p className="mt-5 rounded-2xl bg-red-50 px-5 py-4 text-sm font-bold text-red-700">
               {error}
@@ -137,7 +168,7 @@ export function OwnerRegistrationPage() {
           {result && (
             <div className="mt-5 rounded-2xl bg-emerald-50 px-5 py-4 text-sm font-bold text-emerald-800">
               <p>
-                Contul a fost creat. Perioada gratuită este activă până la{" "}
+                Contul a fost creat. Perioada de testare este activă până la{" "}
                 {new Date(result.trialExpiresAt).toLocaleDateString("ro-RO")}.
               </p>
               <Link href="/login" className="mt-3 inline-block text-blue-700">
