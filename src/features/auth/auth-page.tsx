@@ -79,10 +79,16 @@ function StaffLogin() {
           {submitting ? "Se autentifică..." : "Intră în dashboard"}
         </button>
         <Link
+          href="/parola-uitata"
+          className="mt-3 block text-center text-sm font-black text-slate-600"
+        >
+          Am uitat parola
+        </Link>
+        <Link
           href="/owner/register"
           className="mt-3 block rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-center text-sm font-black text-blue-700 transition hover:bg-blue-100"
         >
-          Creeaz cont restaurant
+          Creează cont restaurant
         </Link>
         <p className="mt-5 text-center text-xs leading-5 text-slate-500">
           Clienții pot accesa meniul și plasa comenzi fără autentificare.
