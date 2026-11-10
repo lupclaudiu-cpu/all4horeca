@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     phone: input.phone.trim(),
     email: input.email.trim(),
     seo_title: `${input.name.trim()} | Comanda online`,
-    seo_description: `Comanda online de la ${input.name.trim()} prin ANTORIA.`,
+    seo_description: `Comandă online de la ${input.name.trim()}.`,
     social_image_url: input.logoUrl,
     opening_time: input.openingTime,
     closing_time: input.closingTime,

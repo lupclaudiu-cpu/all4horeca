@@ -17,9 +17,6 @@ export function AntoriaBrand({
           <span className={`block text-[15px] font-black tracking-[0.16em] ${inverse ? "text-white" : "text-slate-950"}`}>
             ALL4HORECA
           </span>
-          <span className={`block text-[9px] font-bold uppercase tracking-[0.2em] ${inverse ? "text-cyan-200/70" : "text-slate-400"}`}>
-            by ANTORIA
-          </span>
         </span>
       )}
     </span>

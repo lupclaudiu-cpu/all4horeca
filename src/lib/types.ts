@@ -336,6 +336,8 @@ export type OwnerSelfRegistrationInput = {
   address: string;
   password: string;
   confirmPassword: string;
+  acceptTerms?: boolean;
+  website?: string;
 };
 
 export type ProductInput = {

@@ -27,7 +27,7 @@ export async function sendWebPush(
 ) {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
-  const subject = process.env.VAPID_SUBJECT || "mailto:contact@antoria.ro";
+  const subject = process.env.VAPID_SUBJECT || "mailto:contact@all4horeca.ro";
   if (!publicKey || !privateKey) {
     throw new Error(
       "Lipsesc NEXT_PUBLIC_VAPID_PUBLIC_KEY sau VAPID_PRIVATE_KEY.",

@@ -37,7 +37,7 @@ export function RestaurantSettingsPage() {
   } | null>(null);
   const accessLocked = Boolean(currentRestaurant?.accessLocked);
   const lockedMessage =
-    "Perioada gratuita a expirat. Contacteaza ANTORIA pentru activarea contului.";
+    "Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.";
 
   const updateNumber = (
     field: "deliveryFee" | "freeDeliveryThreshold" | "minimumOrderValue",

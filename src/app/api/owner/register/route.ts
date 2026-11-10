@@ -109,6 +109,10 @@ export async function POST(request: Request) {
 }
 
 function validateInput(input: OwnerSelfRegistrationInput) {
+  if (input.website?.trim()) return "Cerere invalidă.";
+  if (input.acceptTerms !== true) {
+    return "Trebuie să accepți Termenii și Politica de confidențialitate.";
+  }
   if (!input.contactName?.trim()) return "Numele persoanei de contact este obligatoriu.";
   if (!/^[0-9+\s()-]{8,16}$/.test(input.phone?.trim() ?? "")) {
     return "Telefonul este invalid.";

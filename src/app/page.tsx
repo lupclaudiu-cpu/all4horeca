@@ -1,5 +1,6 @@
-import { AntoriaHomePage } from "@/features/public-restaurant/antoria-home-page";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return <AntoriaHomePage />;
+// Pagina de prezentare este pe https://all4horeca.ro. Aplicatia ramane pe comanda.all4horeca.ro.
+export default function HomePage() {
+  redirect("https://all4horeca.ro");
 }

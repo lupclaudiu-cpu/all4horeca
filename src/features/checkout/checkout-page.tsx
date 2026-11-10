@@ -66,7 +66,7 @@ export function CheckoutPage() {
     : "/";
   const accessLocked = Boolean(currentRestaurant?.accessLocked);
   const lockedMessage =
-    "Perioada gratuita a expirat. Contacteaza ANTORIA pentru activarea contului.";
+    "Restaurantul nu poate primi comenzi online momentan. Încearcă mai târziu sau contactează restaurantul.";
   const [customer, setCustomer] = useState<CustomerDetails>(initialCustomer);
   const [orderType, setOrderType] = useState<OrderType>("delivery");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
