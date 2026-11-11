@@ -179,3 +179,10 @@ Notificările push necesită HTTPS în producție. Pe calculator pot fi testate
 prin `localhost`. Clienții autentificați activează notificările din
 `/cont/notificari`, iar restaurantul trimite broadcasturi din
 `/restaurant/dashboard/notificari`.
+
+## Idei viitoare
+
+- **Încarcă poza sau PDF-ul meniului**: administratorul fotografiază meniul tipărit
+  (sau încarcă PDF-ul), iar aplicația propune automat categoriile și produsele
+  (nume, preț), pe care le verifică înainte de salvare. Până atunci se folosesc
+  „Adăugare rapidă” și importul Excel/CSV din pagina Produse.

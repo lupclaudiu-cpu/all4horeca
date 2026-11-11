@@ -4,22 +4,28 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ChartIcon,
+  CloseIcon,
   DashboardIcon,
   HistoryIcon,
   LogoutIcon,
+  MenuIcon,
   OrdersIcon,
   ProductsIcon,
   SettingsIcon,
+  StarIcon,
   UserIcon,
 } from "@/components/icons";
 import { useRestaurantSettings } from "@/features/settings/settings-context";
 import { useAuth } from "@/features/auth/auth-context";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useOrders } from "@/features/orders/order-context";
 import { NewOrderToast } from "@/features/dashboard/new-order-toast";
 import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import { AntoriaBrand } from "@/components/antoria-brand";
+import { OrdersPauseControl } from "@/features/dashboard/orders-pause-control";
+import { FirstRunGuide } from "@/features/dashboard/first-run-guide";
+import { trialDaysLeft } from "@/lib/trial";
 
 const navigation = [
   { href: "/restaurant/dashboard", label: "Prezentare", icon: DashboardIcon },
@@ -33,7 +39,40 @@ const navigation = [
   { href: "/restaurant/dashboard/notificari", label: "Notificări", icon: OrdersIcon },
   { href: "/restaurant/dashboard/prezenta", label: "QR & SEO", icon: SettingsIcon },
   { href: "/restaurant/dashboard/setari", label: "Setări", icon: SettingsIcon },
+  { href: "/restaurant/dashboard/profil", label: "Profil restaurant", icon: UserIcon },
 ];
+
+const MENU_PATHS = [
+  "/restaurant/dashboard/meniu",
+  "/restaurant/dashboard/categorii",
+  "/restaurant/dashboard/produse",
+];
+
+// Pe telefon: 4 butoane jos. Restul paginilor sunt în „Mai mult”.
+const mobilePrimary = [
+  { href: "/restaurant/dashboard/comenzi", label: "Comenzi", icon: OrdersIcon },
+  { href: "/restaurant/dashboard/meniu", label: "Meniu", icon: ProductsIcon },
+  { href: "/restaurant/dashboard/promotii", label: "Promoții", icon: StarIcon },
+];
+
+const mobileMore = [
+  { href: "/restaurant/dashboard", label: "Prezentare", icon: DashboardIcon },
+  { href: "/restaurant/dashboard/istoric", label: "Istoric", icon: HistoryIcon },
+  { href: "/restaurant/dashboard/rapoarte", label: "Rapoarte", icon: ChartIcon },
+  { href: "/restaurant/dashboard/clienti", label: "Clienți", icon: UserIcon },
+  { href: "/restaurant/dashboard/notificari", label: "Notificări", icon: OrdersIcon },
+  { href: "/restaurant/dashboard/prezenta", label: "QR & SEO", icon: SettingsIcon },
+  { href: "/restaurant/dashboard/setari", label: "Setări", icon: SettingsIcon },
+  { href: "/restaurant/dashboard/profil", label: "Profil restaurant", icon: UserIcon },
+];
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/restaurant/dashboard") return pathname === href;
+  if (href === "/restaurant/dashboard/meniu") {
+    return MENU_PATHS.some((path) => pathname.startsWith(path));
+  }
+  return pathname.startsWith(href);
+}
 
 const staffNavigation = [
   { href: "/restaurant/dashboard/locatie", label: "Locație", icon: OrdersIcon },
@@ -58,6 +97,21 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const isStaff = profile?.role === "restaurant_staff";
   const visibleNavigation = isStaff ? staffNavigation : navigation;
+  const moreItems = isStaff ? staffNavigation : mobileMore;
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreActive =
+    !isStaff &&
+    !mobilePrimary.some((item) => isActivePath(pathname, item.href));
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMoreOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [moreOpen]);
+
   useEffect(() => {
     if (isStaff && !pathname.startsWith("/restaurant/dashboard/locatie")) {
       router.replace("/restaurant/dashboard/locatie");
@@ -87,9 +141,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <nav className="mt-6 flex-1 space-y-1.5 pb-4">
           {visibleNavigation.map((item) => {
             const active =
-              item.href === "/restaurant/dashboard"
-                ? pathname === item.href
-                : pathname.startsWith(item.href);
+              isActivePath(pathname, item.href) ||
+              (item.href.endsWith("/produse") &&
+                pathname.startsWith("/restaurant/dashboard/meniu"));
             const Icon = item.icon;
             return (
               <Link
@@ -143,14 +197,19 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </p>
             </div>
           </div>
-          <Link
-            href={
-              currentRestaurant ? `/clienti/${currentRestaurant.slug}` : "/admin"
-            }
-            className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-black text-blue-700 transition hover:bg-blue-100"
-          >
-            Aplicație
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            {!isStaff && currentRestaurant && (
+              <OrdersPauseControl disabled={Boolean(accessLocked)} />
+            )}
+            <Link
+              href={
+                currentRestaurant ? `/clienti/${currentRestaurant.slug}` : "/admin"
+              }
+              className="hidden rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-black text-blue-700 transition hover:bg-blue-100 sm:block"
+            >
+              Aplicație
+            </Link>
+          </div>
         </header>
 
         <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-8">
@@ -160,15 +219,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-bold text-blue-900">
                 <p>
                   Perioadă de testare: mai ai{" "}
-                  {Math.max(
-                    0,
-                    Math.ceil(
-                      (new Date(currentRestaurant.trialExpiresAt).getTime() -
-                        Date.now()) /
-                        86400000,
-                    ),
-                  )}{" "}
-                  zile (până la{" "}
+                  {trialDaysLeft(currentRestaurant.trialExpiresAt)} zile (până la{" "}
                   {new Date(currentRestaurant.trialExpiresAt).toLocaleDateString(
                     "ro-RO",
                   )}
@@ -189,36 +240,156 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
 
-        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t border-slate-200/80 bg-white/90 px-1 pt-2 shadow-[0_-12px_35px_rgba(15,23,42,.06)] backdrop-blur-2xl lg:hidden">
-          {visibleNavigation.map((item) => {
-            const active =
-              item.href === "/restaurant/dashboard"
-                ? pathname === item.href
-                : pathname.startsWith(item.href);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={navigationHref(item.href)}
-                className={`flex min-w-[76px] flex-1 flex-col items-center gap-1 py-2 text-[10px] font-bold ${
-                  active ? "text-blue-600" : "text-slate-400"
+        <nav
+          aria-label="Navigare principală"
+          className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-slate-200/80 bg-white/95 px-1 pt-1.5 shadow-[0_-12px_35px_rgba(15,23,42,.06)] backdrop-blur-2xl lg:hidden"
+        >
+          {isStaff ? (
+            <>
+              {staffNavigation.map((item) => (
+                <MobileNavLink
+                  key={item.href}
+                  href={navigationHref(item.href)}
+                  label={item.label}
+                  icon={item.icon}
+                  active={isActivePath(pathname, item.href)}
+                />
+              ))}
+              <button
+                type="button"
+                onClick={() => void logout()}
+                className="flex min-h-14 flex-col items-center justify-center gap-1 py-1.5 text-[11px] font-bold text-slate-500"
+              >
+                <LogoutIcon className="size-5" />
+                Ieșire
+              </button>
+            </>
+          ) : (
+            <>
+              {mobilePrimary.map((item) => (
+                <MobileNavLink
+                  key={item.href}
+                  href={navigationHref(item.href)}
+                  label={item.label}
+                  icon={item.icon}
+                  active={isActivePath(pathname, item.href)}
+                  badge={
+                    item.href.endsWith("/comenzi") ? newOrdersCount : 0
+                  }
+                />
+              ))}
+              <button
+                type="button"
+                onClick={() => setMoreOpen(true)}
+                aria-expanded={moreOpen}
+                aria-controls="dashboard-more-sheet"
+                className={`flex min-h-14 flex-col items-center justify-center gap-1 py-1.5 text-[11px] font-bold ${
+                  moreActive || moreOpen ? "text-blue-600" : "text-slate-500"
                 }`}
               >
-                <Icon className="size-5" />
-                <span className="relative truncate">
-                  {item.label.replace("Comenzi ", "")}
-                  {item.href.endsWith("/comenzi") && newOrdersCount > 0 && (
-                    <span className="absolute -right-3 -top-2 grid min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[8px] font-black text-white">
-                      {newOrdersCount}
-                    </span>
-                  )}
-                </span>
-              </Link>
-            );
-          })}
+                <MenuIcon className="size-5" />
+                Mai mult
+              </button>
+            </>
+          )}
         </nav>
+
+        {moreOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <button
+              type="button"
+              aria-label="Închide meniul"
+              onClick={() => setMoreOpen(false)}
+              className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"
+            />
+            <div
+              id="dashboard-more-sheet"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mai mult"
+              className="safe-bottom absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-[2rem] bg-white p-4 shadow-2xl"
+            >
+              <div className="flex items-center justify-between px-2 pb-3">
+                <p className="text-base font-black text-slate-950">Mai mult</p>
+                <button
+                  type="button"
+                  onClick={() => setMoreOpen(false)}
+                  aria-label="Închide"
+                  className="grid size-11 place-items-center rounded-full text-slate-500"
+                >
+                  <CloseIcon className="size-5" />
+                </button>
+              </div>
+              <ul className="divide-y divide-slate-100">
+                {moreItems.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActivePath(pathname, item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={navigationHref(item.href)}
+                        onClick={() => setMoreOpen(false)}
+                        className={`flex min-h-14 items-center gap-3 rounded-xl px-3 text-sm font-black ${
+                          active ? "bg-blue-50 text-blue-700" : "text-slate-800"
+                        }`}
+                      >
+                        <Icon className="size-5" />
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => void logout()}
+                    className="flex min-h-14 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-black text-red-700"
+                  >
+                    <LogoutIcon className="size-5" />
+                    Ieșire din cont
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
+        {!isStaff && <FirstRunGuide />}
         <NewOrderToast />
       </div>
     </div>
+  );
+}
+
+function MobileNavLink({
+  href,
+  label,
+  icon: Icon,
+  active,
+  badge = 0,
+}: {
+  href: string;
+  label: string;
+  icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode;
+  active: boolean;
+  badge?: number;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className={`flex min-h-14 flex-col items-center justify-center gap-1 py-1.5 text-[11px] font-bold ${
+        active ? "text-blue-600" : "text-slate-500"
+      }`}
+    >
+      <span className="relative">
+        <Icon className="size-5" />
+        {badge > 0 && (
+          <span className="absolute -right-3 -top-2 grid min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[9px] font-black text-white">
+            {badge}
+          </span>
+        )}
+      </span>
+      {label}
+    </Link>
   );
 }

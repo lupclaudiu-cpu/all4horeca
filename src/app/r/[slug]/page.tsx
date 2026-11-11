@@ -5,16 +5,47 @@ import { getPublicServerClient } from "@/lib/supabase/public-server";
 import { isTrialExpired } from "@/lib/trial";
 import { getPublicCatalog } from "@/services/public-catalog-service";
 
+const BASE_COLUMNS =
+  "id, slug, name, logo_url, primary_color, secondary_color, address, phone, seo_title, seo_description, social_image_url, is_active, status, trial_active, trial_started_at, trial_expires_at, contract_signed";
+
+type PublicRestaurantRow = {
+  id: string;
+  slug: string;
+  name: string;
+  logo_url: string | null;
+  primary_color: string;
+  secondary_color: string;
+  address: string;
+  phone: string;
+  seo_title: string;
+  seo_description: string;
+  social_image_url: string | null;
+  is_active: boolean;
+  status: "trial" | "active" | "suspended" | "deleted" | null;
+  trial_active: boolean | null;
+  trial_started_at: string | null;
+  trial_expires_at: string | null;
+  contract_signed: boolean | null;
+  cover_image_url?: string | null;
+  facebook_url?: string | null;
+  instagram_url?: string | null;
+};
+
 async function getRestaurant(slug: string) {
   const supabase = getPublicServerClient();
   if (!supabase) return null;
-  const { data } = await supabase
-    .from("restaurants")
-    .select("id, slug, name, logo_url, primary_color, secondary_color, address, phone, seo_title, seo_description, social_image_url, is_active, status, trial_active, trial_started_at, trial_expires_at, contract_signed")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .maybeSingle();
-  return data;
+  const run = (columns: string) =>
+    supabase
+      .from("restaurants")
+      .select(columns)
+      .eq("slug", slug)
+      .eq("is_active", true)
+      .maybeSingle();
+  // Coloanele de profil (copertă, rețele sociale) vin din migrarea 20261111000100.
+  // Dacă nu e aplicată încă, pagina funcționează cu selecția de bază.
+  const extended = await run(`${BASE_COLUMNS}, cover_image_url, facebook_url, instagram_url`);
+  const result = extended.error ? await run(BASE_COLUMNS) : extended;
+  return (result.data as unknown as PublicRestaurantRow | null) ?? null;
 }
 
 export async function generateMetadata({
@@ -70,6 +101,9 @@ export default async function RestaurantPage({
         trialStartedAt: restaurant.trial_started_at ?? null,
         trialExpiresAt: restaurant.trial_expires_at ?? null,
         contractSigned: restaurant.contract_signed ?? false,
+        coverImageUrl: restaurant.cover_image_url ?? null,
+        facebookUrl: restaurant.facebook_url ?? "",
+        instagramUrl: restaurant.instagram_url ?? "",
         trialExpired,
         accessLocked:
           status === "suspended" ||

@@ -54,7 +54,7 @@ export function CheckoutPage() {
   const { user, loading: authLoading } = useAuth();
   const { items, total: subtotal, clearCart, removeItem, addItem } = useCart();
   const { createOrder } = useOrders();
-  const { settings, restaurantOpen } = useRestaurantSettings();
+  const { settings, restaurantOpen, ordersPaused } = useRestaurantSettings();
   const { products } = useCatalog();
   const { currentRestaurant } = useRestaurant();
   const fallbackRestaurantId = items[0]?.product.restaurantId;
@@ -636,9 +636,13 @@ export function CheckoutPage() {
           >
             {submitting ? "Se trimite..." : `Trimite comanda · ${formatPrice(total)}`}
           </button>
-          {!checkoutRestaurantOpen && (
+          {!checkoutRestaurantOpen && !accessLocked && (
             <UnavailableMessage
-              text={`Restaurantul este închis. Comenzile pot fi trimise între ${checkoutSettings.openingTime} și ${checkoutSettings.closingTime}.`}
+              text={
+                currentRestaurant && ordersPaused ?
+                   "Restaurantul nu primește comenzi momentan."
+                  : `Restaurantul este închis. Comenzile pot fi trimise între ${checkoutSettings.openingTime} și ${checkoutSettings.closingTime}.`
+              }
             />
           )}
           {accessLocked && <UnavailableMessage text={lockedMessage} />}

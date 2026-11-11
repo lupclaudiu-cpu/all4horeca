@@ -10,6 +10,7 @@ import {
   type RestaurantPresence,
 } from "@/services/commercial-service";
 import { useRestaurant } from "@/features/restaurant/restaurant-context";
+import { markPublicLinkUsed } from "@/lib/setup-checklist";
 
 export function RestaurantPresencePage() {
   const {
@@ -72,6 +73,7 @@ export function RestaurantPresencePage() {
   };
 
   const download = (content: string, type: string, filename: string) => {
+    markPublicLinkUsed(currentRestaurant?.id);
     const anchor = document.createElement("a");
     anchor.href =
       type === "image/png" ?
@@ -118,6 +120,30 @@ export function RestaurantPresencePage() {
           <p className="mt-3 break-all text-xs font-bold text-[#64748b]">
             {presence.publicUrl}
           </p>
+          <div className="mt-3 flex justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                markPublicLinkUsed(currentRestaurant?.id);
+                void navigator.clipboard
+                  ?.writeText(presence.publicUrl)
+                  .then(() => setMessage("Link-ul a fost copiat."))
+                  .catch(() => setError("Link-ul nu a putut fi copiat."));
+              }}
+              className="min-h-11 rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-black text-[#0f172a]"
+            >
+              Copiază link-ul
+            </button>
+            <a
+              href={presence.publicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => markPublicLinkUsed(currentRestaurant?.id)}
+              className="inline-flex min-h-11 items-center rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-black text-[#0f172a]"
+            >
+              Deschide
+            </a>
+          </div>
           <div className="mt-5 flex justify-center gap-2">
             <button type="button" onClick={() => download(qr, "image/png", `${presence.slug}-qr.png`)} className="rounded-xl bg-[#2563eb] px-4 py-3 text-xs font-black text-white">Descarca PNG</button>
             <button type="button" onClick={() => download(svg, "image/svg+xml", `${presence.slug}-qr.svg`)} className="rounded-xl bg-[#0f172a] px-4 py-3 text-xs font-black text-white">Descarca SVG</button>

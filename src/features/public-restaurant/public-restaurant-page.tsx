@@ -31,7 +31,7 @@ export function PublicRestaurantPage({
   const { user } = useAuth();
   const { currentRestaurant } = useRestaurant();
   const { addItem, openCart } = useCart();
-  const { settings, restaurantOpen, restaurantStatus } =
+  const { settings, restaurantOpen, restaurantStatus, ordersPaused } =
     useRestaurantSettings();
   const {
     products: contextProducts,
@@ -173,13 +173,36 @@ export function PublicRestaurantPage({
   };
 
   const accent = restaurant.primaryColor || "#0e7490";
-  const heroStatus = restaurantOpen ? "Deschis" : restaurantStatus.label;
+  const heroStatus = ordersPaused ?
+     "Nu primește comenzi momentan"
+    : restaurantOpen ?
+       "Deschis"
+      : restaurantStatus.label;
+  const mapsUrl = restaurant.address ?
+     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        `${restaurant.name} ${restaurant.address}`,
+      )}`
+    : null;
 
   return (
     <main className="min-h-screen bg-slate-100 pb-28">
       {currentRestaurant?.status === "trial" && (
         <div className="bg-amber-100 px-4 py-2 text-center text-xs font-black text-amber-900">
           Restaurant în mod test. Comenzile reale nu sunt active încă.
+        </div>
+      )}
+      {restaurant.coverImageUrl && (
+        <div className="relative mx-auto h-32 max-w-3xl overflow-hidden bg-slate-200 sm:h-44 sm:rounded-b-3xl">
+          <SafeImage
+            src={restaurant.coverImageUrl}
+            alt=""
+            fallbackLabel={restaurant.name}
+            fill
+            priority
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 768px"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         </div>
       )}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
@@ -243,6 +266,15 @@ export function PublicRestaurantPage({
       </header>
 
       <div className="mx-auto max-w-3xl">
+        {ordersPaused && (
+          <div
+            role="status"
+            className="mx-3 mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-black text-amber-900"
+          >
+            Restaurantul nu primește comenzi momentan. Te rugăm să revii puțin
+            mai târziu.
+          </div>
+        )}
         {!user && (
           <div
             className="mx-3 mt-3 flex items-center gap-3 rounded-2xl py-2 pl-4 pr-2 text-white"
@@ -371,6 +403,71 @@ export function PublicRestaurantPage({
             )}
           </section>
         </div>
+        {(restaurant.address ||
+          restaurant.phone ||
+          restaurant.facebookUrl ||
+          restaurant.instagramUrl) && (
+          <section
+            aria-label="Contact restaurant"
+            className="mx-3 mt-8 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700"
+          >
+            <h2 className="text-base font-black text-slate-950">
+              {restaurant.name}
+            </h2>
+            {restaurant.address && (
+              <p className="mt-2">
+                {mapsUrl ? (
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold underline"
+                  >
+                    {restaurant.address}
+                  </a>
+                ) : (
+                  restaurant.address
+                )}
+              </p>
+            )}
+            {restaurant.phone && (
+              <p className="mt-1">
+                Telefon:{" "}
+                <a
+                  href={`tel:${restaurant.phone.replace(/\s/g, "")}`}
+                  className="font-black"
+                  style={{ color: accent }}
+                >
+                  {restaurant.phone}
+                </a>
+              </p>
+            )}
+            {(restaurant.facebookUrl || restaurant.instagramUrl) && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {restaurant.facebookUrl && (
+                  <a
+                    href={restaurant.facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="grid min-h-11 place-items-center rounded-xl border border-slate-200 px-4 text-xs font-black text-slate-800"
+                  >
+                    Facebook
+                  </a>
+                )}
+                {restaurant.instagramUrl && (
+                  <a
+                    href={restaurant.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="grid min-h-11 place-items-center rounded-xl border border-slate-200 px-4 text-xs font-black text-slate-800"
+                  >
+                    Instagram
+                  </a>
+                )}
+              </div>
+            )}
+          </section>
+        )}
         <footer className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-1 px-3 pb-4 text-xs font-bold text-slate-600">
           <a href="/termeni" className="underline">Termeni</a>
           <a href="/confidentialitate" className="underline">Confidențialitate</a>

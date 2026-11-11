@@ -38,7 +38,16 @@ type RestaurantRow = {
   trial_started_at?: string | null;
   trial_expires_at?: string | null;
   contract_signed?: boolean;
+  created_at?: string | null;
+  cover_image_url?: string | null;
+  facebook_url?: string | null;
+  instagram_url?: string | null;
 };
+
+const RESTAURANT_COLUMNS =
+  "id, slug, name, logo_url, primary_color, secondary_color, address, phone, is_active, status, trial_active, trial_started_at, trial_expires_at, contract_signed, created_at";
+// Coloane adăugate de migrarea 20261111000100; dacă lipsesc, folosim selecția de bază.
+const EXTENDED_RESTAURANT_COLUMNS = `${RESTAURANT_COLUMNS}, cover_image_url, facebook_url, instagram_url`;
 
 const RestaurantContext = createContext<RestaurantContextValue | null>(null);
 export const RESTAURANT_STORAGE_KEY = "all4horeca-current-restaurant";
@@ -102,18 +111,19 @@ export function RestaurantProvider({
     }) => {
       const supabase = getSupabaseClient();
       if (!supabase) throw new Error("Supabase nu este configurat.");
-      let query = supabase
-        .from("restaurants")
-        .select(
-          "id, slug, name, logo_url, primary_color, secondary_color, address, phone, is_active, status, trial_active, trial_started_at, trial_expires_at, contract_signed",
-        );
-      if (id) query = query.eq("id", id);
-      else if (slug) query = query.eq("slug", slug);
-      else return null;
-
-      const { data, error: restaurantError } = await query.maybeSingle();
+      if (!id && !slug) return null;
+      const run = (columns: string) => {
+        const query = supabase.from("restaurants").select(columns);
+        return (id ? query.eq("id", id) : query.eq("slug", slug!)).maybeSingle();
+      };
+      let { data, error: restaurantError } = await run(
+        EXTENDED_RESTAURANT_COLUMNS,
+      );
+      if (restaurantError) {
+        ({ data, error: restaurantError } = await run(RESTAURANT_COLUMNS));
+      }
       if (restaurantError) throw new Error(restaurantError.message);
-      return data ? mapRestaurant(data as RestaurantRow) : null;
+      return data ? mapRestaurant(data as unknown as RestaurantRow) : null;
     },
     [],
   );
@@ -327,6 +337,10 @@ function mapRestaurant(row: RestaurantRow): CurrentRestaurant {
     trialStartedAt: row.trial_started_at ?? null,
     trialExpiresAt: row.trial_expires_at ?? null,
     contractSigned: row.contract_signed ?? false,
+    coverImageUrl: row.cover_image_url ?? null,
+    facebookUrl: row.facebook_url ?? "",
+    instagramUrl: row.instagram_url ?? "",
+    createdAt: row.created_at ?? null,
     trialExpired,
     accessLocked:
       status === "suspended" ||

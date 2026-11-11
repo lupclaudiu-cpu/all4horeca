@@ -1,4 +1,9 @@
-import type { DeliveryZone, RestaurantSettings, ScheduleDay } from "@/lib/types";
+import type {
+  DeliveryZone,
+  RestaurantSettings,
+  ScheduleDay,
+  SpecialScheduleDay,
+} from "@/lib/types";
 
 export const defaultSchedule: ScheduleDay[] = [
   { day: 1, enabled: true, openingTime: "10:00", closingTime: "23:30" },
@@ -48,6 +53,9 @@ export const restaurantSettings: RestaurantSettings = {
   estimatedDeliveryTime: "30-45 min",
   blockOrdersOutsideSchedule: true,
   schedule: defaultSchedule,
+  specialSchedule: [],
+  ordersPaused: false,
+  ordersPausedUntil: null,
   deliveryZones: defaultDeliveryZones,
   openingTime: "10:00",
   closingTime: "23:30",
@@ -67,6 +75,9 @@ export const unavailableRestaurantSettings: RestaurantSettings = {
   estimatedDeliveryTime: "",
   blockOrdersOutsideSchedule: true,
   schedule: defaultSchedule.map((day) => ({ ...day, enabled: false })),
+  specialSchedule: [],
+  ordersPaused: false,
+  ordersPausedUntil: null,
   deliveryZones: [],
   openingTime: "00:00",
   closingTime: "00:00",
@@ -87,9 +98,24 @@ export function getRestaurantScheduleStatus(
   date = new Date(),
 ) {
   const currentDay = date.getDay();
-  const daySettings =
-    settings.schedule.find((item) => item.day === currentDay) ??
-    fallbackDay(settings, currentDay);
+  const special = findSpecialDay(settings.specialSchedule, date);
+  if (special?.closed) {
+    return {
+      open: false,
+      label: special.label ? `Închis azi · ${special.label}` : "Închis azi",
+      openingTime: special.openingTime,
+      closingTime: special.closingTime,
+    };
+  }
+  const daySettings: ScheduleDay = special
+    ? {
+        day: currentDay,
+        enabled: true,
+        openingTime: special.openingTime,
+        closingTime: special.closingTime,
+      }
+    : settings.schedule.find((item) => item.day === currentDay) ??
+      fallbackDay(settings, currentDay);
   if (!daySettings.enabled) {
     const nextOpen = getNextOpenDay(settings, date);
     return {
@@ -126,6 +152,55 @@ export function getRestaurantScheduleStatus(
     openingTime: daySettings.openingTime,
     closingTime: daySettings.closingTime,
   };
+}
+
+/** Data locală în format YYYY-MM-DD (nu UTC, ca să nu sară ziua după miezul nopții). */
+export function localDateKey(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+export function findSpecialDay(
+  specialSchedule: SpecialScheduleDay[] | undefined,
+  date: Date,
+) {
+  if (!specialSchedule?.length) return undefined;
+  const key = localDateKey(date);
+  return specialSchedule.find((item) => item.date === key);
+}
+
+export function normalizeSpecialSchedule(value: unknown): SpecialScheduleDay[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter(
+      (item): item is Partial<SpecialScheduleDay> =>
+        Boolean(item) && typeof item === "object",
+    )
+    .filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(String(item.date ?? "")))
+    .map((item) => ({
+      date: String(item.date),
+      closed: item.closed !== false,
+      openingTime: isTime(item.openingTime) ? item.openingTime : "10:00",
+      closingTime: isTime(item.closingTime) ? item.closingTime : "22:00",
+      label: String(item.label ?? "").slice(0, 80),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** Pauza este activă dacă e pornită și nu a expirat (fără dată = până la reactivare). */
+export function isOrdersPaused(
+  settings: Pick<RestaurantSettings, "ordersPaused" | "ordersPausedUntil">,
+  date = new Date(),
+) {
+  if (!settings.ordersPaused) return false;
+  if (!settings.ordersPausedUntil) return true;
+  const until = new Date(settings.ordersPausedUntil).getTime();
+  return Number.isFinite(until) && until > date.getTime();
+}
+
+function isTime(value: unknown): value is string {
+  return typeof value === "string" && /^\d{2}:\d{2}$/.test(value);
 }
 
 export function resolveDeliveryZone(
