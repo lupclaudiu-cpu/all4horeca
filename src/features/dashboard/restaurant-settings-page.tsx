@@ -4,7 +4,8 @@ import { useState } from "react";
 import { StaffManager } from "@/features/dashboard/staff-manager";
 import { useRestaurantSettings } from "@/features/settings/settings-context";
 import { unlockNotificationSound } from "@/features/orders/notification-sound";
-import type { DeliveryZone, ScheduleDay } from "@/lib/types";
+import type { DeliveryZone, ScheduleDay, SpecialScheduleDay } from "@/lib/types";
+import { localDateKey } from "@/features/settings/restaurant-settings";
 import { useRestaurant } from "@/features/restaurant/restaurant-context";
 
 const dayLabels = [
@@ -28,6 +29,7 @@ export function RestaurantSettingsPage() {
     updateSettings,
     saveSettings,
     resetSettings,
+    extendedSettingsAvailable,
   } = useRestaurantSettings();
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -53,6 +55,40 @@ export function RestaurantSettingsPage() {
     updateSettings({
       schedule: settings.schedule.map((item) =>
         item.day === day ? { ...item, ...updates } : item,
+      ),
+    });
+  };
+
+  const updateSpecialDay = (
+    index: number,
+    updates: Partial<SpecialScheduleDay>,
+  ) => {
+    updateSettings({
+      specialSchedule: settings.specialSchedule.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, ...updates } : item,
+      ),
+    });
+  };
+
+  const addSpecialDay = () => {
+    updateSettings({
+      specialSchedule: [
+        ...settings.specialSchedule,
+        {
+          date: localDateKey(new Date()),
+          closed: true,
+          openingTime: "10:00",
+          closingTime: "16:00",
+          label: "",
+        },
+      ],
+    });
+  };
+
+  const removeSpecialDay = (index: number) => {
+    updateSettings({
+      specialSchedule: settings.specialSchedule.filter(
+        (_, itemIndex) => itemIndex !== index,
       ),
     });
   };
@@ -246,6 +282,85 @@ export function RestaurantSettingsPage() {
             <strong>{restaurantStatus.open ? "OPEN" : "CLOSED"}</strong> ·{" "}
             {restaurantStatus.label}
           </p>
+        </SettingsCard>
+
+        <SettingsCard title="Program special" subtitle="Sărbători și zile speciale">
+          <p className="text-xs leading-5 text-[#64748b]">
+            Pentru o anumită dată poți fi închis sau poți avea alt program.
+            Are prioritate față de programul pe zile.
+          </p>
+          {!extendedSettingsAvailable && (
+            <p className="rounded-xl bg-amber-50 px-4 py-3 text-xs font-bold text-amber-800">
+              Programul special va fi disponibil după actualizarea bazei de date.
+            </p>
+          )}
+          {extendedSettingsAvailable && (
+            <>
+              {settings.specialSchedule.map((item, index) => (
+                <div
+                  key={index}
+                  className="space-y-3 rounded-2xl border border-[#e2e8f0] p-3"
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="block">
+                      <span className="text-sm font-bold">Data</span>
+                      <input
+                        type="date"
+                        value={item.date}
+                        onChange={(event) =>
+                          updateSpecialDay(index, { date: event.target.value })
+                        }
+                        className="mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3 py-3 text-sm outline-none focus:border-[#2563eb]"
+                      />
+                    </label>
+                    <TextField
+                      label="Motiv (opțional)"
+                      value={item.label}
+                      onChange={(label) => updateSpecialDay(index, { label })}
+                      placeholder="Crăciun"
+                    />
+                  </div>
+                  <Toggle
+                    label="Închis toată ziua"
+                    checked={item.closed}
+                    onChange={(closed) => updateSpecialDay(index, { closed })}
+                  />
+                  {!item.closed && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <TimeField
+                        label="Ora deschiderii"
+                        value={item.openingTime}
+                        onChange={(openingTime) =>
+                          updateSpecialDay(index, { openingTime })
+                        }
+                      />
+                      <TimeField
+                        label="Ora închiderii"
+                        value={item.closingTime}
+                        onChange={(closingTime) =>
+                          updateSpecialDay(index, { closingTime })
+                        }
+                      />
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeSpecialDay(index)}
+                    className="rounded-xl bg-red-50 px-4 py-3 text-xs font-black text-red-700"
+                  >
+                    Șterge data
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addSpecialDay}
+                className="rounded-xl bg-[#0f172a] px-4 py-3 text-xs font-black text-white"
+              >
+                Adaugă o dată
+              </button>
+            </>
+          )}
         </SettingsCard>
 
         <SettingsCard title="Livrare" subtitle="Taxe și praguri">

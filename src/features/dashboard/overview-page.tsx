@@ -17,6 +17,8 @@ import {
   statusStyles,
 } from "@/features/dashboard/dashboard-utils";
 import { StatCard } from "@/features/dashboard/stat-card";
+import { SetupChecklistCard } from "@/features/dashboard/setup-checklist-card";
+import { PublicMenuPreviewButton } from "@/features/dashboard/public-menu-preview-button";
 import { useOrders } from "@/features/orders/order-context";
 import { sumMoney } from "@/lib/money";
 
@@ -68,6 +70,7 @@ export function OverviewPage() {
 
   return (
     <div className="mx-auto max-w-7xl">
+      <SetupChecklistCard />
       <section className="relative overflow-hidden rounded-[2.2rem] bg-slate-950 p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.22)] sm:p-8">
         <div className="absolute -right-24 -top-24 size-72 rounded-full bg-blue-500/25 blur-3xl" />
         <div className="absolute bottom-0 left-1/3 size-56 rounded-full bg-cyan-400/15 blur-3xl" />
@@ -84,12 +87,15 @@ export function OverviewPage() {
               mișcă business-ul, dintr-un singur panou premium.
             </p>
           </div>
-          <Link
-            href="/restaurant/dashboard/comenzi"
-            className="w-fit rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-400 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-950/30 transition hover:brightness-110"
-          >
-            Deschide comenzile live
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/restaurant/dashboard/comenzi"
+              className="w-fit rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-400 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-950/30 transition hover:brightness-110"
+            >
+              Deschide comenzile live
+            </Link>
+            <PublicMenuPreviewButton variant="dark" />
+          </div>
         </div>
       </section>
 

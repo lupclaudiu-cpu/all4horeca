@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { SafeImage } from "@/components/safe-image";
 import { formatPrice } from "@/data/restaurant";
 import { DashboardHeader } from "@/features/dashboard/dashboard-header";
@@ -13,6 +13,9 @@ import {
   uploadProductImage,
 } from "@/services/commercial-service";
 import { ProductOptionsModal } from "@/features/dashboard/product-options-modal";
+import { QuickAddProducts } from "@/features/dashboard/quick-add-products";
+import { PublicMenuPreviewButton } from "@/features/dashboard/public-menu-preview-button";
+import { buildProductTemplateCsv } from "@/lib/product-import";
 import { useRestaurant } from "@/features/restaurant/restaurant-context";
 
 const emptyProduct: ProductInput = {
@@ -49,6 +52,32 @@ export function ProductsDashboardPage() {
     "all" | "active" | "inactive" | "sold_out" | "featured"
   >("all");
   const importRef = useRef<HTMLInputElement>(null);
+  const importSectionRef = useRef<HTMLElement>(null);
+  const [quickMode, setQuickMode] = useState(false);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
+
+  // Linkurile „Adăugare rapidă” / „Import” din Meniu și din lista de configurare.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const timer = window.setTimeout(() => {
+      if (params.get("rapid") === "1") setQuickMode(true);
+      if (params.get("import") === "1") {
+        importSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const downloadTemplate = () => {
+    const url = URL.createObjectURL(
+      new Blob([buildProductTemplateCsv()], { type: "text/csv;charset=utf-8" }),
+    );
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "model-produse.csv";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
   const activeCount = products.filter(
     (product) => product.active !== false && !product.soldOut,
   ).length;
@@ -106,10 +135,15 @@ export function ProductsDashboardPage() {
     }
     setImporting(true);
     setActionError(null);
+    setImportMessage(null);
     try {
-      const count = await importProductsFile(restaurantId, file);
+      const { imported, skipped } = await importProductsFile(restaurantId, file);
       await refresh();
-      window.alert(`${count} produse au fost importate.`);
+      setImportMessage(
+        `${imported} produse au fost importate.${
+          skipped ? ` ${skipped} rânduri incomplete au fost sărite.` : ""
+        }`,
+      );
     } catch (reason) {
       setActionError(reason instanceof Error ? reason.message : "Import eșuat.");
     } finally {
@@ -126,21 +160,18 @@ export function ProductsDashboardPage() {
         description="Administrează produsele, disponibilitatea, imaginile și recomandările."
         action={
           <div className="flex flex-wrap gap-2">
+            <PublicMenuPreviewButton className="rounded-xl py-2 text-xs" />
             <button
               type="button"
-              disabled={accessLocked}
-              onClick={() => importRef.current?.click()}
-              className="rounded-xl bg-white px-4 py-3 text-xs font-black shadow-sm disabled:opacity-50"
+              disabled={!restaurantId || accessLocked}
+              onClick={() => setQuickMode((value) => !value)}
+              aria-pressed={quickMode}
+              className={`rounded-xl px-4 py-3 text-xs font-black shadow-sm disabled:opacity-50 ${
+                quickMode ? "bg-slate-950 text-white" : "bg-white text-slate-900"
+              }`}
             >
-              {importing ? "Se importă..." : "Import XLSX / CSV"}
+              Adăugare rapidă
             </button>
-            <input
-              ref={importRef}
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              className="hidden"
-              onChange={(event) => void importFile(event.target.files?.[0])}
-            />
             <button
               type="button"
               disabled={!restaurantId || accessLocked}
@@ -166,6 +197,60 @@ export function ProductsDashboardPage() {
           </div>
         }
       />
+
+      {quickMode && restaurantId && !loading && (
+        <QuickAddProducts
+          restaurantId={restaurantId}
+          categories={categories.filter((category) => category.active !== false)}
+          startSortOrder={products.length + 1}
+          disabled={accessLocked}
+          onSaved={() => refresh()}
+          onClose={() => setQuickMode(false)}
+        />
+      )}
+
+      <section
+        ref={importSectionRef}
+        id="import"
+        className="mt-5 flex flex-col gap-3 rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <h2 className="text-sm font-black text-slate-950">Import din Excel / CSV</h2>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            Coloane: nume, descriere, preț, categorie, gramaj, alergeni.
+            Categoriile care nu există se creează automat.
+          </p>
+          {importMessage && (
+            <p role="status" className="mt-2 text-xs font-bold text-emerald-700">
+              {importMessage}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={downloadTemplate}
+            className="min-h-11 rounded-xl border border-slate-200 bg-white px-4 text-xs font-black text-slate-800"
+          >
+            Descarcă modelul
+          </button>
+          <button
+            type="button"
+            disabled={!restaurantId || accessLocked || importing}
+            onClick={() => importRef.current?.click()}
+            className="min-h-11 rounded-xl bg-slate-950 px-4 text-xs font-black text-white disabled:opacity-50"
+          >
+            {importing ? "Se importă..." : "Importă fișier Excel / CSV"}
+          </button>
+          <input
+            ref={importRef}
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            className="hidden"
+            onChange={(event) => void importFile(event.target.files?.[0])}
+          />
+        </div>
+      </section>
 
       <div className="mt-5 flex flex-wrap gap-2">
         <Badge text={`${activeCount} active`} tone="green" />

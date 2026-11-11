@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx";
 import { getSupabaseClient } from "@/lib/supabase/client";
+import { parseProductRow } from "@/lib/product-import";
 import type {
   Category,
   ProductInput,
@@ -342,12 +343,70 @@ export async function uploadProductImage(
     .publicUrl;
 }
 
+/** Logo / copertă: același mecanism ca uploadProductImage, în folderul restaurantului. */
+export async function uploadRestaurantImage(
+  restaurantId: string,
+  file: File,
+  kind: "logo" | "cover",
+) {
+  validateImage(file);
+  const supabase = requireSupabase();
+  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const path = `${restaurantId}/${kind}-${crypto.randomUUID()}.${extension}`;
+  const { error } = await supabase.storage
+    .from("restaurant-assets")
+    .upload(path, file, { upsert: false, contentType: file.type });
+  if (error) throw new Error(error.message);
+  return supabase.storage.from("restaurant-assets").getPublicUrl(path).data
+    .publicUrl;
+}
+
+export type RestaurantProfileInput = {
+  name: string;
+  logoUrl: string | null;
+  coverImageUrl: string | null;
+  primaryColor: string;
+  phone: string;
+  address: string;
+  facebookUrl: string;
+  instagramUrl: string;
+};
+
+export async function updateRestaurantProfile(
+  restaurantId: string,
+  input: RestaurantProfileInput,
+) {
+  const { error } = await requireSupabase().rpc("update_restaurant_profile", {
+    p_restaurant_id: restaurantId,
+    p_profile: {
+      name: input.name.trim(),
+      logo_url: input.logoUrl || "",
+      cover_image_url: input.coverImageUrl || "",
+      primary_color: input.primaryColor,
+      phone: input.phone.trim(),
+      address: input.address.trim(),
+      facebook_url: input.facebookUrl.trim(),
+      instagram_url: input.instagramUrl.trim(),
+    },
+  });
+  if (error) {
+    if (error.code === "PGRST202" || /could not find the function/i.test(error.message)) {
+      throw new Error(
+        "Salvarea profilului va fi disponibilă după actualizarea bazei de date.",
+      );
+    }
+    throw new Error(error.message);
+  }
+}
+
 export async function importProductsFile(
   restaurantId: string,
   file: File,
 ) {
-  const buffer = await file.arrayBuffer();
-  const workbook = XLSX.read(buffer);
+  // CSV-ul se citește ca text UTF-8, ca diacriticele din antet („preț”) să nu se strice.
+  const workbook = file.name.toLowerCase().endsWith(".csv") ?
+     XLSX.read(await file.text(), { type: "string" })
+    : XLSX.read(await file.arrayBuffer());
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
     defval: "",
@@ -359,27 +418,22 @@ export async function importProductsFile(
     categories.map((item) => [normalize(item.name), item.id]),
   );
   let imported = 0;
+  let skipped = 0;
 
   for (const row of rows) {
-    const categoryName = String(
-      row.Categorie || row.categorie || row.Category || "",
-    ).trim();
-    const productName = String(
-      row.Produs || row.produs || row.Product || "",
-    ).trim();
-    const description = String(
-      row.Descriere || row.descriere || row.Description || "",
-    ).trim();
-    const price = Number(row["Preț"] || row.Pret || row.pret || row.Price);
-    if (!categoryName || !productName || !Number.isFinite(price)) continue;
+    const parsed = parseProductRow(row);
+    if (!parsed) {
+      skipped += 1;
+      continue;
+    }
 
-    let categoryId = categoryMap.get(normalize(categoryName));
+    let categoryId = categoryMap.get(normalize(parsed.categoryName));
     if (!categoryId) {
       const { data, error } = await requireSupabase()
         .from("categories")
         .insert({
           restaurant_id: restaurantId,
-          name: categoryName,
+          name: parsed.categoryName,
           sort_order: categoryMap.size + 1,
           active: true,
         })
@@ -388,31 +442,76 @@ export async function importProductsFile(
       if (error) throw new Error(error.message);
       const createdCategoryId = String(data.id);
       categoryId = createdCategoryId;
-      categoryMap.set(normalize(categoryName), createdCategoryId);
+      categoryMap.set(normalize(parsed.categoryName), createdCategoryId);
     }
 
     await saveProduct(restaurantId, {
-      name: productName,
-      description,
+      ...newProductDefaults,
+      name: parsed.name,
+      description: parsed.description,
       categoryId,
-      price,
-      weight: "",
-      ingredients: "",
-      allergens: "",
-      prepTime: "15-25 min",
-      vatRate: 9,
-      active: true,
-      soldOut: false,
-      featured: false,
-      bestseller: false,
-      isNew: false,
+      price: parsed.price,
+      weight: parsed.weight,
+      allergens: parsed.allergens,
       sortOrder: imported + 1,
-      recommendationIds: [],
     });
     imported += 1;
   }
 
-  return imported;
+  if (!imported) {
+    throw new Error(
+      "Niciun rând valid. Verifică antetul (nume, descriere, preț, categorie, gramaj, alergeni) și că fiecare produs are nume, preț și categorie.",
+    );
+  }
+  return { imported, skipped };
+}
+
+/** Valorile implicite pentru produsele adăugate rapid sau importate. */
+export const newProductDefaults: ProductInput = {
+  name: "",
+  description: "",
+  categoryId: "",
+  price: 0,
+  weight: "",
+  ingredients: "",
+  allergens: "",
+  prepTime: "15-25 min",
+  vatRate: 9,
+  active: true,
+  soldOut: false,
+  featured: false,
+  bestseller: false,
+  isNew: false,
+  sortOrder: 0,
+  recommendationIds: [],
+};
+
+/** Salvează produsele din „Adăugare rapidă”, unul câte unul; raportează ce a eșuat. */
+export async function saveQuickProducts(
+  restaurantId: string,
+  rows: Array<{ key: string; name: string; price: number; categoryId: string }>,
+  startSortOrder: number,
+) {
+  const saved: string[] = [];
+  const failed: Array<{ key: string; message: string }> = [];
+  for (const [index, row] of rows.entries()) {
+    try {
+      await saveProduct(restaurantId, {
+        ...newProductDefaults,
+        name: row.name,
+        price: row.price,
+        categoryId: row.categoryId,
+        sortOrder: startSortOrder + index,
+      });
+      saved.push(row.key);
+    } catch (reason) {
+      failed.push({
+        key: row.key,
+        message: reason instanceof Error ? reason.message : "Salvare eșuată.",
+      });
+    }
+  }
+  return { saved, failed };
 }
 
 export async function getPromotions(

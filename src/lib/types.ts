@@ -38,6 +38,15 @@ export type ScheduleDay = {
   closingTime: string;
 };
 
+export type SpecialScheduleDay = {
+  /** Data în format YYYY-MM-DD (ora locală a restaurantului). */
+  date: string;
+  closed: boolean;
+  openingTime: string;
+  closingTime: string;
+  label: string;
+};
+
 export type DeliveryZone = {
   id: string;
   restaurantId?: string;
@@ -104,6 +113,10 @@ export type CurrentRestaurant = {
   contractSigned: boolean;
   trialExpired: boolean;
   accessLocked: boolean;
+  coverImageUrl?: string | null;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  createdAt?: string | null;
 };
 
 export type CartItem = {
@@ -203,6 +216,9 @@ export type RestaurantSettings = {
   estimatedDeliveryTime: string;
   blockOrdersOutsideSchedule: boolean;
   schedule: ScheduleDay[];
+  specialSchedule: SpecialScheduleDay[];
+  ordersPaused: boolean;
+  ordersPausedUntil: string | null;
   deliveryZones: DeliveryZone[];
   openingTime: string;
   closingTime: string;

@@ -11,7 +11,9 @@ import {
 import {
   defaultSchedule,
   getRestaurantScheduleStatus,
+  isOrdersPaused,
   isRestaurantOpen,
+  normalizeSpecialSchedule,
   restaurantSettings,
   unavailableRestaurantSettings,
 } from "@/features/settings/restaurant-settings";
@@ -25,6 +27,13 @@ type SettingsContextValue = {
   loadingError: string | null;
   restaurantOpen: boolean;
   restaurantStatus: ReturnType<typeof getRestaurantScheduleStatus>;
+  /** Comenzile noi sunt oprite temporar de administrator. */
+  ordersPaused: boolean;
+  /** Ultima salvare a setărilor (pentru lista de configurare). */
+  settingsUpdatedAt: string | null;
+  /** false dacă migrarea 20261111000100 nu a fost încă aplicată. */
+  extendedSettingsAvailable: boolean;
+  setOrdersPause: (minutes: number | "manual" | null) => Promise<void>;
   updateSettings: (updates: Partial<RestaurantSettings>) => void;
   saveSettings: () => Promise<RestaurantSettings>;
   resetSettings: () => Promise<RestaurantSettings>;
@@ -46,10 +55,16 @@ type SettingsRow = {
   notifications_enabled: boolean;
   sound_enabled: boolean;
   highlight_delayed_orders: boolean;
+  updated_at?: string | null;
+  special_schedule?: unknown;
+  orders_paused?: boolean;
+  orders_paused_until?: string | null;
 };
 
 const SETTINGS_COLUMNS =
-  "opening_time, closing_time, accepts_delivery, accepts_pickup, accepts_cash, accepts_card, delivery_fee, free_delivery_threshold, minimum_order_value, estimated_delivery_time, block_orders_outside_schedule, weekly_schedule, notifications_enabled, sound_enabled, highlight_delayed_orders";
+  "opening_time, closing_time, accepts_delivery, accepts_pickup, accepts_cash, accepts_card, delivery_fee, free_delivery_threshold, minimum_order_value, estimated_delivery_time, block_orders_outside_schedule, weekly_schedule, notifications_enabled, sound_enabled, highlight_delayed_orders, updated_at";
+// Coloane adăugate de migrarea 20261111000100. Dacă lipsesc, aplicația funcționează ca înainte.
+const EXTENDED_SETTINGS_COLUMNS = `${SETTINGS_COLUMNS}, special_schedule, orders_paused, orders_paused_until`;
 
 type DeliveryZoneRow = {
   id: string;
@@ -72,6 +87,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [clock, setClock] = useState(0);
   const [loadedRestaurantId, setLoadedRestaurantId] = useState<string | null>(
+    null,
+  );
+  const [extendedSettingsAvailable, setExtendedSettingsAvailable] =
+    useState(true);
+  const [settingsUpdatedAt, setSettingsUpdatedAt] = useState<string | null>(
     null,
   );
 
@@ -102,12 +122,22 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       setLoadingError(null);
       setHydrated(false);
     }, 0);
+    const loadSettingsRow = async () => {
+      const extended = await supabase
+        .from("restaurant_settings")
+        .select(EXTENDED_SETTINGS_COLUMNS)
+        .eq("restaurant_id", restaurantId)
+        .maybeSingle();
+      if (!extended.error) return { ...extended, extendedAvailable: true };
+      const base = await supabase
+        .from("restaurant_settings")
+        .select(SETTINGS_COLUMNS)
+        .eq("restaurant_id", restaurantId)
+        .maybeSingle();
+      return { ...base, extendedAvailable: false };
+    };
     void Promise.all([
-      supabase
-      .from("restaurant_settings")
-      .select(SETTINGS_COLUMNS)
-      .eq("restaurant_id", restaurantId)
-      .maybeSingle(),
+      loadSettingsRow(),
       supabase
         .from("delivery_zones")
         .select("id, restaurant_id, name, areas, delivery_fee, active, sort_order")
@@ -137,6 +167,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         }
 
         const deliveryZones = (zonesResult.data ?? []).map(mapDeliveryZoneRow);
+        setExtendedSettingsAvailable(settingsResult.extendedAvailable);
+        setSettingsUpdatedAt(
+          (data as SettingsRow | null)?.updated_at ?? null,
+        );
         setSettings({
           ...(data ? mapSettingsRow(data as SettingsRow) : restaurantSettings),
           deliveryZones,
@@ -175,10 +209,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       const supabase = getSupabaseClient();
       if (!supabase) throw new Error("Supabase nu este configurat.");
 
+      const columns = extendedSettingsAvailable ?
+         EXTENDED_SETTINGS_COLUMNS
+        : SETTINGS_COLUMNS;
       const { data, error } = await supabase
         .from("restaurant_settings")
         .upsert(
           {
+            ...(extendedSettingsAvailable ?
+               { special_schedule: nextSettings.specialSchedule }
+              : {}),
             restaurant_id: restaurantId,
             opening_time: nextSettings.openingTime,
             closing_time: nextSettings.closingTime,
@@ -200,24 +240,63 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           },
           { onConflict: "restaurant_id" },
         )
-        .select(SETTINGS_COLUMNS)
+        .select(columns)
         .single();
 
       if (error) {
         throw new Error(`Setările nu au putut fi salvate: ${error.message}`);
       }
 
+      const savedRow = data as unknown as SettingsRow;
       const savedSettings = {
-        ...mapSettingsRow(data as SettingsRow),
+        ...mapSettingsRow(savedRow),
         deliveryZones: nextSettings.deliveryZones,
       };
       await syncDeliveryZones(restaurantId, nextSettings.deliveryZones);
       setSettings(savedSettings);
+      setSettingsUpdatedAt(savedRow.updated_at ?? new Date().toISOString());
       setLoadedRestaurantId(restaurantId);
       setLoadingError(null);
       return savedSettings;
     },
-    [restaurantId],
+    [restaurantId, extendedSettingsAvailable],
+  );
+
+  const setOrdersPause = useCallback(
+    async (minutes: number | "manual" | null) => {
+      if (!restaurantId) {
+        throw new Error("Nu este selectat niciun restaurant.");
+      }
+      if (!extendedSettingsAvailable) {
+        throw new Error(
+          "Pauza comenzilor va fi disponibilă după actualizarea bazei de date.",
+        );
+      }
+      const supabase = getSupabaseClient();
+      if (!supabase) throw new Error("Supabase nu este configurat.");
+      const ordersPaused = minutes !== null;
+      const ordersPausedUntil =
+        typeof minutes === "number" ?
+           new Date(Date.now() + minutes * 60_000).toISOString()
+          : null;
+      const { error } = await supabase
+        .from("restaurant_settings")
+        .update({
+          orders_paused: ordersPaused,
+          orders_paused_until: ordersPausedUntil,
+        })
+        .eq("restaurant_id", restaurantId);
+      if (error) {
+        throw new Error(`Pauza nu a putut fi salvată: ${error.message}`);
+      }
+      setSettings((current) => ({
+        ...current,
+        ordersPaused,
+        ordersPausedUntil,
+      }));
+      setClock(Date.now());
+    },
+    [restaurantId, extendedSettingsAvailable],
   );
 
   const saveSettings = useCallback(
@@ -242,12 +321,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
        settings
       : unavailableRestaurantSettings;
 
+    const ordersPaused = isOrdersPaused(resolvedSettings, new Date(clock));
     return {
       settings: resolvedSettings,
       hydrated: hydrated && settingsMatch,
       loadingError,
+      ordersPaused,
+      settingsUpdatedAt: settingsMatch ? settingsUpdatedAt : null,
+      extendedSettingsAvailable,
+      setOrdersPause,
       restaurantOpen:
         Boolean(currentRestaurant && !currentRestaurant.accessLocked) &&
+        !ordersPaused &&
         (!resolvedSettings.blockOrdersOutsideSchedule ||
           isRestaurantOpen(resolvedSettings, new Date(clock))),
       restaurantStatus: getRestaurantScheduleStatus(
@@ -269,6 +354,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     currentRestaurant,
     loadedRestaurantId,
     restaurantId,
+    settingsUpdatedAt,
+    extendedSettingsAvailable,
+    setOrdersPause,
   ]);
 
   return (
@@ -302,6 +390,9 @@ function mapSettingsRow(data: SettingsRow): RestaurantSettings {
     estimatedDeliveryTime: data.estimated_delivery_time ?? "30-45 min",
     blockOrdersOutsideSchedule: data.block_orders_outside_schedule ?? true,
     schedule: normalizeSchedule(data.weekly_schedule),
+    specialSchedule: normalizeSpecialSchedule(data.special_schedule),
+    ordersPaused: data.orders_paused ?? false,
+    ordersPausedUntil: data.orders_paused_until ?? null,
     deliveryZones: [],
     notificationsEnabled: data.notifications_enabled,
     soundEnabled: data.sound_enabled,
