@@ -614,7 +614,7 @@ function mapOrderRow(row: OrderRow): Order {
 
 function createOrderNumber() {
   const datePart = new Date().toISOString().slice(2, 10).replaceAll("-", "");
-  return `ANT-${datePart}-${Math.floor(1000 + Math.random() * 9000)}`;
+  return `A4H-${datePart}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
 let memoryOrders: Order[] = [];

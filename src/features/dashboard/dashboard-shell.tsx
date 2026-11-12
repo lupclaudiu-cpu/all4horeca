@@ -26,6 +26,8 @@ import { AntoriaBrand } from "@/components/antoria-brand";
 import { OrdersPauseControl } from "@/features/dashboard/orders-pause-control";
 import { FirstRunGuide } from "@/features/dashboard/first-run-guide";
 import { trialDaysLeft } from "@/lib/trial";
+import { ContactButtons } from "@/features/dashboard/contact-buttons";
+import { NewOrderSound } from "@/features/dashboard/new-order-sound";
 
 const navigation = [
   { href: "/restaurant/dashboard", label: "Prezentare", icon: DashboardIcon },
@@ -198,6 +200,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <NewOrderSound newOrdersCount={newOrdersCount} />
             {!isStaff && currentRestaurant && (
               <OrdersPauseControl disabled={Boolean(accessLocked)} />
             )}
@@ -238,11 +241,25 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   restaurantului și intră cu telefonul 0770 111 111, codul
                   123456. Comenzile reale și SMS-urile se activează la lansare.
                 </p>
+                {trialDaysLeft(currentRestaurant.trialExpiresAt) <= 3 && (
+                  <>
+                    <p className="mt-2 font-black text-blue-950">
+                      Testarea se încheie în curând. Ca să păstrezi tot ce ai
+                      configurat și să activăm comenzile reale, contactează-ne.
+                    </p>
+                    <ContactButtons />
+                  </>
+                )}
               </div>
             )}
           {accessLocked && (
             <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-bold text-amber-800">
-              Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.
+              <p>
+                {currentRestaurant?.trialExpired
+                  ? "Perioada de testare s-a încheiat. Datele tale sunt păstrate. Contactează ALL4HORECA pentru activare."
+                  : "Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare."}
+              </p>
+              <ContactButtons />
             </div>
           )}
           {children}
