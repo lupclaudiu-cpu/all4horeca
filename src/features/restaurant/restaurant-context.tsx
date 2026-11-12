@@ -260,9 +260,21 @@ export function RestaurantProvider({
     if (restaurant) selectRestaurant(restaurant);
   }, [currentRestaurant, loadRestaurant, selectRestaurant]);
 
+  // Superadminul poate edita orice restaurant din panou, chiar dacă testarea a expirat
+  // sau accesul clientului este suspendat. Meniul public rămâne blocat pentru clienți.
+  const isSuperAdminDashboard =
+    profile?.role === "super_admin" && pathname.startsWith("/restaurant/dashboard");
+  const effectiveRestaurant = useMemo(
+    () =>
+      currentRestaurant && isSuperAdminDashboard && currentRestaurant.accessLocked
+        ? { ...currentRestaurant, accessLocked: false }
+        : currentRestaurant,
+    [currentRestaurant, isSuperAdminDashboard],
+  );
+
   const value = useMemo(
     () => ({
-      currentRestaurant,
+      currentRestaurant: effectiveRestaurant,
       loading,
       error,
       selectRestaurant,
@@ -270,7 +282,7 @@ export function RestaurantProvider({
       refreshRestaurant,
     }),
     [
-      currentRestaurant,
+      effectiveRestaurant,
       loading,
       error,
       selectRestaurant,

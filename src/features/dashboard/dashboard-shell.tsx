@@ -213,6 +213,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-8">
+          {profile?.role === "super_admin" && currentRestaurant && (
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-bold text-amber-900">
+              <span>Editezi ca superadmin: {currentRestaurant.name}</span>
+              <Link href={`/admin/restaurante/${currentRestaurant.id}`} className="text-xs font-black text-amber-800 underline">
+                Înapoi la detalii restaurant
+              </Link>
+            </div>
+          )}
           {!accessLocked &&
             currentRestaurant?.status === "trial" &&
             currentRestaurant.trialExpiresAt && (
