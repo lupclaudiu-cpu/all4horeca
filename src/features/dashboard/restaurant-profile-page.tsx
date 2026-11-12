@@ -195,6 +195,9 @@ export function RestaurantProfilePage() {
                 placeholder="07xx xxx xxx"
                 className={fieldClass}
               />
+              <span className="mt-1 block text-xs font-semibold text-slate-500">
+                Acest număr apare în butonul „Sună acum" din meniul clienților.
+              </span>
             </label>
             <label className="block text-sm font-bold">
               Adresă

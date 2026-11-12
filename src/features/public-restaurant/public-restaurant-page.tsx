@@ -1,5 +1,6 @@
 "use client";
 
+import { toTelHref } from "@/lib/phone";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "@/components/icons";
@@ -184,8 +185,23 @@ export function PublicRestaurantPage({
       )}`
     : null;
 
+  const callHref = toTelHref(restaurant.phone);
+
   return (
     <main className="min-h-screen bg-slate-100 pb-28">
+      {callHref && (
+        <a
+          href={callHref}
+          aria-label="Sună restaurantul"
+          className="fixed bottom-[228px] right-4 z-40 flex h-14 items-center gap-2 rounded-2xl px-4 text-sm font-black text-white shadow-[0_16px_40px_rgba(15,23,42,.3)] transition hover:-translate-y-0.5 active:scale-95 sm:right-6"
+          style={{ backgroundColor: accent }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
+          </svg>
+          <span className="hidden sm:inline">Sună acum</span>
+        </a>
+      )}
       {currentRestaurant?.status === "trial" && (
         <div className="bg-amber-100 px-4 py-2 text-center text-xs font-black text-amber-900">
           Restaurant în mod test. Comenzile reale nu sunt active încă.
@@ -243,7 +259,7 @@ export function PublicRestaurantPage({
             </p>
           </div>
           <a
-            href={restaurant.phone ? `tel:${restaurant.phone}` : "/cont"}
+            href={toTelHref(restaurant.phone) ?? "/cont"}
             aria-label="Ajutor: sună restaurantul"
             className="grid size-11 place-items-center rounded-full text-slate-700"
           >
@@ -434,7 +450,7 @@ export function PublicRestaurantPage({
               <p className="mt-1">
                 Telefon:{" "}
                 <a
-                  href={`tel:${restaurant.phone.replace(/\s/g, "")}`}
+                  href={toTelHref(restaurant.phone) ?? "#"}
                   className="font-black"
                   style={{ color: accent }}
                 >
