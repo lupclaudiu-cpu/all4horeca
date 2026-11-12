@@ -17,7 +17,7 @@ export function RestaurantDetailsPage({ restaurantId }: { restaurantId: string }
         setError(
           reason instanceof Error ?
              reason.message
-            : "Restaurantul nu a putut fi ?nc?rcat.",
+            : "Restaurantul nu a putut fi încărcat.",
         ),
       );
   }, [restaurantId]);
@@ -30,7 +30,7 @@ export function RestaurantDetailsPage({ restaurantId }: { restaurantId: string }
   return (
     <div className="mx-auto max-w-7xl">
       <Link href="/admin" className="text-xs font-black text-blue-600">
-        ?napoi la restaurante
+        ← Înapoi la restaurante
       </Link>
       <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -39,7 +39,7 @@ export function RestaurantDetailsPage({ restaurantId }: { restaurantId: string }
           </p>
           <h1 className="mt-1 text-4xl font-black">{data.name}</h1>
           <p className="mt-2 text-sm text-[#64748b]">
-            {data.address || "Adres necompletat?"} · {data.phone || "Telefon necompletat"}
+            {data.address || "Adresă necompletată"} · {data.phone || "Telefon necompletat"}
           </p>
         </div>
         <span className={`rounded-full px-4 py-2 text-xs font-black ${data.isActive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
@@ -47,8 +47,32 @@ export function RestaurantDetailsPage({ restaurantId }: { restaurantId: string }
         </span>
       </div>
 
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+        <p className="text-sm font-black text-blue-900">
+          Editează ca superadmin restaurantul {data.name}
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          {[
+            ["Comenzi", "comenzi"],
+            ["Categorii", "categorii"],
+            ["Produse", "produse"],
+            ["Promoții", "promotii"],
+            ["Profil", "profil"],
+            ["Setări", "setari"],
+          ].map(([label, path]) => (
+            <Link
+              key={path}
+              href={`/restaurant/dashboard/${path}?restaurant=${restaurantId}`}
+              className="rounded-xl bg-blue-600 px-3 py-3 text-center text-sm font-black text-white transition hover:bg-blue-700"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="mt-6 grid gap-3 md:grid-cols-3">
-        <LinkCard label="Aplica?ie client" href={data.clientUrl} />
+        <LinkCard label="Aplicație client" href={data.clientUrl} />
         <LinkCard label="Panou restaurant" href={data.dashboardUrl} />
         <LinkCard label="QR code" href={data.qrUrl} />
       </section>
@@ -56,7 +80,7 @@ export function RestaurantDetailsPage({ restaurantId }: { restaurantId: string }
       <section className="mt-6 grid gap-5 xl:grid-cols-2">
         <DetailList title={`Categorii (${data.categories.length})`}>
           {data.categories.map((category) => (
-            <Row key={category.id} title={category.name} detail={category.active ? "Activ?" : "Inactiv?"} />
+            <Row key={category.id} title={category.name} detail={category.active ? "Activă" : "Inactivă"} />
           ))}
         </DetailList>
         <DetailList title={`Produse (${data.products.length})`}>

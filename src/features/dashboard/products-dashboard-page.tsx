@@ -312,8 +312,8 @@ export function ProductsDashboardPage() {
       )}
       {!restaurantId && (
         <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-800">
-          Profilul autentificat nu are un restaurant asociat. Ad?ugarea manual?
-          este disponibil imediat dup asocierea contului proprietar.
+          Profilul autentificat nu are un restaurant asociat. Adăugarea manuală
+          este disponibilă imediat după asocierea contului proprietar.
         </p>
       )}
       {accessLocked && (
