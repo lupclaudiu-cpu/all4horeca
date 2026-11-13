@@ -47,8 +47,8 @@ export function CartDrawer() {
         className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
         onClick={closeCart}
       />
-      <aside className="safe-bottom absolute inset-x-0 bottom-0 max-h-[88vh] overflow-hidden rounded-t-[2rem] bg-white shadow-2xl md:inset-y-0 md:left-auto md:w-[430px] md:max-h-none md:rounded-none">
-        <div className="antoria-gradient flex items-center justify-between px-5 py-5 text-white">
+      <aside className="safe-bottom absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col overflow-hidden rounded-t-[2rem] bg-white shadow-2xl md:inset-y-0 md:left-auto md:w-[430px] md:max-h-none md:rounded-none">
+        <div className="antoria-gradient flex shrink-0 items-center justify-between px-5 py-4 text-white">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-200">
               Comanda ta
@@ -78,7 +78,7 @@ export function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="max-h-[50vh] space-y-3 overflow-y-auto bg-slate-50 p-4 min-[390px]:max-h-[55vh] min-[390px]:p-5 md:max-h-[calc(100vh-250px)]">
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4">
               {items.map((item) => (
                 <div
                   key={item.lineId}
@@ -145,8 +145,8 @@ export function CartDrawer() {
                 </div>
               ))}
             </div>
-            <div className="border-t border-slate-200 bg-white p-5">
-              <div className="mb-4 space-y-3 rounded-2xl bg-slate-50 p-4">
+            <div className="shrink-0 border-t border-slate-200 bg-white p-4">
+              <div className="mb-3 space-y-2 rounded-2xl bg-slate-50 p-3">
                 <SummaryRow label="Subtotal" value={formatPrice(total)} />
                 <SummaryRow
                   label={orderDiscount.name ? `Promoție: ${orderDiscount.name}` : "Economii promoții"}

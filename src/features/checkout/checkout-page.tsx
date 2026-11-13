@@ -26,6 +26,7 @@ import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import { calculateCartItemTotal } from "@/lib/cart-pricing";
 import { addMoney } from "@/lib/money";
 import { useAuth } from "@/features/auth/auth-context";
+import { TRIAL_ORDER_MESSAGE, isTestAccountPhone } from "@/lib/trial";
 import { useOrderDiscount } from "@/features/cart/use-order-discount";
 import { PhoneLogin } from "@/features/auth/phone-login";
 import { useCatalog } from "@/features/catalog/catalog-context";
@@ -65,6 +66,8 @@ export function CheckoutPage() {
     ? `/clienti/${currentRestaurant.slug}`
     : "/";
   const accessLocked = Boolean(currentRestaurant?.accessLocked);
+  const trialOrderBlocked =
+    currentRestaurant?.status === "trial" && !isTestAccountPhone(user?.phone);
   const lockedMessage =
     "Restaurantul nu poate primi comenzi online momentan. Încearcă mai târziu sau contactează restaurantul.";
   const [customer, setCustomer] = useState<CustomerDetails>(initialCustomer);
@@ -227,6 +230,10 @@ export function CheckoutPage() {
     }
     if (accessLocked) {
       setSubmitError(lockedMessage);
+      return;
+    }
+    if (trialOrderBlocked) {
+      setSubmitError(TRIAL_ORDER_MESSAGE);
       return;
     }
 
@@ -627,6 +634,7 @@ export function CheckoutPage() {
               submitting ||
               !orderRestaurantId ||
               accessLocked ||
+              trialOrderBlocked ||
               !checkoutRestaurantOpen ||
               !minimumReached ||
               !selectedOrderType ||
@@ -646,6 +654,9 @@ export function CheckoutPage() {
             />
           )}
           {accessLocked && <UnavailableMessage text={lockedMessage} />}
+          {!accessLocked && trialOrderBlocked && (
+            <UnavailableMessage text={TRIAL_ORDER_MESSAGE} />
+          )}
           {submitError && (
             <p className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-center text-xs font-bold text-red-700">
               {submitError}
