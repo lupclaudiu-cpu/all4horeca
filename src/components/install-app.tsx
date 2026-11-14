@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { CloseIcon, PlusIcon } from "@/components/icons";
+import { useRestaurant } from "@/features/restaurant/restaurant-context";
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -12,6 +13,9 @@ type InstallPromptEvent = Event & {
 const DISMISSED_KEY = "all4horeca-install-dismissed";
 
 export function InstallApp() {
+  const { currentRestaurant } = useRestaurant();
+  const appName = currentRestaurant?.name ?? "ALL4HORECA";
+  const logoUrl = currentRestaurant?.logoUrl ?? null;
   const [promptEvent, setPromptEvent] = useState<InstallPromptEvent | null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [isIos, setIsIos] = useState(false);
@@ -44,6 +48,17 @@ export function InstallApp() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!currentRestaurant?.slug) return;
+    let link = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "manifest";
+      document.head.appendChild(link);
+    }
+    link.href = `/api/manifest/${encodeURIComponent(currentRestaurant.slug)}`;
+  }, [currentRestaurant?.slug]);
+
   const install = async () => {
     if (promptEvent) {
       await promptEvent.prompt();
@@ -74,15 +89,21 @@ export function InstallApp() {
           <CloseIcon className="size-4" />
         </button>
         <div className="flex items-center gap-3 pr-7">
-          <Image
-            src="/icons/icon-192.png"
-            width={48}
-            height={48}
-            alt=""
-            className="rounded-xl"
-          />
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} width={48} height={48} alt="" className="size-12 rounded-xl object-cover" />
+          ) : currentRestaurant ? (
+            <span
+              className="grid size-12 place-items-center rounded-xl text-base font-black text-white"
+              style={{ backgroundColor: currentRestaurant.primaryColor }}
+            >
+              {appName.slice(0, 2).toUpperCase()}
+            </span>
+          ) : (
+            <Image src="/icons/icon-192.png" width={48} height={48} alt="" className="rounded-xl" />
+          )}
           <div>
-            <p className="text-sm font-black">Instalează ALL4HORECA</p>
+            <p className="text-sm font-black">Instalează {appName}</p>
             <p className="mt-1 text-xs leading-4 text-[#64748b]">
               Acces rapid, direct de pe ecranul principal.
             </p>

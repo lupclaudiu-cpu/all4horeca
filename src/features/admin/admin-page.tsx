@@ -190,6 +190,16 @@ export function AdminPage() {
         </div>
       </section>
 
+      {showForm && (
+        <RestaurantWizard
+          onClose={() => setShowForm(false)}
+          onCreated={async () => {
+            setShowForm(false);
+            await loadRestaurants();
+          }}
+        />
+      )}
+
       <ClientHealth restaurants={restaurants} now={now} />
 
       <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
@@ -258,16 +268,6 @@ export function AdminPage() {
           </p>
         </div>
       </section>
-
-      {showForm && (
-        <RestaurantWizard
-          onClose={() => setShowForm(false)}
-          onCreated={async () => {
-            setShowForm(false);
-            await loadRestaurants();
-          }}
-        />
-      )}
 
       {error && (
         <p className="mt-5 rounded-2xl bg-red-50 px-5 py-4 text-sm font-bold text-red-700">
