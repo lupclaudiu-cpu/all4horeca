@@ -24,4 +24,4 @@ export function isTestAccountPhone(phone: string | null | undefined): boolean {
 }
 
 export const TRIAL_ORDER_MESSAGE =
-  "Restaurantul este în perioadă de testare. Comenzile se pot trimite doar cu contul de test: ieși din cont și intră cu telefonul 0770 111 111, codul 123456.";
+  "Restaurantul este în perioadă de testare. Comenzile se pot trimite doar de administratorul restaurantului sau cu contul de test (telefon 0770 111 111, cod 123456).";

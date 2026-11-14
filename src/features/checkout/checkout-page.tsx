@@ -52,7 +52,7 @@ type FieldErrors = Partial<Record<keyof CustomerDetails, string>>;
 
 export function CheckoutPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { items, total: subtotal, clearCart, removeItem, addItem } = useCart();
   const { createOrder } = useOrders();
   const { settings, restaurantOpen, ordersPaused } = useRestaurantSettings();
@@ -70,7 +70,12 @@ export function CheckoutPage() {
   const trialOrderBlocked =
     currentRestaurant?.status === "trial" &&
     Boolean(user) &&
-    !isTestAccountPhone(user?.phone);
+    !isTestAccountPhone(user?.phone) &&
+    // Administratorul restaurantului poate testa comenzi în perioada de probă.
+    !(
+      profile?.role === "restaurant_owner" &&
+      profile.restaurantId === currentRestaurant?.id
+    );
   const lockedMessage =
     "Restaurantul nu poate primi comenzi online momentan. Încearcă mai târziu sau contactează restaurantul.";
   const [customer, setCustomer] = useState<CustomerDetails>(initialCustomer);
