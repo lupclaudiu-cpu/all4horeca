@@ -370,6 +370,10 @@ export type RestaurantProfileInput = {
   address: string;
   facebookUrl: string;
   instagramUrl: string;
+  companyName: string;
+  vatCui: string;
+  city: string;
+  publicEmail: string;
 };
 
 export async function updateRestaurantProfile(
@@ -387,6 +391,10 @@ export async function updateRestaurantProfile(
       address: input.address.trim(),
       facebook_url: input.facebookUrl.trim(),
       instagram_url: input.instagramUrl.trim(),
+      company_name: input.companyName.trim(),
+      vat_cui: input.vatCui.trim(),
+      city: input.city.trim(),
+      email: input.publicEmail.trim(),
     },
   });
   if (error) {

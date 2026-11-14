@@ -66,8 +66,11 @@ export function CheckoutPage() {
     ? `/clienti/${currentRestaurant.slug}`
     : "/";
   const accessLocked = Boolean(currentRestaurant?.accessLocked);
+  // Doar pentru client autentificat: cine nu s-a logat încă vede formularul de autentificare.
   const trialOrderBlocked =
-    currentRestaurant?.status === "trial" && !isTestAccountPhone(user?.phone);
+    currentRestaurant?.status === "trial" &&
+    Boolean(user) &&
+    !isTestAccountPhone(user?.phone);
   const lockedMessage =
     "Restaurantul nu poate primi comenzi online momentan. Încearcă mai târziu sau contactează restaurantul.";
   const [customer, setCustomer] = useState<CustomerDetails>(initialCustomer);
