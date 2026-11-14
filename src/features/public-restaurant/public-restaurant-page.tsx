@@ -189,19 +189,6 @@ export function PublicRestaurantPage({
 
   return (
     <main className="min-h-screen bg-slate-100 pb-28">
-      {callHref && (
-        <a
-          href={callHref}
-          aria-label="Sună restaurantul"
-          className="fixed bottom-[228px] right-4 z-40 flex h-14 items-center gap-2 rounded-2xl px-4 text-sm font-black text-white shadow-[0_16px_40px_rgba(15,23,42,.3)] transition hover:-translate-y-0.5 active:scale-95 sm:right-6"
-          style={{ backgroundColor: accent }}
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
-          </svg>
-          <span className="hidden sm:inline">Sună acum</span>
-        </a>
-      )}
       {currentRestaurant?.status === "trial" && (
         <div className="bg-amber-100 px-4 py-2 text-center text-xs font-black text-amber-900">
           Restaurant în mod test. Comenzile reale nu sunt active încă.
@@ -258,16 +245,30 @@ export function PublicRestaurantPage({
                 : ""}
             </p>
           </div>
-          <a
-            href={toTelHref(restaurant.phone) ?? "/cont"}
-            aria-label="Ajutor: sună restaurantul"
-            className="grid size-11 place-items-center rounded-full text-slate-700"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01" />
-            </svg>
-          </a>
+          {callHref ? (
+            <a
+              href={callHref}
+              aria-label="Sună restaurantul"
+              className="flex h-11 items-center gap-2 rounded-full px-4 text-sm font-black text-white shadow-sm transition active:scale-95"
+              style={{ backgroundColor: accent }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
+              </svg>
+              Sună
+            </a>
+          ) : (
+            <a
+              href="/cont"
+              aria-label="Ajutor"
+              className="grid size-11 place-items-center rounded-full text-slate-700"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01" />
+              </svg>
+            </a>
+          )}
           <a
             href="/cont/notificari"
             aria-label="Notificări"
@@ -485,9 +486,9 @@ export function PublicRestaurantPage({
           </section>
         )}
         <footer className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-1 px-3 pb-4 text-xs font-bold text-slate-600">
-          <a href="/termeni" className="underline">Termeni</a>
-          <a href="/confidentialitate" className="underline">Confidențialitate</a>
-          <a href="/cookie-uri" className="underline">Cookie-uri</a>
+          <a href={`/clienti/${restaurant.slug}/termeni`} className="underline">Termeni</a>
+          <a href={`/clienti/${restaurant.slug}/confidentialitate`} className="underline">Confidențialitate</a>
+          <a href={`/clienti/${restaurant.slug}/cookie-uri`} className="underline">Cookie-uri</a>
         </footer>
       </div>
     </main>

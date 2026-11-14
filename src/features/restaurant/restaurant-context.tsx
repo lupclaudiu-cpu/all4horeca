@@ -42,12 +42,16 @@ type RestaurantRow = {
   cover_image_url?: string | null;
   facebook_url?: string | null;
   instagram_url?: string | null;
+  company_name?: string | null;
+  vat_cui?: string | null;
+  city?: string | null;
+  email?: string | null;
 };
 
 const RESTAURANT_COLUMNS =
   "id, slug, name, logo_url, primary_color, secondary_color, address, phone, is_active, status, trial_active, trial_started_at, trial_expires_at, contract_signed, created_at";
 // Coloane adăugate de migrarea 20261111000100; dacă lipsesc, folosim selecția de bază.
-const EXTENDED_RESTAURANT_COLUMNS = `${RESTAURANT_COLUMNS}, cover_image_url, facebook_url, instagram_url`;
+const EXTENDED_RESTAURANT_COLUMNS = `${RESTAURANT_COLUMNS}, cover_image_url, facebook_url, instagram_url, company_name, vat_cui, city, email`;
 
 const RestaurantContext = createContext<RestaurantContextValue | null>(null);
 export const RESTAURANT_STORAGE_KEY = "all4horeca-current-restaurant";
@@ -352,6 +356,10 @@ function mapRestaurant(row: RestaurantRow): CurrentRestaurant {
     coverImageUrl: row.cover_image_url ?? null,
     facebookUrl: row.facebook_url ?? "",
     instagramUrl: row.instagram_url ?? "",
+    companyName: row.company_name ?? "",
+    vatCui: row.vat_cui ?? "",
+    city: row.city ?? "",
+    publicEmail: row.email ?? "",
     createdAt: row.created_at ?? null,
     trialExpired,
     accessLocked:

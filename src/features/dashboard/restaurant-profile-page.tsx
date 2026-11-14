@@ -41,6 +41,10 @@ export function RestaurantProfilePage() {
         address: currentRestaurant.address ?? "",
         facebookUrl: currentRestaurant.facebookUrl ?? "",
         instagramUrl: currentRestaurant.instagramUrl ?? "",
+        companyName: currentRestaurant.companyName ?? "",
+        vatCui: currentRestaurant.vatCui ?? "",
+        city: currentRestaurant.city ?? "",
+        publicEmail: currentRestaurant.publicEmail ?? "",
       });
       setLoadedId(currentRestaurant.id);
     }, 0);
@@ -208,6 +212,54 @@ export function RestaurantProfilePage() {
                 placeholder="Strada, număr, oraș"
                 className={fieldClass}
               />
+            </label>
+            <label className="block text-sm font-bold">
+              Denumirea firmei
+              <input
+                value={form.companyName}
+                maxLength={150}
+                onChange={(event) => update("companyName", event.target.value)}
+                placeholder="SC Exemplu SRL"
+                className={fieldClass}
+              />
+              <span className="mt-1 block text-xs font-semibold text-slate-500">
+                Apare în Termeni, Confidențialitate și Cookie-uri, ca vânzător.
+              </span>
+            </label>
+            <label className="block text-sm font-bold">
+              CUI
+              <input
+                value={form.vatCui}
+                maxLength={30}
+                onChange={(event) => update("vatCui", event.target.value)}
+                placeholder="RO12345678"
+                className={fieldClass}
+              />
+            </label>
+            <label className="block text-sm font-bold">
+              Oraș
+              <input
+                value={form.city}
+                maxLength={80}
+                onChange={(event) => update("city", event.target.value)}
+                placeholder="Orașul localului"
+                className={fieldClass}
+              />
+            </label>
+            <label className="block text-sm font-bold">
+              Email de contact
+              <input
+                type="email"
+                inputMode="email"
+                value={form.publicEmail}
+                maxLength={120}
+                onChange={(event) => update("publicEmail", event.target.value)}
+                placeholder="contact@restaurant.ro"
+                className={fieldClass}
+              />
+              <span className="mt-1 block text-xs font-semibold text-slate-500">
+                Apare în documentele legale, pentru solicitările clienților.
+              </span>
             </label>
             <label className="block text-sm font-bold">
               Link Facebook

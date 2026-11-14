@@ -116,6 +116,10 @@ export type CurrentRestaurant = {
   coverImageUrl?: string | null;
   facebookUrl?: string;
   instagramUrl?: string;
+  companyName?: string;
+  vatCui?: string;
+  city?: string;
+  publicEmail?: string;
   createdAt?: string | null;
 };
 
