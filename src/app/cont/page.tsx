@@ -11,6 +11,7 @@ import {
   UserIcon,
 } from "@/components/icons";
 import { useAuth } from "@/features/auth/auth-context";
+import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import {
   getLocalCustomerProfile,
   saveLocalCustomerProfile,
@@ -41,6 +42,7 @@ const settings = [
 export default function AccountPage() {
   const router = useRouter();
   const { user, profile, loading, signOut } = useAuth();
+  const { currentRestaurant } = useRestaurant();
   const [localProfile, setLocalProfile] =
     useState<SavedCustomerProfile | null>(null);
   const [draftProfile, setDraftProfile] = useState({
@@ -66,7 +68,8 @@ export default function AccountPage() {
 
   const logout = async () => {
     await signOut();
-    router.replace("/");
+    // Clientul rămâne în meniul restaurantului la care era, nu pe site-ul ALL4HORECA.
+    router.replace(currentRestaurant ? `/clienti/${currentRestaurant.slug}` : "/");
   };
 
   useEffect(() => {
