@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     .eq("id", user.id)
     .maybeSingle();
   if (profile?.role !== "restaurant_owner") {
-    return NextResponse.json({ error: "Doar administratorii pot adăuga locații." }, { status: 403 });
+    return NextResponse.json({ error: "Doar administratorul unui restaurant poate adăuga locații. Din contul de super admin folosește butonul „Adaugă restaurant”." }, { status: 403 });
   }
 
   const input = (await request.json()) as AddLocationInput;
