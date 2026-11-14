@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: { default: "ALL4HORECA", template: "%s | ALL4HORECA" },
   description: "Aplicație de comenzi online pentru restaurante, cafenele și fast-food.",
   applicationName: "ALL4HORECA",
+  // Aplicația nu se promovează pe Google; SEO se face pe all4horeca.ro.
+  robots: { index: false, follow: false },
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
