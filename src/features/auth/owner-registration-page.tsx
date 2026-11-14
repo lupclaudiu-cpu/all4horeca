@@ -83,7 +83,7 @@ export function OwnerRegistrationPage() {
     } catch (reason) {
       setError(
         reason instanceof Error ?
-           reason.message
+           translateRegisterError(reason.message)
           : "Contul restaurant nu a putut fi creat.",
       );
     } finally {
@@ -219,4 +219,14 @@ function Field({
       />
     </label>
   );
+}
+
+function translateRegisterError(message: string) {
+  if (/already been registered|already registered|already exists/i.test(message)) {
+    return "Există deja un cont cu acest email. Autentifică-te sau folosește alt email.";
+  }
+  if (/password.*(short|least|weak)/i.test(message)) {
+    return "Parola este prea scurtă sau prea slabă. Folosește cel puțin 8 caractere.";
+  }
+  return message;
 }

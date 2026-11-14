@@ -16,6 +16,8 @@ import {
 export function CustomerNotificationSettings() {
   const { user, loading: authLoading } = useAuth();
   const { currentRestaurant, loading: restaurantLoading } = useRestaurant();
+  // Cheia VAPID se setează la lansare; până atunci nu arătăm o eroare tehnică.
+  const pushConfigured = Boolean(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
   const [permission, setPermission] = useState<PushPermissionState>(() =>
     getPushPermission(),
   );
@@ -109,7 +111,7 @@ export function CustomerNotificationSettings() {
             <button
               type="button"
               onClick={() => void toggle()}
-              disabled={pending || permission === "unsupported"}
+              disabled={pending || permission === "unsupported" || !pushConfigured}
               className={`mt-6 w-full rounded-2xl px-5 py-4 text-sm font-black text-white disabled:opacity-50 ${
                 subscribed ? "bg-slate-700" : "bg-blue-600"
               }`}
@@ -120,6 +122,11 @@ export function CustomerNotificationSettings() {
                    "Dezactivează notificările"
                   : "Activează notificările"}
             </button>
+            {!pushConfigured && (
+              <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs font-bold text-slate-600">
+                Notificările pe telefon vor fi disponibile în curând. Poți vedea starea comenzilor în secțiunea „Comenzi”.
+              </p>
+            )}
             {permission === "denied" && (
               <p className="mt-4 rounded-xl bg-amber-50 p-3 text-xs font-bold text-amber-800">
                 Permisiunea este blocată din browser. Activeaz-o din setările
