@@ -503,7 +503,13 @@ export async function updateOrderStatus(
     estimated_minutes_input: estimatedMinutes ?? null,
   });
 
-  if (error) throw new Error(`Statusul nu a putut fi actualizat: ${error.message}`);
+  if (error) {
+    // Sesiune expirată sau închisă (de ex. ieșire din cont în alt tab): cerere fără autentificare.
+    if (/permission denied|jwt|not authenticated/i.test(error.message)) {
+      throw new Error("Sesiunea a expirat. Autentifică-te din nou ca administrator și reîncearcă.");
+    }
+    throw new Error(`Statusul nu a putut fi actualizat: ${error.message}`);
+  }
   return getOrderById(orderId);
 }
 

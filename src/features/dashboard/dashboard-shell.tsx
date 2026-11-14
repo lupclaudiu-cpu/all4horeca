@@ -42,6 +42,7 @@ const navigation = [
   { href: "/restaurant/dashboard/prezenta", label: "QR & SEO", icon: SettingsIcon },
   { href: "/restaurant/dashboard/setari", label: "Setări", icon: SettingsIcon },
   { href: "/restaurant/dashboard/profil", label: "Profil restaurant", icon: UserIcon },
+  { href: "/restaurant/dashboard/locatii", label: "Locațiile mele", icon: OrdersIcon },
 ];
 
 const MENU_PATHS = [
@@ -66,6 +67,7 @@ const mobileMore = [
   { href: "/restaurant/dashboard/prezenta", label: "QR & SEO", icon: SettingsIcon },
   { href: "/restaurant/dashboard/setari", label: "Setări", icon: SettingsIcon },
   { href: "/restaurant/dashboard/profil", label: "Profil restaurant", icon: UserIcon },
+  { href: "/restaurant/dashboard/locatii", label: "Locațiile mele", icon: OrdersIcon },
 ];
 
 function isActivePath(pathname: string, href: string) {
