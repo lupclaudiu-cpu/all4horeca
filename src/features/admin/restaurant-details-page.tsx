@@ -38,7 +38,7 @@ export function RestaurantDetailsPage({ restaurantId }: { restaurantId: string }
             Restaurant
           </p>
           <h1 className="mt-1 text-4xl font-black">{data.name}</h1>
-          <p className="mt-2 text-sm text-[#64748b]">
+          <p className="mt-2 text-sm text-[#4A5A52]">
             {data.address || "Adresă necompletată"} · {data.phone || "Telefon necompletat"}
           </p>
         </div>
@@ -119,9 +119,9 @@ function LinkCard({ label, href }: { label: string; href: string }) {
 function DetailList({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,.06)]">
-      <h2 className="border-b border-[#e2e8f0] p-5 text-xl font-black">{title}</h2>
-      <div className="divide-y divide-[#e2e8f0]">
-        {children || <p className="p-5 text-sm text-[#64748b]">Nu există date.</p>}
+      <h2 className="border-b border-[#D9CFBC] p-5 text-xl font-black">{title}</h2>
+      <div className="divide-y divide-[#D9CFBC]">
+        {children || <p className="p-5 text-sm text-[#4A5A52]">Nu există date.</p>}
       </div>
     </section>
   );
@@ -131,7 +131,7 @@ function Row({ title, detail }: { title: string; detail: string }) {
   return (
     <div className="p-4">
       <p className="text-sm font-black">{title}</p>
-      <p className="mt-1 text-xs text-[#64748b]">{detail}</p>
+      <p className="mt-1 text-xs text-[#4A5A52]">{detail}</p>
     </div>
   );
 }

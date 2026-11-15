@@ -50,7 +50,7 @@ export function OrderMap({
             title: "Livrator",
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
-              fillColor: "#0f172a",
+              fillColor: "#14231D",
               fillOpacity: 1,
               strokeColor: "#ffffff",
               strokeWeight: 3,
@@ -86,7 +86,7 @@ export function OrderMap({
   return (
     <div
       ref={containerRef}
-      className={`w-full overflow-hidden rounded-2xl bg-[#e2e8f0] ${
+      className={`w-full overflow-hidden rounded-2xl bg-[#D9CFBC] ${
         compact ? "h-40" : "h-72"
       }`}
       aria-label="Hartă adresă livrare"
@@ -96,7 +96,7 @@ export function OrderMap({
 
 function MapFallback({ text }: { text: string }) {
   return (
-    <div className="grid min-h-32 place-items-center rounded-2xl border border-dashed border-[#d8d1ca] bg-[#f8fafc] px-5 text-center text-xs font-bold leading-5 text-[#64748b]">
+    <div className="grid min-h-32 place-items-center rounded-2xl border border-dashed border-[#d8d1ca] bg-[#F7F3EA] px-5 text-center text-xs font-bold leading-5 text-[#4A5A52]">
       {text}
     </div>
   );

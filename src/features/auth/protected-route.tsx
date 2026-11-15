@@ -27,10 +27,10 @@ export function ProtectedRoute({
 
   if (loading || !allowed) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#f8fafc]">
+      <div className="grid min-h-screen place-items-center bg-[#F7F3EA]">
         <div className="text-center">
-          <div className="mx-auto size-10 animate-spin rounded-full border-4 border-[#2563eb]/20 border-t-[#2563eb]" />
-          <p className="mt-4 text-sm font-bold text-[#64748b]">
+          <div className="mx-auto size-10 animate-spin rounded-full border-4 border-[#173A2E]/20 border-t-[#173A2E]" />
+          <p className="mt-4 text-sm font-bold text-[#4A5A52]">
             Verificăm accesul...
           </p>
         </div>

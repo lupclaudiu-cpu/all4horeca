@@ -52,7 +52,7 @@ export function CustomersPage() {
                 </div>
                 <div className="min-w-0">
                   <h2 className="truncate text-base font-black">{customer.name}</h2>
-                  <p className="mt-1 flex items-center gap-1.5 text-xs text-[#64748b]">
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-[#4A5A52]">
                     <PhoneIcon className="size-3.5" />
                     {customer.phone}
                   </p>
@@ -68,8 +68,8 @@ export function CustomersPage() {
                   value={formatPrice(customer.totalValue)}
                 />
               </div>
-              <div className="mt-4 border-t border-[#e2e8f0] pt-4">
-                <p className="text-[10px] font-black uppercase tracking-wide text-[#64748b]">
+              <div className="mt-4 border-t border-[#D9CFBC] pt-4">
+                <p className="text-[10px] font-black uppercase tracking-wide text-[#4A5A52]">
                   Ultima comandă
                 </p>
                 <p className="mt-1 text-xs font-bold">
@@ -83,7 +83,7 @@ export function CustomersPage() {
             <div>
               <UserIcon className="mx-auto size-12 text-[#c5bfb9]" />
               <h2 className="mt-4 text-xl font-black">Nu există clienți încă</h2>
-              <p className="mt-2 text-sm text-[#64748b]">
+              <p className="mt-2 text-sm text-[#4A5A52]">
                 Clienții vor apărea după plasarea comenzilor.
               </p>
             </div>
@@ -129,8 +129,8 @@ function aggregateCustomers(
 
 function CustomerMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-[#f8fafc] p-3">
-      <p className="text-[10px] font-bold text-[#64748b]">{label}</p>
+    <div className="rounded-xl bg-[#F7F3EA] p-3">
+      <p className="text-[10px] font-bold text-[#4A5A52]">{label}</p>
       <p className="mt-1 text-sm font-black">{value}</p>
     </div>
   );

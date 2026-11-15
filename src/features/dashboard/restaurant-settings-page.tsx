@@ -176,13 +176,13 @@ export function RestaurantSettingsPage() {
     <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#2563eb]">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#173A2E]">
             Configurare
           </p>
           <h1 className="mt-1 text-3xl font-black tracking-[-0.05em]">
             Setări restaurant
           </h1>
-          <p className="mt-2 text-sm text-[#64748b]">
+          <p className="mt-2 text-sm text-[#4A5A52]">
             Modificările sunt aplicate după salvare.
           </p>
         </div>
@@ -250,7 +250,7 @@ export function RestaurantSettingsPage() {
               return (
                 <div
                   key={day.day}
-                  className="rounded-2xl border border-[#e2e8f0] p-3"
+                  className="rounded-2xl border border-[#D9CFBC] p-3"
                 >
                   <Toggle
                     label={day.label}
@@ -277,7 +277,7 @@ export function RestaurantSettingsPage() {
               );
             })}
           </div>
-          <p className="rounded-xl bg-[#f8fafc] px-4 py-3 text-xs leading-5 text-[#64748b]">
+          <p className="rounded-xl bg-[#F7F3EA] px-4 py-3 text-xs leading-5 text-[#4A5A52]">
             Status curent:{" "}
             <strong>{restaurantStatus.open ? "OPEN" : "CLOSED"}</strong> ·{" "}
             {restaurantStatus.label}
@@ -285,7 +285,7 @@ export function RestaurantSettingsPage() {
         </SettingsCard>
 
         <SettingsCard title="Program special" subtitle="Sărbători și zile speciale">
-          <p className="text-xs leading-5 text-[#64748b]">
+          <p className="text-xs leading-5 text-[#4A5A52]">
             Pentru o anumită dată poți fi închis sau poți avea alt program.
             Are prioritate față de programul pe zile.
           </p>
@@ -299,7 +299,7 @@ export function RestaurantSettingsPage() {
               {settings.specialSchedule.map((item, index) => (
                 <div
                   key={index}
-                  className="space-y-3 rounded-2xl border border-[#e2e8f0] p-3"
+                  className="space-y-3 rounded-2xl border border-[#D9CFBC] p-3"
                 >
                   <div className="grid grid-cols-2 gap-3">
                     <label className="block">
@@ -310,7 +310,7 @@ export function RestaurantSettingsPage() {
                         onChange={(event) =>
                           updateSpecialDay(index, { date: event.target.value })
                         }
-                        className="mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3 py-3 text-sm outline-none focus:border-[#2563eb]"
+                        className="mt-2 w-full rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] px-3 py-3 text-sm outline-none focus:border-[#173A2E]"
                       />
                     </label>
                     <TextField
@@ -355,7 +355,7 @@ export function RestaurantSettingsPage() {
               <button
                 type="button"
                 onClick={addSpecialDay}
-                className="rounded-xl bg-[#0f172a] px-4 py-3 text-xs font-black text-white"
+                className="rounded-xl bg-[#14231D] px-4 py-3 text-xs font-black text-white"
               >
                 Adaugă o dată
               </button>
@@ -393,7 +393,7 @@ export function RestaurantSettingsPage() {
           <button
             type="button"
             onClick={addZone}
-            className="rounded-xl bg-[#0f172a] px-4 py-3 text-xs font-black text-white"
+            className="rounded-xl bg-[#14231D] px-4 py-3 text-xs font-black text-white"
           >
             Adaugă zonă
           </button>
@@ -401,7 +401,7 @@ export function RestaurantSettingsPage() {
             {settings.deliveryZones.map((zone) => (
               <div
                 key={zone.id}
-                className="rounded-2xl border border-[#e2e8f0] p-4"
+                className="rounded-2xl border border-[#D9CFBC] p-4"
               >
                 <div className="grid gap-3 sm:grid-cols-2">
                   <TextField
@@ -456,7 +456,7 @@ export function RestaurantSettingsPage() {
               </div>
             ))}
             {!settings.deliveryZones.length && (
-              <p className="rounded-xl bg-[#f8fafc] px-4 py-3 text-xs font-bold text-[#64748b]">
+              <p className="rounded-xl bg-[#F7F3EA] px-4 py-3 text-xs font-bold text-[#4A5A52]">
                 Nu există zone definite. Se folosește taxa de livrare implicită.
               </p>
             )}
@@ -508,7 +508,7 @@ export function RestaurantSettingsPage() {
           type="button"
           onClick={() => void restoreDefaults()}
           disabled={!hydrated || saving || resetting || accessLocked}
-          className="rounded-xl border border-[#cbd5e1] bg-white px-4 py-3 text-xs font-black text-[#475569]"
+          className="rounded-xl border border-[#C9BFA9] bg-white px-4 py-3 text-xs font-black text-[#3E4D46]"
         >
           {resetting ? "Se restaureaza..." : "Restaureaza valorile implicite"}
         </button>
@@ -516,7 +516,7 @@ export function RestaurantSettingsPage() {
           type="button"
           onClick={() => void save()}
           disabled={!hydrated || saving || resetting || accessLocked}
-          className="rounded-xl bg-[#2563eb] px-5 py-3 text-xs font-black text-white disabled:cursor-wait disabled:opacity-60"
+          className="rounded-xl bg-[#173A2E] px-5 py-3 text-xs font-black text-white disabled:cursor-wait disabled:opacity-60"
         >
           {saving ? "Se salveaza..." : "Salveaza modificarile"}
         </button>
@@ -537,7 +537,7 @@ function SettingsCard({
 }) {
   return (
     <section className="rounded-[1.5rem] bg-white p-5 shadow-[0_12px_30px_rgba(31,22,16,0.05)]">
-      <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+      <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
         {subtitle}
       </p>
       <h2 className="mt-1 text-xl font-black">{title}</h2>
@@ -556,13 +556,13 @@ function Toggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-[#e2e8f0] px-4 py-3">
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-[#D9CFBC] px-4 py-3">
       <span className="text-sm font-bold">{label}</span>
       <input
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
-        className="size-5 accent-[#2563eb]"
+        className="size-5 accent-[#173A2E]"
       />
     </label>
   );
@@ -580,7 +580,7 @@ function NumberField({
   return (
     <label className="block">
       <span className="text-sm font-bold">{label}</span>
-      <div className="mt-2 flex items-center rounded-xl border border-[#cbd5e1] bg-[#f8fafc]">
+      <div className="mt-2 flex items-center rounded-xl border border-[#C9BFA9] bg-[#F7F3EA]">
         <input
           type="number"
           min="0"
@@ -589,7 +589,7 @@ function NumberField({
           onChange={(event) => onChange(event.target.value)}
           className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm outline-none"
         />
-        <span className="pr-4 text-xs font-black text-[#64748b]">lei</span>
+        <span className="pr-4 text-xs font-black text-[#4A5A52]">lei</span>
       </div>
     </label>
   );
@@ -614,7 +614,7 @@ function TextField({
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3 py-3 text-sm outline-none focus:border-[#2563eb]"
+        className="mt-2 w-full rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] px-3 py-3 text-sm outline-none focus:border-[#173A2E]"
       />
     </label>
   );
@@ -636,7 +636,7 @@ function TimeField({
         type="time"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3 py-3 text-sm outline-none focus:border-[#2563eb]"
+        className="mt-2 w-full rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] px-3 py-3 text-sm outline-none focus:border-[#173A2E]"
       />
     </label>
   );
