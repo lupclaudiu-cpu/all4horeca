@@ -43,11 +43,21 @@ export async function DELETE(
 
   const { data: restaurant } = await admin
     .from("restaurants")
-    .select("id")
+    .select("id, is_onboarding_template")
     .eq("id", id)
     .maybeSingle();
   if (!restaurant) {
     return NextResponse.json({ error: "Restaurant inexistent." }, { status: 404 });
+  }
+
+  if (restaurant.is_onboarding_template) {
+    return NextResponse.json(
+      {
+        error:
+          "Restaurantul ALL4HORECA este modelul din care se copiază meniul conturilor noi și nu poate fi șters.",
+      },
+      { status: 400 },
+    );
   }
 
   // Conturile administratorilor acestui restaurant (niciodată super admin).
