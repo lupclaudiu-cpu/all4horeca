@@ -229,7 +229,7 @@ export function QuickAddProducts({
           type="button"
           onClick={() => void saveAll()}
           disabled={saving || disabled}
-          className="min-h-11 rounded-xl bg-[#2563eb] px-5 text-sm font-black text-white disabled:opacity-60"
+          className="min-h-11 rounded-xl bg-[#173A2E] px-5 text-sm font-black text-white disabled:opacity-60"
         >
           {saving ? "Se salvează..." : "Salvează tot"}
         </button>

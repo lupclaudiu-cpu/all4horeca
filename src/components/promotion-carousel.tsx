@@ -6,7 +6,7 @@ import { getActivePromotions } from "@/services/public-promotions-service";
 
 export function PromotionCarousel({
   restaurantId,
-  accent = "#0e7490",
+  accent = "#7A5620",
 }: {
   restaurantId: string;
   accent?: string;

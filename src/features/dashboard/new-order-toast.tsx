@@ -30,7 +30,7 @@ export function NewOrderToast() {
             {newOrderNotification.orderNumber} ·{" "}
             {newOrderNotification.customerName}
           </p>
-          <p className="mt-1 text-xs font-bold text-[#64748b]">
+          <p className="mt-1 text-xs font-bold text-[#4A5A52]">
             Total {formatPrice(newOrderNotification.total)}
           </p>
         </div>
@@ -38,7 +38,7 @@ export function NewOrderToast() {
           type="button"
           onClick={dismissNewOrderNotification}
           aria-label="Închide notificarea"
-          className="grid size-8 shrink-0 place-items-center rounded-full bg-[#f1f5f9]"
+          className="grid size-8 shrink-0 place-items-center rounded-full bg-[#EFE8DA]"
         >
           <CloseIcon className="size-4" />
         </button>

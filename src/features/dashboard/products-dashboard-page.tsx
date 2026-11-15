@@ -190,7 +190,7 @@ export function ProductsDashboardPage() {
                 }
                 setEditing("new");
               }}
-              className="rounded-xl bg-[#2563eb] px-4 py-3 text-xs font-black text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-[#173A2E] px-4 py-3 text-xs font-black text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               Adaugă produs
             </button>
@@ -324,9 +324,9 @@ export function ProductsDashboardPage() {
 
       <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
         {loading ? (
-          <div className="h-80 animate-pulse bg-[#f8fafc]" />
+          <div className="h-80 animate-pulse bg-[#F7F3EA]" />
         ) : (
-          <div className="divide-y divide-[#e2e8f0]">
+          <div className="divide-y divide-[#D9CFBC]">
             {filteredProducts.map((product) => {
               const category = categories.find(
                 (item) => item.id === product.categoryId,
@@ -337,7 +337,7 @@ export function ProductsDashboardPage() {
                   className="grid gap-4 p-4 md:grid-cols-[1.5fr_.8fr_.6fr_1fr] md:items-center"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-[#f0f9ff]">
+                    <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-[#EFE8DA]">
                       <SafeImage
                         src={product.image}
                         alt=""
@@ -353,13 +353,13 @@ export function ProductsDashboardPage() {
                         {product.isNew && <SmallBadge text="Nou" />}
                       </div>
                       <p className="mt-1 truncate text-sm font-black">{product.name}</p>
-                      <p className="mt-1 truncate text-[11px] text-[#64748b]">
+                      <p className="mt-1 truncate text-[11px] text-[#4A5A52]">
                         {product.weight || product.prepTime}
                       </p>
                     </div>
                   </div>
                   <p className="text-sm font-bold">{category?.name || "Fără categorie"}</p>
-                  <p className="text-sm font-black text-[#2563eb]">
+                  <p className="text-sm font-black text-[#173A2E]">
                     {formatPrice(product.price)}
                   </p>
                   <div className="flex flex-wrap gap-2 md:justify-end">
@@ -367,7 +367,7 @@ export function ProductsDashboardPage() {
                       type="button"
                       disabled={accessLocked}
                       onClick={() => setOptionsProduct(product)}
-                      className="rounded-xl bg-[#eff6ff] px-3 py-2 text-[11px] font-black text-[#0369a1] disabled:opacity-50"
+                      className="rounded-xl bg-[#EFE8DA] px-3 py-2 text-[11px] font-black text-[#7A5620] disabled:opacity-50"
                     >
                       Variante & Extra
                     </button>
@@ -395,7 +395,7 @@ export function ProductsDashboardPage() {
                           active: product.active === false,
                         })
                       }
-                      className="rounded-xl bg-[#f1f5f9] px-3 py-2 text-[11px] font-black disabled:opacity-50"
+                      className="rounded-xl bg-[#EFE8DA] px-3 py-2 text-[11px] font-black disabled:opacity-50"
                     >
                       {product.active === false ? "Activează" : "Dezactivează"}
                     </button>
@@ -403,7 +403,7 @@ export function ProductsDashboardPage() {
                       type="button"
                       disabled={accessLocked}
                       onClick={() => setEditing(product)}
-                      className="rounded-xl bg-[#0f172a] px-3 py-2 text-[11px] font-black text-white disabled:opacity-50"
+                      className="rounded-xl bg-[#14231D] px-3 py-2 text-[11px] font-black text-white disabled:opacity-50"
                     >
                       Modifică
                     </button>
@@ -517,7 +517,7 @@ function ProductModal({
       <form onSubmit={submit} className="mx-auto max-w-3xl rounded-[2rem] bg-white p-5 shadow-2xl sm:p-7">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-black">{product ? "Modifică produs" : "Adaugă produs"}</h2>
-          <button type="button" onClick={onClose} className="text-xs font-black text-[#64748b]">Închide</button>
+          <button type="button" onClick={onClose} className="text-xs font-black text-[#4A5A52]">Închide</button>
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -543,7 +543,7 @@ function ProductModal({
         </div>
 
         <div className="mt-6">
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-[#2563eb]">Cumpărate frecvent împreună</p>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[#173A2E]">Cumpărate frecvent împreună</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {products.filter((item) => item.id !== product?.id).map((item) => (
               <ProductCheck
@@ -564,7 +564,7 @@ function ProductModal({
         </div>
 
         {error && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{error}</p>}
-        <button disabled={saving || uploading || !data.name || !data.categoryId} className="mt-6 w-full rounded-2xl bg-[#2563eb] px-5 py-4 text-sm font-black text-white disabled:opacity-50">
+        <button disabled={saving || uploading || !data.name || !data.categoryId} className="mt-6 w-full rounded-2xl bg-[#173A2E] px-5 py-4 text-sm font-black text-white disabled:opacity-50">
           {uploading ? "Se încarcă imaginea..." : saving ? "Se salvează..." : "Salvează produsul"}
         </button>
       </form>
@@ -572,7 +572,7 @@ function ProductModal({
   );
 }
 
-const inputClass = "mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#2563eb]";
+const inputClass = "mt-2 w-full rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] px-4 py-3 text-sm outline-none focus:border-[#173A2E]";
 
 function ProductField({ label, value, onChange, type = "text", placeholder, step }: { label: string; value: string; onChange: (value: string) => void; type?: string; placeholder?: string; step?: string }) {
   return <label><span className="text-xs font-black">{label}</span><input type={type} step={step} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className={inputClass} /></label>;
@@ -581,12 +581,12 @@ function ProductArea({ label, value, onChange }: { label: string; value: string;
   return <label><span className="text-xs font-black">{label}</span><textarea value={value} rows={3} onChange={(event) => onChange(event.target.value)} className={inputClass} /></label>;
 }
 function ProductCheck({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
-  return <label className="flex items-center justify-between gap-2 rounded-xl border border-[#e2e8f0] px-3 py-3 text-xs font-black"><span className="truncate">{label}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-4 accent-[#2563eb]" /></label>;
+  return <label className="flex items-center justify-between gap-2 rounded-xl border border-[#D9CFBC] px-3 py-3 text-xs font-black"><span className="truncate">{label}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-4 accent-[#173A2E]" /></label>;
 }
 function Badge({ text, tone = "gray" }: { text: string; tone?: "green" | "red" | "gray" }) {
   const styles = tone === "green" ? "bg-emerald-100 text-emerald-700" : tone === "red" ? "bg-red-100 text-red-700" : "bg-zinc-100 text-zinc-600";
   return <span className={`rounded-full px-3 py-2 text-xs font-black ${styles}`}>{text}</span>;
 }
 function SmallBadge({ text }: { text: string }) {
-  return <span className="rounded-full bg-[#ecfeff] px-2 py-1 text-[8px] font-black uppercase text-[#0369a1]">{text}</span>;
+  return <span className="rounded-full bg-[#EFE8DA] px-2 py-1 text-[8px] font-black uppercase text-[#7A5620]">{text}</span>;
 }

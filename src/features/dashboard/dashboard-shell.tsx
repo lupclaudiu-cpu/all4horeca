@@ -186,11 +186,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="lg:hidden"><AntoriaBrand compact /></div>
             <div>
               <p className="text-sm font-black">{restaurantName}</p>
-              <p className="text-[11px] text-[#64748b]">
+              <p className="text-[11px] text-[#4A5A52]">
                 <span className={`mr-1 inline-block size-2 rounded-full ${restaurantOpen ? "bg-emerald-500" : "bg-red-500"}`} />
                 Restaurant {restaurantOpen ? "deschis" : "închis"} · {settings.openingTime}-{settings.closingTime}
               </p>
-              <p className="mt-0.5 text-[10px] text-[#94a3b8]">
+              <p className="mt-0.5 text-[10px] text-[#7D8A82]">
                 {profile?.fullName || profile?.email}
                 <span
                   className={`ml-2 inline-block size-1.5 rounded-full ${

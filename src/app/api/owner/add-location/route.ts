@@ -67,8 +67,8 @@ export async function POST(request: Request) {
       city: input.city.trim(),
       company_name: input.companyName.trim(),
       vat_cui: input.vatCui.trim(),
-      primary_color: "#2563eb",
-      secondary_color: "#0f172a",
+      primary_color: "#173A2E",
+      secondary_color: "#14231D",
     },
     owner_id: user.id,
   });

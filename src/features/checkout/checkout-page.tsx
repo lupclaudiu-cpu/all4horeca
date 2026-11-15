@@ -325,18 +325,18 @@ export function CheckoutPage() {
     return (
       <main className="page-enter grid min-h-screen place-items-center px-6 pb-28 text-center">
         <div>
-          <div className="mx-auto grid size-24 place-items-center rounded-[2rem] bg-[#ecfeff] text-[#2563eb]">
+          <div className="mx-auto grid size-24 place-items-center rounded-[2rem] bg-[#EFE8DA] text-[#173A2E]">
             <CartIcon className="size-11" />
           </div>
           <h1 className="mt-6 text-3xl font-black tracking-[-0.05em]">
             Coșul este gol
           </h1>
-          <p className="mt-2 text-sm text-[#64748b]">
+          <p className="mt-2 text-sm text-[#4A5A52]">
             Adaugă produse înainte de a continua către checkout.
           </p>
           <Link
             href={menuUrl}
-            className="mt-7 inline-flex rounded-2xl bg-[#2563eb] px-7 py-4 text-sm font-black text-white"
+            className="mt-7 inline-flex rounded-2xl bg-[#173A2E] px-7 py-4 text-sm font-black text-white"
           >
             Înapoi la meniu
           </Link>
@@ -346,12 +346,12 @@ export function CheckoutPage() {
   }
 
   return (
-    <main className="page-enter min-h-screen bg-[#f8fafc] pb-28">
+    <main className="page-enter min-h-screen bg-[#F7F3EA] pb-28">
       <header className="border-b border-slate-200/80 bg-white/90 px-4 py-4 shadow-sm backdrop-blur-xl sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center gap-3">
           <Link
             href={menuUrl}
-            className="grid size-11 place-items-center rounded-full bg-[#f1f5f9]"
+            className="grid size-11 place-items-center rounded-full bg-[#EFE8DA]"
             aria-label="Înapoi la meniu"
           >
             <ArrowLeftIcon className="size-5" />
@@ -379,7 +379,7 @@ export function CheckoutPage() {
       >
         <div className="space-y-5">
           <section className="antoria-card rounded-[1.75rem] p-5 sm:p-6">
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
               Tip comandă
             </p>
             <h2 className="mt-1 text-xl font-black">Cum primești comanda?</h2>
@@ -406,21 +406,21 @@ export function CheckoutPage() {
               <UnavailableMessage text="Restaurantul nu acceptă momentan comenzi pentru livrare sau ridicare." />
             )}
             {selectedOrderType === "pickup" && (
-              <p className="mt-4 rounded-xl bg-[#eff6ff] px-4 py-3 text-sm font-bold text-[#1e40af]">
+              <p className="mt-4 rounded-xl bg-[#EFE8DA] px-4 py-3 text-sm font-bold text-[#173A2E]">
                 Comanda va fi ridicată din locație.
               </p>
             )}
           </section>
 
           {selectedOrderType === "delivery" && selectedDeliveryZone && (
-            <p className="rounded-2xl bg-[#ecfeff] px-4 py-3 text-sm font-bold text-[#0e7490]">
+            <p className="rounded-2xl bg-[#EFE8DA] px-4 py-3 text-sm font-bold text-[#7A5620]">
               Zona detectată: {selectedDeliveryZone.name} · taxă{" "}
               {formatPrice(selectedDeliveryZone.deliveryFee)}
             </p>
           )}
 
           <section className="antoria-card rounded-[1.75rem] p-5 sm:p-6">
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
               Date contact
             </p>
             <h2 className="mt-1 text-xl font-black">
@@ -471,14 +471,14 @@ export function CheckoutPage() {
                   onChange={(event) => updateField("notes", event.target.value)}
                   placeholder="Interfon, etaj, preferințe..."
                   rows={4}
-                  className="mt-2 w-full resize-none rounded-2xl border border-[#cbd5e1] bg-[#f8fafc] px-4 py-3 text-sm outline-none transition placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-4 focus:ring-[#2563eb]/10"
+                  className="mt-2 w-full resize-none rounded-2xl border border-[#C9BFA9] bg-[#F7F3EA] px-4 py-3 text-sm outline-none transition placeholder:text-[#7D8A82] focus:border-[#173A2E] focus:ring-4 focus:ring-[#173A2E]/10"
                 />
               </label>
             </div>
           </section>
 
           <section className="antoria-card rounded-[1.75rem] p-5 sm:p-6">
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
               Plată
             </p>
             <h2 className="mt-1 text-xl font-black">Cum dorești să plătești?</h2>
@@ -507,7 +507,7 @@ export function CheckoutPage() {
               <UnavailableMessage text="Nu este activă nicio metodă de plată." />
             )}
             {selectedPaymentMethod === "card" && (
-              <p className="mt-3 rounded-xl bg-[#ecfeff] px-4 py-3 text-xs leading-5 text-[#0e7490]">
+              <p className="mt-3 rounded-xl bg-[#EFE8DA] px-4 py-3 text-xs leading-5 text-[#7A5620]">
                 Plata cu cardul este simulată momentan. Nu vor fi solicitate date bancare.
               </p>
             )}
@@ -515,7 +515,7 @@ export function CheckoutPage() {
 
           {checkoutUpsells.length > 0 && (
             <section className="antoria-card rounded-[1.75rem] p-5 sm:p-6">
-              <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+              <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
                 Clienții mai adaugă
               </p>
               <h2 className="mt-1 text-xl font-black">Completeaza comanda</h2>
@@ -533,17 +533,17 @@ export function CheckoutPage() {
                         addItem(product);
                       }
                     }}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-[#e2e8f0] bg-white p-3 text-left transition hover:border-blue-200 hover:bg-blue-50"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-[#D9CFBC] bg-white p-3 text-left transition hover:border-blue-200 hover:bg-blue-50"
                   >
                     <span>
                       <span className="block text-sm font-black">
                         {product.name}
                       </span>
-                      <span className="mt-1 block text-xs text-[#64748b]">
+                      <span className="mt-1 block text-xs text-[#4A5A52]">
                         {formatPrice(product.price)}
                       </span>
                     </span>
-                    <span className="rounded-xl bg-[#2563eb] px-3 py-2 text-xs font-black text-white">
+                    <span className="rounded-xl bg-[#173A2E] px-3 py-2 text-xs font-black text-white">
                       Adaugă
                     </span>
                   </button>
@@ -554,14 +554,14 @@ export function CheckoutPage() {
         </div>
 
         <section className="antoria-card rounded-[1.75rem] p-5 lg:sticky lg:top-5">
-          <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+          <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
             Rezumat
           </p>
           <h2 className="mt-1 text-xl font-black">Comanda ta</h2>
           <div className="mt-5 space-y-3">
             {items.map((item) => (
               <div key={item.lineId} className="flex items-center gap-3">
-                <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-[#f0f9ff]">
+                <div className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-[#EFE8DA]">
                   <SafeImage
                     src={item.product.image}
                     alt=""
@@ -572,11 +572,11 @@ export function CheckoutPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-black">{item.product.name}</p>
-                  <p className="text-xs text-[#64748b]">
+                  <p className="text-xs text-[#4A5A52]">
                     {item.quantity} × {formatPrice(item.unitPrice)}
                   </p>
                   {item.selectedOptions.length > 0 && (
-                    <p className="mt-1 text-[10px] leading-4 text-[#64748b]">
+                    <p className="mt-1 text-[10px] leading-4 text-[#4A5A52]">
                       {item.selectedOptions
                         .map((option) => `${option.quantity} × ${option.optionName}`)
                         .join(" · ")}
@@ -597,7 +597,7 @@ export function CheckoutPage() {
               </div>
             ))}
           </div>
-          <div className="my-5 h-px bg-[#e2e8f0]" />
+          <div className="my-5 h-px bg-[#D9CFBC]" />
           <div className="space-y-3 text-sm">
             <PriceRow label="Subtotal" value={subtotal} />
             {orderDiscount.amount > 0 && (
@@ -620,7 +620,7 @@ export function CheckoutPage() {
               </p>
             )}
             {selectedOrderType === "delivery" && (
-              <p className="rounded-xl bg-[#f8fafc] px-4 py-3 text-xs font-bold text-[#64748b]">
+              <p className="rounded-xl bg-[#F7F3EA] px-4 py-3 text-xs font-bold text-[#4A5A52]">
                 Estimare livrare: {checkoutSettings.estimatedDeliveryTime}
               </p>
             )}
@@ -670,7 +670,7 @@ export function CheckoutPage() {
               {submitError}
             </p>
           )}
-          <p className="mt-3 text-center text-[11px] leading-4 text-[#94a3b8]">
+          <p className="mt-3 text-center text-[11px] leading-4 text-[#7D8A82]">
             Prin trimiterea comenzii confirmi datele introduse.
           </p>
         </section>
@@ -696,12 +696,12 @@ function ChoiceOption({
       onClick={onClick}
       className={`rounded-2xl border p-4 text-left transition ${
         active ?
-           "border-[#2563eb] bg-[#eff6ff] ring-2 ring-[#2563eb]/10"
-          : "border-[#cbd5e1] bg-white"
+           "border-[#173A2E] bg-[#EFE8DA] ring-2 ring-[#173A2E]/10"
+          : "border-[#C9BFA9] bg-white"
       }`}
     >
       <span className="block text-sm font-black">{title}</span>
-      <span className="mt-1 block text-xs text-[#64748b]">{detail}</span>
+      <span className="mt-1 block text-xs text-[#4A5A52]">{detail}</span>
     </button>
   );
 }
@@ -740,10 +740,10 @@ function Field({
         placeholder={placeholder}
         autoComplete={autoComplete}
         inputMode={inputMode}
-        className={`mt-2 w-full rounded-2xl border bg-[#f8fafc] px-4 py-3 text-sm outline-none transition placeholder:text-[#94a3b8] focus:ring-4 ${
+        className={`mt-2 w-full rounded-2xl border bg-[#F7F3EA] px-4 py-3 text-sm outline-none transition placeholder:text-[#7D8A82] focus:ring-4 ${
           error ?
              "border-red-400 focus:border-red-400 focus:ring-red-100"
-            : "border-[#cbd5e1] focus:border-[#2563eb] focus:ring-[#2563eb]/10"
+            : "border-[#C9BFA9] focus:border-[#173A2E] focus:ring-[#173A2E]/10"
         }`}
       />
       {error && <span className="mt-1.5 block text-xs font-bold text-red-600">{error}</span>}
@@ -770,22 +770,22 @@ function PaymentOption({
       onClick={onClick}
       className={`rounded-2xl border p-4 text-left transition ${
         active ?
-           "border-[#2563eb] bg-[#eff6ff] ring-2 ring-[#2563eb]/10"
-          : "border-[#cbd5e1] bg-white"
+           "border-[#173A2E] bg-[#EFE8DA] ring-2 ring-[#173A2E]/10"
+          : "border-[#C9BFA9] bg-white"
       }`}
     >
       <span className="text-2xl">{icon}</span>
       <span className="mt-3 block text-sm font-black">{title}</span>
-      <span className="mt-1 block text-xs text-[#64748b]">{detail}</span>
+      <span className="mt-1 block text-xs text-[#4A5A52]">{detail}</span>
     </button>
   );
 }
 
 function PriceRow({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center justify-between text-[#64748b]">
+    <div className="flex items-center justify-between text-[#4A5A52]">
       <span>{label}</span>
-      <span className="font-bold text-[#0f172a]">{formatPrice(value)}</span>
+      <span className="font-bold text-[#14231D]">{formatPrice(value)}</span>
     </div>
   );
 }

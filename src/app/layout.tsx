@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { AppProviders } from "@/components/app-providers";
+import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
+
+const fraunces = Fraunces({ subsets: ["latin", "latin-ext"], variable: "--font-fraunces", display: "swap" });
+const manrope = Manrope({ subsets: ["latin", "latin-ext"], variable: "--font-manrope", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "ALL4HORECA", template: "%s | ALL4HORECA" },
@@ -27,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f172a",
+  themeColor: "#14231D",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -36,7 +40,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ro">
+    <html lang="ro" className={`${fraunces.variable} ${manrope.variable}`}>
       <body>
         <AppProviders>{children}</AppProviders>
       </body>

@@ -15,7 +15,7 @@ const lockedMessage =
   "Accesul restaurantului este suspendat. Contactează ALL4HORECA pentru reactivare.";
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#2563eb] focus:bg-white";
+  "mt-2 w-full rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] px-4 py-3 text-sm outline-none focus:border-[#173A2E] focus:bg-white";
 
 export function RestaurantProfilePage() {
   const { currentRestaurant, refreshRestaurant } = useRestaurant();
@@ -36,7 +36,7 @@ export function RestaurantProfilePage() {
         coverImageUrl: currentRestaurant.coverImageUrl ?? null,
         primaryColor: /^#[0-9a-f]{6}$/i.test(currentRestaurant.primaryColor) ?
            currentRestaurant.primaryColor
-          : "#2563eb",
+          : "#173A2E",
         phone: currentRestaurant.phone ?? "",
         address: currentRestaurant.address ?? "",
         facebookUrl: currentRestaurant.facebookUrl ?? "",
@@ -175,7 +175,7 @@ export function RestaurantProfilePage() {
 
           <label className="block text-sm font-bold">
             Culoare principală
-            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] p-2">
+            <div className="mt-2 flex items-center gap-3 rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] p-2">
               <input
                 type="color"
                 value={form.primaryColor}
@@ -298,7 +298,7 @@ export function RestaurantProfilePage() {
           <button
             type="submit"
             disabled={saving || Boolean(uploading) || accessLocked}
-            className="min-h-11 w-full rounded-xl bg-[#2563eb] px-5 py-3 text-sm font-black text-white disabled:opacity-60 sm:w-auto"
+            className="min-h-11 w-full rounded-xl bg-[#173A2E] px-5 py-3 text-sm font-black text-white disabled:opacity-60 sm:w-auto"
           >
             {saving ? "Se salvează..." : "Salvează profilul"}
           </button>
@@ -331,7 +331,7 @@ function ImageField({
     <div>
       <p className="text-sm font-bold">{label}</p>
       <div
-        className={`relative mt-2 overflow-hidden rounded-xl border border-dashed border-[#cbd5e1] bg-[#f8fafc] ${
+        className={`relative mt-2 overflow-hidden rounded-xl border border-dashed border-[#C9BFA9] bg-[#F7F3EA] ${
           square ? "aspect-square max-w-40" : "aspect-[8/3]"
         }`}
       >

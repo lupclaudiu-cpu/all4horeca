@@ -10,7 +10,7 @@ export async function GET(
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   let name = "ALL4HORECA";
   let logo: string | null = null;
-  let color = "#0f172a";
+  let color = "#14231D";
 
   if (url && key) {
     const supabase = createClient(url, key, { auth: { persistSession: false } });

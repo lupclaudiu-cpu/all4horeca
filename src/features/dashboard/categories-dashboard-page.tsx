@@ -147,11 +147,11 @@ export function CategoriesDashboardPage() {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Nume categorie"
-          className="min-w-0 flex-1 rounded-xl border border-[#cbd5e1] px-4 py-3 text-sm outline-none focus:border-[#2563eb]"
+          className="min-w-0 flex-1 rounded-xl border border-[#C9BFA9] px-4 py-3 text-sm outline-none focus:border-[#173A2E]"
         />
         <button
           disabled={accessLocked}
-          className="rounded-xl bg-[#2563eb] px-5 py-3 text-xs font-black text-white disabled:opacity-50"
+          className="rounded-xl bg-[#173A2E] px-5 py-3 text-xs font-black text-white disabled:opacity-50"
         >
           Adaugă
         </button>
@@ -171,16 +171,16 @@ export function CategoriesDashboardPage() {
 
       <section className="mt-5 overflow-hidden rounded-[1.75rem] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
         {loading ? (
-          <div className="h-72 animate-pulse bg-[#f8fafc]" />
+          <div className="h-72 animate-pulse bg-[#F7F3EA]" />
         ) : (
-          <div className="divide-y divide-[#e2e8f0]">
+          <div className="divide-y divide-[#D9CFBC]">
             {categories.map((category) => (
               <div
                 key={category.id}
                 className="grid gap-3 p-4 sm:grid-cols-[70px_1fr_auto_auto] sm:items-center"
               >
                 <label>
-                  <span className="text-[10px] font-bold text-[#64748b]">Ordine</span>
+                  <span className="text-[10px] font-bold text-[#4A5A52]">Ordine</span>
                   <input
                     disabled={accessLocked}
                     type="number"
@@ -198,7 +198,7 @@ export function CategoriesDashboardPage() {
                     onBlur={() =>
                       void update(category, { sortOrder: category.sortOrder ?? 0 })
                     }
-                    className="mt-1 w-full rounded-lg border border-[#cbd5e1] px-2 py-2 text-sm"
+                    className="mt-1 w-full rounded-lg border border-[#C9BFA9] px-2 py-2 text-sm"
                   />
                 </label>
                 <input
@@ -214,7 +214,7 @@ export function CategoriesDashboardPage() {
                     )
                   }
                   onBlur={() => void update(category, { name: category.name })}
-                  className="rounded-xl border border-transparent px-3 py-3 text-sm font-black outline-none hover:border-[#cbd5e1] focus:border-[#2563eb]"
+                  className="rounded-xl border border-transparent px-3 py-3 text-sm font-black outline-none hover:border-[#C9BFA9] focus:border-[#173A2E]"
                 />
                 <button
                   type="button"

@@ -1,15 +1,30 @@
 @import "tailwindcss";
 
+@theme {
+  /* ALL4HORECA brand: blue -> green, cyan -> brass, slate -> warm neutrals */
+  --color-blue-50: #edf3ef; --color-blue-100: #dce8e1; --color-blue-200: #bcd2c5; --color-blue-300: #8fb3a0;
+  --color-blue-400: #5e8f77; --color-blue-500: #2f6a52; --color-blue-600: #173a2e; --color-blue-700: #123026;
+  --color-blue-800: #0e241c; --color-blue-900: #0a1a14; --color-blue-950: #06100c;
+  --color-sky-50: #edf3ef; --color-sky-100: #dce8e1; --color-sky-200: #bcd2c5; --color-sky-300: #8fb3a0;
+  --color-sky-400: #5e8f77; --color-sky-500: #2f6a52; --color-sky-600: #173a2e; --color-sky-700: #123026;
+  --color-cyan-50: #f8f1e4; --color-cyan-100: #f0e3c8; --color-cyan-200: #e3cda0; --color-cyan-300: #d4b37a;
+  --color-cyan-400: #c9a063; --color-cyan-500: #b88a44; --color-cyan-600: #9a7236; --color-cyan-700: #7a5620;
+  --color-cyan-800: #5e4219; --color-cyan-900: #483212;
+  --color-slate-50: #f7f3ea; --color-slate-100: #efe8da; --color-slate-200: #d9cfbc; --color-slate-300: #c2b8a3;
+  --color-slate-400: #8a9088; --color-slate-500: #5f6d65; --color-slate-600: #4a5a52; --color-slate-700: #34433c;
+  --color-slate-800: #22322b; --color-slate-900: #14231d; --color-slate-950: #0e1f19;
+}
+
 :root {
-  --antoria-slate-950: #020617;
-  --antoria-slate-900: #0f172a;
-  --antoria-slate-700: #334155;
-  --antoria-slate-500: #64748b;
-  --antoria-slate-200: #e2e8f0;
-  --antoria-slate-50: #f8fafc;
-  --antoria-blue: #2563eb;
-  --antoria-cyan: #06b6d4;
-  --antoria-teal: #14b8a6;
+  --antoria-slate-950: #0E1F19;
+  --antoria-slate-900: #14231D;
+  --antoria-slate-700: #34433C;
+  --antoria-slate-500: #4A5A52;
+  --antoria-slate-200: #D9CFBC;
+  --antoria-slate-50: #F7F3EA;
+  --antoria-blue: #173A2E;
+  --antoria-cyan: #B88A44;
+  --antoria-teal: #2F6A52;
   --ink: var(--antoria-slate-900);
 }
 
@@ -20,27 +35,27 @@ body {
   margin: 0;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 15% 0%, rgba(37, 99, 235, .08), transparent 30rem),
+    radial-gradient(circle at 15% 0%, rgba(184, 138, 68, .10), transparent 30rem),
     var(--antoria-slate-50);
   color: var(--ink);
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-manrope), Manrope, "Segoe UI", Arial, sans-serif;
 }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { cursor: pointer; }
-::selection { background: #bae6fd; color: #0f172a; }
+::selection { background: #E3CDA0; color: #14231D; }
 .antoria-gradient {
   background:
-    radial-gradient(circle at 85% 15%, rgba(6, 182, 212, .28), transparent 24rem),
-    radial-gradient(circle at 10% 85%, rgba(37, 99, 235, .24), transparent 28rem),
-    linear-gradient(145deg, #020617 0%, #0f172a 55%, #172554 100%);
+    radial-gradient(circle at 85% 15%, rgba(184, 138, 68, .30), transparent 24rem),
+    radial-gradient(circle at 10% 85%, rgba(239, 232, 218, .10), transparent 28rem),
+    linear-gradient(145deg, #0E1F19 0%, #173A2E 100%);
 }
 .antoria-card {
-  border: 1px solid rgba(226, 232, 240, .9);
+  border: 1px solid rgba(217, 207, 188, .9);
   background: rgba(255, 255, 255, .92);
-  box-shadow: 0 18px 50px rgba(15, 23, 42, .07);
+  box-shadow: 0 18px 50px rgba(20, 35, 29, .08);
 }
 .antoria-focus:focus-visible {
-  outline: 3px solid rgba(6, 182, 212, .3);
+  outline: 3px solid rgba(184, 138, 68, .4);
   outline-offset: 2px;
 }
 .hide-scrollbar { scrollbar-width: none; }
@@ -55,3 +70,5 @@ button { cursor: pointer; }
   from { opacity: 0; transform: translateY(-10px) scale(.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+h1, h2, .font-display { font-family: var(--font-fraunces), Fraunces, Georgia, serif; }

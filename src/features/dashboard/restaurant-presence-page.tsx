@@ -117,7 +117,7 @@ export function RestaurantPresencePage() {
               className="mx-auto w-64"
             />
           )}
-          <p className="mt-3 break-all text-xs font-bold text-[#64748b]">
+          <p className="mt-3 break-all text-xs font-bold text-[#4A5A52]">
             {presence.publicUrl}
           </p>
           <div className="mt-3 flex justify-center gap-2">
@@ -130,7 +130,7 @@ export function RestaurantPresencePage() {
                   .then(() => setMessage("Link-ul a fost copiat."))
                   .catch(() => setError("Link-ul nu a putut fi copiat."));
               }}
-              className="min-h-11 rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-black text-[#0f172a]"
+              className="min-h-11 rounded-xl border border-[#C9BFA9] bg-white px-4 text-xs font-black text-[#14231D]"
             >
               Copiază link-ul
             </button>
@@ -139,16 +139,16 @@ export function RestaurantPresencePage() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => markPublicLinkUsed(currentRestaurant?.id)}
-              className="inline-flex min-h-11 items-center rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-black text-[#0f172a]"
+              className="inline-flex min-h-11 items-center rounded-xl border border-[#C9BFA9] bg-white px-4 text-xs font-black text-[#14231D]"
             >
               Deschide
             </a>
           </div>
           <div className="mt-5 flex justify-center gap-2">
-            <button type="button" onClick={() => download(qr, "image/png", `${presence.slug}-qr.png`)} className="rounded-xl bg-[#2563eb] px-4 py-3 text-xs font-black text-white">Descarca PNG</button>
-            <button type="button" onClick={() => download(svg, "image/svg+xml", `${presence.slug}-qr.svg`)} className="rounded-xl bg-[#0f172a] px-4 py-3 text-xs font-black text-white">Descarca SVG</button>
+            <button type="button" onClick={() => download(qr, "image/png", `${presence.slug}-qr.png`)} className="rounded-xl bg-[#173A2E] px-4 py-3 text-xs font-black text-white">Descarca PNG</button>
+            <button type="button" onClick={() => download(svg, "image/svg+xml", `${presence.slug}-qr.svg`)} className="rounded-xl bg-[#14231D] px-4 py-3 text-xs font-black text-white">Descarca SVG</button>
           </div>
-          <div className="mt-6 rounded-2xl bg-[#0f172a] p-5 text-white">
+          <div className="mt-6 rounded-2xl bg-[#14231D] p-5 text-white">
             <p className="text-lg font-black">Scaneaza si comanda</p>
             <p className="mt-1 text-xs text-white/60">{presence.name}</p>
           </div>
@@ -163,7 +163,7 @@ export function RestaurantPresencePage() {
           <PresenceField label="Imagine social media (URL)" value={presence.socialImageUrl || ""} onChange={(socialImageUrl) => setData({ ...presence, socialImageUrl })} />
           {message && <p className="mt-4 text-sm font-bold text-emerald-700">{message}</p>}
           {error && <p className="mt-4 text-sm font-bold text-red-700">{error}</p>}
-          <button className="mt-5 rounded-xl bg-[#2563eb] px-5 py-3 text-sm font-black text-white">Salveaza SEO</button>
+          <button className="mt-5 rounded-xl bg-[#173A2E] px-5 py-3 text-sm font-black text-white">Salveaza SEO</button>
         </form>
       </div>
     </div>
@@ -171,7 +171,7 @@ export function RestaurantPresencePage() {
 }
 
 const fieldClass =
-  "mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#2563eb]";
+  "mt-2 w-full rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] px-4 py-3 text-sm outline-none focus:border-[#173A2E]";
 
 function PresenceField({
   label,

@@ -126,7 +126,7 @@ export function PromotionsDashboardPage() {
             type="button"
             disabled={!restaurantId}
             onClick={() => setEditing("new")}
-            className="rounded-xl bg-[#2563eb] px-4 py-3 text-xs font-black text-white disabled:opacity-50"
+            className="rounded-xl bg-[#173A2E] px-4 py-3 text-xs font-black text-white disabled:opacity-50"
           >
             Creează promoție
           </button>
@@ -141,9 +141,9 @@ export function PromotionsDashboardPage() {
 
       <section className="mt-6 overflow-hidden rounded-[1.75rem] bg-white shadow-sm">
         {loading ? (
-          <div className="h-80 animate-pulse bg-[#f8fafc]" />
+          <div className="h-80 animate-pulse bg-[#F7F3EA]" />
         ) : promotions.length ? (
-          <div className="divide-y divide-[#e2e8f0]">
+          <div className="divide-y divide-[#D9CFBC]">
             {promotions.map((promotion) => (
               <article
                 key={promotion.id}
@@ -165,10 +165,10 @@ export function PromotionsDashboardPage() {
                       {promotion.active ? "Activă" : "Inactivă"}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-[#64748b]">
+                  <p className="mt-2 text-sm text-[#4A5A52]">
                     {promotion.description || "Fără descriere"}
                   </p>
-                  <p className="mt-2 text-xs font-bold text-[#2563eb]">
+                  <p className="mt-2 text-xs font-bold text-[#173A2E]">
                     Reducere {promotion.discountPercent}%
                     {promotion.type === "loyalty" &&
                       promotion.triggerOrderNumber &&
@@ -183,7 +183,7 @@ export function PromotionsDashboardPage() {
                   type="button"
                   disabled={pendingId === promotion.id}
                   onClick={() => void toggleActive(promotion)}
-                  className="rounded-xl bg-[#f1f5f9] px-4 py-3 text-xs font-black"
+                  className="rounded-xl bg-[#EFE8DA] px-4 py-3 text-xs font-black"
                 >
                   {promotion.active ? "Dezactivează" : "Activează"}
                 </button>
@@ -191,7 +191,7 @@ export function PromotionsDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setEditing(promotion)}
-                    className="rounded-xl bg-[#0f172a] px-4 py-3 text-xs font-black text-white"
+                    className="rounded-xl bg-[#14231D] px-4 py-3 text-xs font-black text-white"
                   >
                     Editează
                   </button>
@@ -208,7 +208,7 @@ export function PromotionsDashboardPage() {
             ))}
           </div>
         ) : (
-          <p className="p-10 text-center text-sm font-bold text-[#64748b]">
+          <p className="p-10 text-center text-sm font-bold text-[#4A5A52]">
             Nu există promoții configurate.
           </p>
         )}
@@ -296,7 +296,7 @@ function PromotionModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-black text-[#64748b]"
+            className="text-xs font-black text-[#4A5A52]"
           >
             Închide
           </button>
@@ -392,14 +392,14 @@ function PromotionModal({
 
         {data.type === "product_discount" && (
           <div className="mt-5">
-            <p className="text-xs font-black uppercase tracking-[0.14em] text-[#2563eb]">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[#173A2E]">
               Produse selectate
             </p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {products.map((product) => (
                 <label
                   key={product.id}
-                  className="flex items-center justify-between rounded-xl border border-[#e2e8f0] px-3 py-3 text-xs font-black"
+                  className="flex items-center justify-between rounded-xl border border-[#D9CFBC] px-3 py-3 text-xs font-black"
                 >
                   <span>{product.name}</span>
                   <input
@@ -413,7 +413,7 @@ function PromotionModal({
                           : data.productIds.filter((id) => id !== product.id),
                       )
                     }
-                    className="size-4 accent-[#2563eb]"
+                    className="size-4 accent-[#173A2E]"
                   />
                 </label>
               ))}
@@ -421,13 +421,13 @@ function PromotionModal({
           </div>
         )}
 
-        <label className="mt-5 flex items-center justify-between rounded-xl border border-[#e2e8f0] p-4 text-sm font-black">
+        <label className="mt-5 flex items-center justify-between rounded-xl border border-[#D9CFBC] p-4 text-sm font-black">
           Promoție activă
           <input
             type="checkbox"
             checked={data.active}
             onChange={(event) => update("active", event.target.checked)}
-            className="size-5 accent-[#2563eb]"
+            className="size-5 accent-[#173A2E]"
           />
         </label>
 
@@ -443,7 +443,7 @@ function PromotionModal({
             data.discountPercent < 0 ||
             data.discountPercent > 100
           }
-          className="mt-6 w-full rounded-2xl bg-[#2563eb] px-5 py-4 text-sm font-black text-white disabled:opacity-50"
+          className="mt-6 w-full rounded-2xl bg-[#173A2E] px-5 py-4 text-sm font-black text-white disabled:opacity-50"
         >
           {saving ? "Se salvează..." : "Salvează promoția"}
         </button>
@@ -453,7 +453,7 @@ function PromotionModal({
 }
 
 const inputClass =
-  "mt-2 w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-4 py-3 text-sm outline-none focus:border-[#2563eb]";
+  "mt-2 w-full rounded-xl border border-[#C9BFA9] bg-[#F7F3EA] px-4 py-3 text-sm outline-none focus:border-[#173A2E]";
 
 function Field({
   label,

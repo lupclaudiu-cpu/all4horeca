@@ -173,7 +173,7 @@ export function PublicRestaurantPage({
     openCart();
   };
 
-  const accent = restaurant.primaryColor || "#0e7490";
+  const accent = restaurant.primaryColor || "#7A5620";
   const heroStatus = ordersPaused ?
      "Nu primește comenzi momentan"
     : restaurantOpen ?

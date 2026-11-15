@@ -23,8 +23,8 @@ const initialData: RestaurantOnboardingInput = {
   name: "",
   slug: "",
   logoUrl: null,
-  primaryColor: "#2563eb",
-  secondaryColor: "#0f172a",
+  primaryColor: "#173A2E",
+  secondaryColor: "#14231D",
   address: "",
   phone: "",
   email: "",
@@ -88,15 +88,15 @@ export function RestaurantWizard({
 
   return (
     <section className="mt-6 overflow-hidden rounded-[2rem] bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-      <div className="border-b border-[#e2e8f0] p-5 sm:p-6">
+      <div className="border-b border-[#D9CFBC] p-5 sm:p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2563eb]">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-[#173A2E]">
               Pasul {step} din 5
             </p>
             <h2 className="mt-1 text-2xl font-black">Adaugă Restaurant</h2>
           </div>
-          <button onClick={onClose} className="text-xs font-black text-[#64748b]">
+          <button onClick={onClose} className="text-xs font-black text-[#4A5A52]">
             Închide
           </button>
         </div>
@@ -104,7 +104,7 @@ export function RestaurantWizard({
           {[1, 2, 3, 4, 5].map((item) => (
             <div
               key={item}
-              className={`h-1.5 rounded-full ${item <= step ? "bg-[#2563eb]" : "bg-[#e2e8f0]"}`}
+              className={`h-1.5 rounded-full ${item <= step ? "bg-[#173A2E]" : "bg-[#D9CFBC]"}`}
             />
           ))}
         </div>
@@ -144,7 +144,7 @@ export function RestaurantWizard({
                     />
                   </div>
                 ) : (
-                  <div className="grid size-20 place-items-center rounded-xl bg-[#f1f5f9] text-xs font-black text-[#64748b]">
+                  <div className="grid size-20 place-items-center rounded-xl bg-[#EFE8DA] text-xs font-black text-[#4A5A52]">
                     LOGO
                   </div>
                 )}
@@ -191,7 +191,7 @@ export function RestaurantWizard({
                             : [...data.workingDays, value],
                         )
                       }
-                      className={`grid size-11 place-items-center rounded-xl text-xs font-black ${active ? "bg-[#2563eb] text-white" : "bg-[#f1f5f9] text-[#64748b]"}`}
+                      className={`grid size-11 place-items-center rounded-xl text-xs font-black ${active ? "bg-[#173A2E] text-white" : "bg-[#EFE8DA] text-[#4A5A52]"}`}
                     >
                       {label}
                     </button>
@@ -215,8 +215,8 @@ export function RestaurantWizard({
           <WizardGrid>
             <WizardField label="Taxă livrare" value={String(data.deliveryFee)} onChange={(value) => update("deliveryFee", Number(value))} type="number" />
             <WizardField label="Prag livrare gratuită" value={String(data.freeDeliveryThreshold)} onChange={(value) => update("freeDeliveryThreshold", Number(value))} type="number" />
-            <div className="sm:col-span-2 mt-3 border-t border-[#e2e8f0] pt-5">
-              <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">Cont proprietar restaurant</p>
+            <div className="sm:col-span-2 mt-3 border-t border-[#D9CFBC] pt-5">
+              <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">Cont proprietar restaurant</p>
             </div>
             <WizardField label="Nume proprietar" value={data.ownerName} onChange={(value) => update("ownerName", value)} />
             <WizardField label="Email proprietar" value={data.ownerEmail} onChange={(value) => update("ownerEmail", value)} type="email" />
@@ -231,12 +231,12 @@ export function RestaurantWizard({
             type="button"
             disabled={step === 1}
             onClick={() => setStep((current) => current - 1)}
-            className="rounded-xl bg-[#f1f5f9] px-5 py-3 text-xs font-black disabled:opacity-30"
+            className="rounded-xl bg-[#EFE8DA] px-5 py-3 text-xs font-black disabled:opacity-30"
           >
             Înapoi
           </button>
           {step < 5 ? (
-            <button type="button" onClick={() => setStep((current) => current + 1)} className="rounded-xl bg-[#0f172a] px-5 py-3 text-xs font-black text-white">
+            <button type="button" onClick={() => setStep((current) => current + 1)} className="rounded-xl bg-[#14231D] px-5 py-3 text-xs font-black text-white">
               Continuă
             </button>
           ) : (
@@ -244,7 +244,7 @@ export function RestaurantWizard({
               type="button"
               disabled={submitting || data.ownerPassword.length < 8}
               onClick={() => void finish()}
-              className="rounded-xl bg-[#2563eb] px-5 py-3 text-xs font-black text-white disabled:opacity-50"
+              className="rounded-xl bg-[#173A2E] px-5 py-3 text-xs font-black text-white disabled:opacity-50"
             >
               {submitting ? "Se creează..." : "Creează restaurantul"}
             </button>
@@ -262,13 +262,13 @@ function WizardGrid({ children }: { children: React.ReactNode }) {
 function WizardField({ label, value, onChange, type = "text", readOnly = false }: {
   label: string; value: string; onChange: (value: string) => void; type?: string; readOnly?: boolean;
 }) {
-  return <label className="block"><span className="text-sm font-black">{label}</span><input type={type} value={value} readOnly={readOnly} onChange={(event) => onChange(event.target.value)} className={`mt-2 w-full rounded-xl border border-[#cbd5e1] px-4 py-3 text-sm outline-none focus:border-[#2563eb] ${readOnly ? "cursor-not-allowed bg-[#f1f5f9] text-[#756f69]" : "bg-[#f8fafc]"}`} /></label>;
+  return <label className="block"><span className="text-sm font-black">{label}</span><input type={type} value={value} readOnly={readOnly} onChange={(event) => onChange(event.target.value)} className={`mt-2 w-full rounded-xl border border-[#C9BFA9] px-4 py-3 text-sm outline-none focus:border-[#173A2E] ${readOnly ? "cursor-not-allowed bg-[#EFE8DA] text-[#756f69]" : "bg-[#F7F3EA]"}`} /></label>;
 }
 
 function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label><span className="text-sm font-black">{label}</span><div className="mt-2 flex items-center gap-3 rounded-xl border border-[#cbd5e1] p-2"><input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="size-10 rounded-lg" /><span className="text-xs font-bold">{value}</span></div></label>;
+  return <label><span className="text-sm font-black">{label}</span><div className="mt-2 flex items-center gap-3 rounded-xl border border-[#C9BFA9] p-2"><input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="size-10 rounded-lg" /><span className="text-xs font-bold">{value}</span></div></label>;
 }
 
 function WizardToggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
-  return <label className="flex items-center justify-between rounded-xl border border-[#e2e8f0] p-4"><span className="text-sm font-black">{label}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-5 accent-[#2563eb]" /></label>;
+  return <label className="flex items-center justify-between rounded-xl border border-[#D9CFBC] p-4"><span className="text-sm font-black">{label}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-5 accent-[#173A2E]" /></label>;
 }

@@ -133,7 +133,7 @@ export function LiveOrdersPage() {
                 <OrdersIcon className="size-9" />
               </div>
               <h2 className="mt-5 text-xl font-black">Totul este la zi</h2>
-              <p className="mt-2 text-sm text-[#64748b]">
+              <p className="mt-2 text-sm text-[#4A5A52]">
                 Nu există comenzi active momentan.
               </p>
             </div>
@@ -201,10 +201,10 @@ function LiveOrderCard({
       {isNew && (
         <div className="absolute left-0 top-0 h-full w-1.5 bg-emerald-500" />
       )}
-      <div className="flex items-start justify-between gap-4 border-b border-[#e2e8f0] p-5">
+      <div className="flex items-start justify-between gap-4 border-b border-[#D9CFBC] p-5">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs font-bold text-[#64748b]">
+            <p className="text-xs font-bold text-[#4A5A52]">
               {formatDashboardDate(order.createdAt)}
             </p>
             {isNew && (
@@ -227,7 +227,7 @@ function LiveOrderCard({
                 ? delayLevel === "critical"
                   ? "text-red-600"
                   : "text-blue-600"
-                : "text-[#64748b]"
+                : "text-[#4A5A52]"
             }`}
           >
             <ClockIcon className="size-4" />
@@ -243,18 +243,18 @@ function LiveOrderCard({
             href={`tel:${order.customer.phone.replace(/[^\d+]/g, "")}`}
             className="mt-2 flex w-fit items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-700"
           >
-            <PhoneIcon className="size-4 text-[#2563eb]" />
+            <PhoneIcon className="size-4 text-[#173A2E]" />
             Sună {order.customer.phone}
           </a>
-          <p className="mt-2 flex items-start gap-2 text-xs leading-5 text-[#64748b]">
-            <MapPinIcon className="mt-0.5 size-4 shrink-0 text-[#2563eb]" />
+          <p className="mt-2 flex items-start gap-2 text-xs leading-5 text-[#4A5A52]">
+            <MapPinIcon className="mt-0.5 size-4 shrink-0 text-[#173A2E]" />
             {order.orderType === "pickup" ?
                "Ridicare din locație"
               : order.customer.address}
           </p>
         </div>
-        <div className="rounded-2xl bg-[#f8fafc] p-4">
-          <p className="text-[10px] font-black uppercase tracking-wide text-[#64748b]">
+        <div className="rounded-2xl bg-[#F7F3EA] p-4">
+          <p className="text-[10px] font-black uppercase tracking-wide text-[#4A5A52]">
             Produse
           </p>
           <div className="mt-2 space-y-2">
@@ -266,7 +266,7 @@ function LiveOrderCard({
                 <span className="font-bold">
                   {item.quantity} × {item.name}
                   {item.selectedOptions.length > 0 && (
-                    <span className="mt-1 block text-[10px] font-medium text-[#64748b]">
+                    <span className="mt-1 block text-[10px] font-medium text-[#4A5A52]">
                       {item.selectedOptions
                         .map((option) => `${option.quantity} × ${option.optionName}`)
                         .join(" · ")}
@@ -289,7 +289,7 @@ function LiveOrderCard({
         </div>
       )}
 
-      <div className="grid gap-3 border-t border-[#e2e8f0] px-5 py-4 text-xs sm:grid-cols-3">
+      <div className="grid gap-3 border-t border-[#D9CFBC] px-5 py-4 text-xs sm:grid-cols-3">
         <Info label="Total" value={formatPrice(order.total)} strong />
         <Info
           label={order.orderType === "pickup" ? "Ridicare" : "Livrare"}
@@ -307,11 +307,11 @@ function LiveOrderCard({
         )}
       </div>
 
-      <div className="flex flex-wrap gap-2 border-t border-[#e2e8f0] bg-[#f8fafc] p-4">
+      <div className="flex flex-wrap gap-2 border-t border-[#D9CFBC] bg-[#F7F3EA] p-4">
         <button
           type="button"
           onClick={onOpen}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-[#0f172a] px-3 py-2 text-[11px] font-black text-white"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#14231D] px-3 py-2 text-[11px] font-black text-white"
         >
           <EyeIcon className="size-4" />
           Vezi Detalii
@@ -396,7 +396,7 @@ function OrderDetailsModal({
       }}
     >
       <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-[2rem] bg-white shadow-2xl sm:max-w-2xl sm:rounded-[2rem]">
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[#e2e8f0] bg-white/95 p-5 backdrop-blur">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-[#D9CFBC] bg-white/95 p-5 backdrop-blur">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-2xl font-black">{order.orderNumber}</h2>
@@ -404,14 +404,14 @@ function OrderDetailsModal({
                 {order.status}
               </span>
             </div>
-            <p className="mt-1 text-xs font-bold text-[#64748b]">
+            <p className="mt-1 text-xs font-bold text-[#4A5A52]">
               {formatDashboardDate(order.createdAt)} · {formatOrderTimer(order.createdAt, now)}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid size-10 shrink-0 place-items-center rounded-full bg-[#f1f5f9]"
+            className="grid size-10 shrink-0 place-items-center rounded-full bg-[#EFE8DA]"
             aria-label="Închide detaliile"
           >
             <CloseIcon className="size-5" />
@@ -419,7 +419,7 @@ function OrderDetailsModal({
         </div>
 
         <div className="space-y-5 p-5">
-          <section className="grid gap-3 rounded-2xl bg-[#f8fafc] p-4 sm:grid-cols-2">
+          <section className="grid gap-3 rounded-2xl bg-[#F7F3EA] p-4 sm:grid-cols-2">
             <Info label="Client" value={order.customer.name} />
             <Info label="Telefon" value={order.customer.phone} />
             <Info
@@ -438,7 +438,7 @@ function OrderDetailsModal({
 
           {order.orderType === "delivery" && (
             <section>
-              <p className="mb-3 text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+              <p className="mb-3 text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
                 Locație livrare
               </p>
               <OrderMap
@@ -449,21 +449,21 @@ function OrderDetailsModal({
           )}
 
           <section>
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#2563eb]">
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-[#173A2E]">
               Produse
             </p>
-            <div className="mt-3 divide-y divide-[#e2e8f0]">
+            <div className="mt-3 divide-y divide-[#D9CFBC]">
               {order.items.map((item, index) => (
                 <div key={`${item.productId}-${index}`} className="flex justify-between gap-4 py-3">
                   <div>
                     <p className="text-sm font-black">{item.name}</p>
-                    <p className="mt-1 text-xs text-[#64748b]">
+                    <p className="mt-1 text-xs text-[#4A5A52]">
                       {item.quantity} × {formatPrice(item.unitPrice)}
                     </p>
                     {item.selectedOptions.length > 0 && (
                       <div className="mt-2 space-y-1">
                         {item.selectedOptions.map((option) => (
-                          <p key={`${option.groupId}-${option.optionId}`} className="text-[11px] text-[#64748b]">
+                          <p key={`${option.groupId}-${option.optionId}`} className="text-[11px] text-[#4A5A52]">
                             {option.groupName}: <strong>{option.quantity} × {option.optionName}</strong>
                             {option.priceDelta > 0 && ` (+${formatPrice(option.priceDelta)})`}
                           </p>
@@ -479,12 +479,12 @@ function OrderDetailsModal({
             </div>
           </section>
 
-          <section className="rounded-2xl border border-[#e2e8f0] p-4">
+          <section className="rounded-2xl border border-[#D9CFBC] p-4">
             <PriceLine label="Subtotal" value={order.subtotal} />
             <PriceLine label="Taxă livrare" value={order.deliveryFee} />
-            <div className="mt-3 flex justify-between border-t border-[#e2e8f0] pt-3">
+            <div className="mt-3 flex justify-between border-t border-[#D9CFBC] pt-3">
               <span className="font-black">Total</span>
-              <span className="text-xl font-black text-[#2563eb]">
+              <span className="text-xl font-black text-[#173A2E]">
                 {formatPrice(order.total)}
               </span>
             </div>
@@ -603,7 +603,7 @@ function AcceptanceEtaModal({
               Acceptare comandă
             </p>
             <h2 className="mt-1 text-2xl font-black">{order.orderNumber}</h2>
-            <p className="mt-2 text-sm text-[#64748b]">
+            <p className="mt-2 text-sm text-[#4A5A52]">
               Selectează timpul estimat comunicat clientului.
             </p>
           </div>
@@ -611,7 +611,7 @@ function AcceptanceEtaModal({
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="grid size-10 place-items-center rounded-full bg-[#f1f5f9]"
+            className="grid size-10 place-items-center rounded-full bg-[#EFE8DA]"
             aria-label="Închide"
           >
             <CloseIcon className="size-5" />
@@ -627,7 +627,7 @@ function AcceptanceEtaModal({
               className={`rounded-2xl border px-4 py-4 text-sm font-black transition ${
                 selectedEta === minutes ?
                    "border-blue-600 bg-blue-50 text-blue-700 ring-2 ring-blue-600/10"
-                  : "border-[#e2e8f0] bg-white text-[#475569]"
+                  : "border-[#D9CFBC] bg-white text-[#3E4D46]"
               }`}
             >
               {minutes} minute
@@ -635,7 +635,7 @@ function AcceptanceEtaModal({
           ))}
         </div>
 
-        <label className="mt-4 block rounded-2xl border border-[#e2e8f0] p-4">
+        <label className="mt-4 block rounded-2xl border border-[#D9CFBC] p-4">
           <span className="flex items-center gap-2 text-sm font-black">
             <input
               type="radio"
@@ -655,10 +655,10 @@ function AcceptanceEtaModal({
                 setSelectedEta("custom");
                 setCustomEta(event.target.value);
               }}
-              className="min-w-0 flex-1 rounded-xl border border-[#cbd5e1] px-4 py-3 text-sm font-bold outline-none focus:border-blue-600"
+              className="min-w-0 flex-1 rounded-xl border border-[#C9BFA9] px-4 py-3 text-sm font-bold outline-none focus:border-blue-600"
               placeholder="Ex: 35"
             />
-            <span className="text-sm font-bold text-[#64748b]">minute</span>
+            <span className="text-sm font-bold text-[#4A5A52]">minute</span>
           </div>
         </label>
 
@@ -681,9 +681,9 @@ function AcceptanceEtaModal({
 
 function PriceLine({ label, value }: { label: string; value: number }) {
   return (
-    <div className="mb-2 flex justify-between text-sm text-[#64748b]">
+    <div className="mb-2 flex justify-between text-sm text-[#4A5A52]">
       <span>{label}</span>
-      <span className="font-bold text-[#0f172a]">{formatPrice(value)}</span>
+      <span className="font-bold text-[#14231D]">{formatPrice(value)}</span>
     </div>
   );
 }
@@ -699,8 +699,8 @@ function Info({
 }) {
   return (
     <div>
-      <p className="font-bold text-[#64748b]">{label}</p>
-      <p className={`mt-1 ${strong ? "text-base font-black text-[#2563eb]" : "font-bold"}`}>
+      <p className="font-bold text-[#4A5A52]">{label}</p>
+      <p className={`mt-1 ${strong ? "text-base font-black text-[#173A2E]" : "font-bold"}`}>
         {value}
       </p>
     </div>
