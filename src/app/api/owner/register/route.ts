@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import type { OwnerSelfRegistrationInput } from "@/lib/types";
+import { sendWelcomeEmail } from "@/lib/welcome-email";
 
 export async function POST(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -95,6 +96,13 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+
+  await sendWelcomeEmail({
+    to: input.email.trim(),
+    name: input.contactName.trim(),
+    restaurantName: input.restaurantName.trim(),
+    trialExpiresAt: restaurant.trial_expires_at,
+  });
 
   return NextResponse.json(
     {
