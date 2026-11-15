@@ -9,6 +9,7 @@ import { RestaurantWizard } from "@/features/admin/restaurant-wizard";
 import type { AdminRestaurant } from "@/lib/types";
 import {
   getAdminRestaurants,
+  hardDeleteRestaurant,
   softDeleteRestaurant,
   updateRestaurantActive,
   updateRestaurantCommercialStatus,
@@ -94,6 +95,27 @@ export function AdminPage() {
       await loadRestaurants();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Arhivare eșuată.");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const purgeRestaurant = async (item: AdminRestaurant) => {
+    const typed = window.prompt(
+      `ȘTERGERE DEFINITIVĂ: restaurantul „${item.name}”, produsele, comenzile și contul administratorului vor fi șterse fără posibilitate de recuperare.\n\nScrie numele exact al restaurantului pentru confirmare:`,
+    );
+    if (typed === null) return;
+    if (typed.trim() !== item.name.trim()) {
+      setError("Numele nu se potrivește. Restaurantul nu a fost șters.");
+      return;
+    }
+    setSavingId(item.id);
+    setError(null);
+    try {
+      await hardDeleteRestaurant(item.id);
+      await loadRestaurants();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Ștergere eșuată.");
     } finally {
       setSavingId(null);
     }
@@ -344,6 +366,7 @@ export function AdminPage() {
                 now={now}
                 onAction={runTrialAction}
                 onDelete={deleteRestaurant}
+                onPurge={purgeRestaurant}
               />
             ))}
           </div>
@@ -365,7 +388,7 @@ export function AdminPage() {
             {visibleRestaurants.map((item) => (
               <article
                 key={item.id}
-                className="grid gap-4 p-5 transition hover:bg-blue-50/30 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
+                className="grid gap-4 p-5 transition hover:bg-blue-50/30 sm:grid-cols-[1fr_auto_auto_auto_auto] sm:items-center"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -414,6 +437,14 @@ export function AdminPage() {
                        "Activ"
                       : "Inactiv"}
                 </button>
+                <button
+                  type="button"
+                  disabled={savingId === item.id}
+                  onClick={() => void purgeRestaurant(item)}
+                  className="rounded-xl bg-red-600 px-4 py-3 text-xs font-black text-white disabled:opacity-60"
+                >
+                  Șterge
+                </button>
               </article>
             ))}
           </div>
@@ -433,6 +464,7 @@ function TrialRestaurantRow({
   now,
   onAction,
   onDelete,
+  onPurge,
 }: {
   item: AdminRestaurant;
   saving: boolean;
@@ -442,6 +474,7 @@ function TrialRestaurantRow({
     action: "activate" | "suspend" | "extend_trial" | "convert_paid",
   ) => Promise<void>;
   onDelete: (item: AdminRestaurant) => Promise<void>;
+  onPurge: (item: AdminRestaurant) => Promise<void>;
 }) {
   const trialState = getTrialState(item, now);
 
@@ -516,6 +549,9 @@ function TrialRestaurantRow({
         </TrialButton>
         <TrialButton danger disabled={saving} onClick={() => void onDelete(item)}>
           Arhivează
+        </TrialButton>
+        <TrialButton danger disabled={saving} onClick={() => void onPurge(item)}>
+          Șterge definitiv
         </TrialButton>
       </div>
     </article>
