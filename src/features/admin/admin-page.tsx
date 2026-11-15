@@ -100,15 +100,22 @@ export function AdminPage() {
     }
   };
 
+  const [purgeTarget, setPurgeTarget] = useState<AdminRestaurant | null>(null);
+  const [purgeText, setPurgeText] = useState("");
+
   const purgeRestaurant = async (item: AdminRestaurant) => {
-    const typed = window.prompt(
-      `ȘTERGERE DEFINITIVĂ: restaurantul „${item.name}”, produsele, comenzile și contul administratorului vor fi șterse fără posibilitate de recuperare.\n\nScrie numele exact al restaurantului pentru confirmare:`,
-    );
-    if (typed === null) return;
-    if (typed.trim() !== item.name.trim()) {
+    setPurgeText("");
+    setPurgeTarget(item);
+  };
+
+  const confirmPurge = async () => {
+    const item = purgeTarget;
+    if (!item) return;
+    if (purgeText.trim().toLowerCase() !== item.name.trim().toLowerCase()) {
       setError("Numele nu se potrivește. Restaurantul nu a fost șters.");
       return;
     }
+    setPurgeTarget(null);
     setSavingId(item.id);
     setError(null);
     try {
@@ -454,6 +461,48 @@ export function AdminPage() {
           </p>
         )}
       </section>
+      {purgeTarget && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-black text-red-700">
+              Ștergere definitivă
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Se șterg restaurantul „{purgeTarget.name}”, produsele, comenzile
+              și contul administratorului. Nu se poate recupera.
+            </p>
+            <p className="mt-3 text-xs font-bold text-slate-500">
+              Scrie numele exact pentru confirmare:
+            </p>
+            <input
+              value={purgeText}
+              onChange={(event) => setPurgeText(event.target.value)}
+              placeholder={purgeTarget.name}
+              className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-3 text-sm"
+            />
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPurgeTarget(null)}
+                className="rounded-xl bg-slate-100 px-4 py-3 text-sm font-black"
+              >
+                Anulează
+              </button>
+              <button
+                type="button"
+                disabled={
+                  purgeText.trim().toLowerCase() !==
+                  purgeTarget.name.trim().toLowerCase()
+                }
+                onClick={() => void confirmPurge()}
+                className="rounded-xl bg-red-600 px-4 py-3 text-sm font-black text-white disabled:opacity-40"
+              >
+                Șterge definitiv
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
