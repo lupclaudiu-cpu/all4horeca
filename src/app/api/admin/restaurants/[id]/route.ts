@@ -68,6 +68,17 @@ export async function DELETE(
   if (ordersError) {
     return NextResponse.json({ error: ordersError.message }, { status: 400 });
   }
+  // Profilurile administratorilor trebuie șterse înainte de restaurant
+  // (constrângerea „restaurant_owner_requires_restaurant” blochează altfel ștergerea).
+  if (ownerIds.length) {
+    const { error: profilesError } = await admin
+      .from("profiles")
+      .delete()
+      .in("id", ownerIds);
+    if (profilesError) {
+      return NextResponse.json({ error: profilesError.message }, { status: 400 });
+    }
+  }
   const { error: deleteError } = await admin
     .from("restaurants")
     .delete()
