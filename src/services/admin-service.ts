@@ -307,6 +307,14 @@ export async function softDeleteRestaurant(restaurantId: string) {
   if (error) throw new Error(error.message);
 }
 
+export async function hardDeleteRestaurant(restaurantId: string) {
+  const response = await fetch(`/api/admin/restaurants/${restaurantId}`, {
+    method: "DELETE",
+  });
+  const body = (await response.json().catch(() => ({}))) as { error?: string };
+  if (!response.ok) throw new Error(body.error || "Ștergere eșuată.");
+}
+
 function validateImage(file: File) {
   const allowed = ["image/jpeg", "image/png", "image/webp"];
   if (!allowed.includes(file.type)) {
