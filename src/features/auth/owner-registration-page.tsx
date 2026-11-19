@@ -105,7 +105,7 @@ export function OwnerRegistrationPage() {
             Primești meniu demo, panou de control și link public. Configurezi
             singur produsele, promoțiile și programul, fără obligații și fără
             card. Comenzile reale și SMS-urile se activează la lansare. După
-            cele 14 zile de testare, datele rămân păstrate.
+            cele 14 zile de testare, datele rămân păstrate pe perioada colaborării.
           </p>
         </div>
 
