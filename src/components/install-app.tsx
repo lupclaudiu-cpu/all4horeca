@@ -14,7 +14,7 @@ const DISMISSED_KEY = "all4horeca-install-dismissed";
 
 export function InstallApp() {
   const { currentRestaurant } = useRestaurant();
-  const appName = currentRestaurant?.name ?? "ALL4HORECA";
+  const appName = currentRestaurant?.name ?? "";
   const logoUrl = currentRestaurant?.logoUrl ?? null;
   const [promptEvent, setPromptEvent] = useState<InstallPromptEvent | null>(null);
   const [showHelp, setShowHelp] = useState(false);
@@ -76,7 +76,7 @@ export function InstallApp() {
     setVisible(false);
   };
 
-  if (!visible) return null;
+  if (!visible || !currentRestaurant) return null;
 
   return (
     <>

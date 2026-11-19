@@ -309,5 +309,5 @@ function formatOrderTime(value: string) {
 }
 
 function paymentLabel(method: PaymentMethod) {
-  return method === "cash" ? "Plată cash" : "Plată card · simulare";
+  return method === "cash" ? "Plată cash" : "Plată card · POS";
 }

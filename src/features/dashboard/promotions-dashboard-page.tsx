@@ -120,7 +120,7 @@ export function PromotionsDashboardPage() {
       <DashboardHeader
         eyebrow="Comercial"
         title="Promoții"
-        description="Configurează promoțiile restaurantului. Motorul de aplicare automată va fi conectat într-o etapă ulterioară."
+        description="Configurează promoțiile restaurantului."
         action={
           <button
             type="button"

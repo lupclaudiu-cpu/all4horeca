@@ -184,7 +184,12 @@ function LiveOrderCard({
   const delayLevel = getOrderDelayLevel(order, now);
   const delayed = highlightDelayed && delayLevel !== "normal";
   const isNew = order.status === "Nouă";
-  const nextAction = nextActions[order.status];
+  const baseAction = nextActions[order.status];
+  const isPickupOrder = order.orderType === "pickup";
+  const nextAction =
+    baseAction && order.status === "În preparare" && isPickupOrder ?
+      { ...baseAction, label: "Gata de ridicare" }
+    : baseAction;
 
   return (
     <article
@@ -293,7 +298,7 @@ function LiveOrderCard({
         <Info label="Total" value={formatPrice(order.total)} strong />
         <Info
           label={order.orderType === "pickup" ? "Ridicare" : "Livrare"}
-          value={order.paymentMethod === "cash" ? "Cash" : "Card · simulare"}
+          value={order.paymentMethod === "cash" ? "Cash" : "Card · POS"}
         />
         <Info
           label="Observații"
@@ -432,7 +437,7 @@ function OrderDetailsModal({
             />
             <Info
               label="Plată"
-              value={order.paymentMethod === "cash" ? "Cash" : "Card · simulare"}
+              value={order.paymentMethod === "cash" ? "Cash" : "Card · POS"}
             />
           </section>
 

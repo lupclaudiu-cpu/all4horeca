@@ -49,6 +49,7 @@ export function buildWelcomeEmail(input: WelcomeEmailInput, guideUrl: string) {
 <p>Ghidul complet, cu toți pașii explicați: <a href="${esc(guideUrl)}" style="color:#7A5620">${esc(guideUrl)}</a></p>
 <p style="margin:26px 0"><a href="${panelUrl}" style="background:#173A2E;color:#EFE8DA;padding:13px 24px;text-decoration:none;border-radius:6px;font-weight:bold">Deschide panoul</a></p>
 <p>După probă, abonamentul pentru o locație costă 449 lei/lună + TVA, iar implementarea 1.900 lei + TVA. Dacă ai întrebări, răspunde la acest email sau scrie-ne la contact@all4horeca.ro.</p>
+<p><b>Important:</b> costul implementării și abonamentul de după perioada de probă se aplică doar cu acordul tău și doar dacă decizi să folosești aplicația. Nu plătești nimic automat la sfârșitul probei.</p>
 <p>Succes,<br>Echipa ALL4HORECA</p>
 </div></div>`;
 
@@ -64,6 +65,7 @@ export function buildWelcomeEmail(input: WelcomeEmailInput, guideUrl: string) {
     `Deschide panoul: ${panelUrl}`,
     "",
     "După probă, abonamentul costă 449 lei/lună + TVA, iar implementarea 1.900 lei + TVA.",
+    "Important: costul implementării și abonamentul de după perioada de probă se aplică doar cu acordul tău și doar dacă decizi să folosești aplicația. Nu plătești nimic automat la sfârșitul probei.",
     "Întrebări: contact@all4horeca.ro",
     "",
     "Echipa ALL4HORECA",

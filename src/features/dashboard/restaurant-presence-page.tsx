@@ -145,11 +145,11 @@ export function RestaurantPresencePage() {
             </a>
           </div>
           <div className="mt-5 flex justify-center gap-2">
-            <button type="button" onClick={() => download(qr, "image/png", `${presence.slug}-qr.png`)} className="rounded-xl bg-[#173A2E] px-4 py-3 text-xs font-black text-white">Descarca PNG</button>
-            <button type="button" onClick={() => download(svg, "image/svg+xml", `${presence.slug}-qr.svg`)} className="rounded-xl bg-[#14231D] px-4 py-3 text-xs font-black text-white">Descarca SVG</button>
+            <button type="button" onClick={() => download(qr, "image/png", `${presence.slug}-qr.png`)} className="rounded-xl bg-[#173A2E] px-4 py-3 text-xs font-black text-white">Descarcă PNG</button>
+            <button type="button" onClick={() => download(svg, "image/svg+xml", `${presence.slug}-qr.svg`)} className="rounded-xl bg-[#14231D] px-4 py-3 text-xs font-black text-white">Descarcă SVG</button>
           </div>
           <div className="mt-6 rounded-2xl bg-[#14231D] p-5 text-white">
-            <p className="text-lg font-black">Scaneaza si comanda</p>
+            <p className="text-lg font-black">Scanează și comandă</p>
             <p className="mt-1 text-xs text-white/60">{presence.name}</p>
           </div>
         </section>
