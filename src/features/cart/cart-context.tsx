@@ -36,7 +36,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const activeRestaurantId = restaurantId ?? items[0]?.product.restaurantId;
   const [isOpen, setIsOpen] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [hydratedFor, setHydratedFor] = useState<string | null>(null);
+  const hydrated = hydratedFor !== null && hydratedFor === restaurantId;
 
   useEffect(() => {
     publishDataFlowDebug({
@@ -58,11 +59,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [activeRestaurantId, hydrated, isOpen, items.length]);
 
   useEffect(() => {
+    if (!restaurantId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHydratedFor(null);
+    }
+  }, [restaurantId]);
+
+  useEffect(() => {
     if (restaurantLoading || !restaurantId) {
       return;
     }
     const timer = window.setTimeout(() => {
-      setHydrated(false);
       try {
         const saved = window.localStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -92,7 +99,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       } catch {
         window.localStorage.removeItem(STORAGE_KEY);
       } finally {
-        setHydrated(true);
+        setHydratedFor(restaurantId);
       }
     }, 0);
     return () => window.clearTimeout(timer);
