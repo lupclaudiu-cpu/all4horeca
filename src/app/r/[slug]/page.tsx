@@ -64,6 +64,9 @@ export async function generateMetadata({
     openGraph: restaurant.social_image_url ?
        { images: [restaurant.social_image_url] }
       : undefined,
+    // La instalare pe telefon clientul vede doar numele restaurantului, nu al platformei.
+    manifest: `/api/manifest/${encodeURIComponent(slug)}`,
+    appleWebApp: { capable: true, title: restaurant.name },
   };
 }
 

@@ -497,7 +497,7 @@ export function CheckoutPage() {
                   <PaymentOption
                     active={selectedPaymentMethod === "card"}
                     title="Card"
-                    detail="Simulare"
+                    detail={selectedOrderType === "pickup" ? "POS la ridicare" : "POS la livrare"}
                     icon="💳"
                     onClick={() => setPaymentMethod("card")}
                   />
@@ -508,7 +508,7 @@ export function CheckoutPage() {
             )}
             {selectedPaymentMethod === "card" && (
               <p className="mt-3 rounded-xl bg-[#EFE8DA] px-4 py-3 text-xs leading-5 text-[#7A5620]">
-                Plata cu cardul este simulată momentan. Nu vor fi solicitate date bancare.
+                Plătești cu cardul la POS-ul pe care îl are livratorul (sau restaurantul, la ridicare). În aplicație nu se introduc date bancare.
               </p>
             )}
           </section>

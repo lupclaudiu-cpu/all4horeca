@@ -132,14 +132,14 @@ export function RestaurantSettingsPage() {
     setMessage(null);
     try {
       await saveSettings();
-      setMessage({ type: "success", text: "Setarile au fost salvate." });
+      setMessage({ type: "success", text: "Setările au fost salvate." });
     } catch (reason) {
       setMessage({
         type: "error",
         text:
           reason instanceof Error ?
              reason.message
-            : "Setarile nu au putut fi salvate.",
+            : "Setările nu au putut fi salvate.",
       });
     } finally {
       setSaving(false);
@@ -157,7 +157,7 @@ export function RestaurantSettingsPage() {
       await resetSettings();
       setMessage({
         type: "success",
-        text: "Valorile implicite au fost restaurate si salvate.",
+        text: "Valorile implicite au fost restaurate și salvate.",
       });
     } catch (reason) {
       setMessage({
@@ -215,7 +215,7 @@ export function RestaurantSettingsPage() {
             onChange={(checked) => updateSettings({ acceptsDelivery: checked })}
           />
           <Toggle
-            label="Ridicare din locatie"
+            label="Ridicare din locație"
             checked={settings.acceptsPickup}
             onChange={(checked) => updateSettings({ acceptsPickup: checked })}
           />
@@ -228,7 +228,7 @@ export function RestaurantSettingsPage() {
             onChange={(checked) => updateSettings({ acceptsCash: checked })}
           />
           <Toggle
-            label="Card (simulare)"
+            label="Card (livratorul vine cu POS)"
             checked={settings.acceptsCard}
             onChange={(checked) => updateSettings({ acceptsCard: checked })}
           />
@@ -279,7 +279,7 @@ export function RestaurantSettingsPage() {
           </div>
           <p className="rounded-xl bg-[#F7F3EA] px-4 py-3 text-xs leading-5 text-[#4A5A52]">
             Status curent:{" "}
-            <strong>{restaurantStatus.open ? "OPEN" : "CLOSED"}</strong> ·{" "}
+            <strong>{restaurantStatus.open ? "Deschis" : "Închis"}</strong> ·{" "}
             {restaurantStatus.label}
           </p>
         </SettingsCard>
@@ -463,9 +463,9 @@ export function RestaurantSettingsPage() {
           </div>
         </SettingsCard>
 
-        <SettingsCard title="Notificari comenzi" subtitle="Supabase Realtime">
+        <SettingsCard title="Notificări comenzi" subtitle="Comenzile noi apar instant în panou">
           <Toggle
-            label="Notificari activate"
+            label="Notificări activate"
             checked={settings.notificationsEnabled}
             onChange={(notificationsEnabled) =>
               updateSettings({ notificationsEnabled })
@@ -480,7 +480,7 @@ export function RestaurantSettingsPage() {
             }}
           />
           <Toggle
-            label="Evidentiere comenzi intarziate"
+            label="Evidențiere comenzi întârziate"
             checked={settings.highlightDelayedOrders}
             onChange={(highlightDelayedOrders) =>
               updateSettings({ highlightDelayedOrders })
@@ -510,7 +510,7 @@ export function RestaurantSettingsPage() {
           disabled={!hydrated || saving || resetting || accessLocked}
           className="rounded-xl border border-[#C9BFA9] bg-white px-4 py-3 text-xs font-black text-[#3E4D46]"
         >
-          {resetting ? "Se restaureaza..." : "Restaureaza valorile implicite"}
+          {resetting ? "Se restaurează..." : "Restaurează valorile implicite"}
         </button>
         <button
           type="button"
@@ -518,7 +518,7 @@ export function RestaurantSettingsPage() {
           disabled={!hydrated || saving || resetting || accessLocked}
           className="rounded-xl bg-[#173A2E] px-5 py-3 text-xs font-black text-white disabled:cursor-wait disabled:opacity-60"
         >
-          {saving ? "Se salveaza..." : "Salveaza modificarile"}
+          {saving ? "Se salvează..." : "Salvează modificările"}
         </button>
       </div>
       <StaffManager />

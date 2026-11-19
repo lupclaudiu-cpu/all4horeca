@@ -79,17 +79,12 @@ export function AddressAutocomplete({
           }`}
         />
         <span className="pointer-events-none absolute right-3 top-1/2 mt-1 -translate-y-1/2 text-[10px] font-black uppercase tracking-wide text-[#4A5A52]">
-          {loading ? "Se încarcă" : location ? "Adresă aleasă" : "Google"}
+          {loading ? "Se încarcă" : location ? "Adresă aleasă" : ""}
         </span>
       </div>
       {location && (
         <span className="mt-1.5 block text-xs font-bold text-emerald-700">
           Locație confirmată: {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
-        </span>
-      )}
-      {!getGoogleMapsApiKey() && (
-        <span className="mt-1.5 block text-xs text-[#4A5A52]">
-          Autocomplete-ul va fi activ după configurarea cheii Google Maps.
         </span>
       )}
       {mapsError && (

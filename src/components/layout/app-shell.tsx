@@ -11,6 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isStandalone =
     pathname.startsWith("/restaurant/dashboard") ||
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/owner") ||
     pathname.startsWith("/demo/") ||
     pathname === "/" ||
     pathname === "/app" ||

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/features/auth/auth-context";
+import { useRestaurant } from "@/features/restaurant/restaurant-context";
 
 /**
  * Customer sign-in: phone number + one SMS code (only on a new device).
@@ -9,6 +10,8 @@ import { useAuth } from "@/features/auth/auth-context";
  */
 export function PhoneLogin({ onDone }: { onDone?: () => void }) {
   const { requestPhoneCode, verifyPhoneCode } = useAuth();
+  const { currentRestaurant } = useRestaurant();
+  const isTrial = currentRestaurant?.status === "trial";
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"phone" | "code">("phone");
@@ -60,6 +63,11 @@ export function PhoneLogin({ onDone }: { onDone?: () => void }) {
           "Ca să plasezi comanda ai nevoie de un cont. Doar numărul de telefon, fără parolă."
         : `Am trimis un cod de 6 cifre la ${phone}.`}
       </p>
+      {isTrial && (
+        <p className="rounded-xl bg-amber-100 px-4 py-3 text-xs font-bold leading-5 text-amber-900">
+          Restaurant în perioadă de test. Pentru o comandă de probă folosește telefonul 0770 111 111 și codul 123456.
+        </p>
+      )}
       {step === "phone" ?
         <input
           type="tel"

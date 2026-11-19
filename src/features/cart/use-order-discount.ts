@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase/client";
+import { useAuth } from "@/features/auth/auth-context";
 import type { CartItem } from "@/lib/types";
 
 export type OrderDiscount = { name: string | null; amount: number };
@@ -13,6 +14,9 @@ export function useOrderDiscount(
   restaurantId: string | null | undefined,
   items: CartItem[],
 ): OrderDiscount {
+  const { user } = useAuth();
+  // Reducerea depinde de contul clientului (ex. „prima comandă”), deci se recalculează la autentificare.
+  const userKey = user?.id ?? "anon";
   const [discount, setDiscount] = useState<OrderDiscount>(NONE);
   const key = JSON.stringify(
     items.map((item) => [
@@ -57,7 +61,7 @@ export function useOrderDiscount(
       window.clearTimeout(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [restaurantId, key]);
+  }, [restaurantId, key, userKey]);
 
   return discount;
 }
