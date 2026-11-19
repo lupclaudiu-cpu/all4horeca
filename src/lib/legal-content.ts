@@ -107,7 +107,7 @@ export const privacyDocument: LegalDocument = {
     {
       heading: "4. Cui transmitem datele",
       paragraphs: [
-        "Restaurantului la care comanzi, pentru a prepara și livra comanda. Furnizorilor care ne ajută să rulăm aplicația: Supabase (baza de date, servere în Uniunea Europeană), furnizorul de hosting (Netlify sau Cloudflare), furnizorul de SMS pentru codurile de autentificare și Google (hărți pentru adrese).",
+        "Restaurantului la care comanzi, pentru a prepara și livra comanda. Furnizorilor care ne ajută să rulăm aplicația: Supabase (baza de date, servere în Uniunea Europeană), furnizorul de hosting (Cloudflare), furnizorul de SMS pentru codurile de autentificare și Google (hărți pentru adrese).",
         "Nu vindem datele tale și nu le folosim pentru publicitate.",
       ],
     },
