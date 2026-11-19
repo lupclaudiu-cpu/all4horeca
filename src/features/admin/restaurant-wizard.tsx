@@ -29,7 +29,7 @@ const initialData: RestaurantOnboardingInput = {
   phone: "",
   email: "",
   openingTime: "10:00",
-  closingTime: "23:30",
+  closingTime: "09:59",
   workingDays: [1, 2, 3, 4, 5, 6, 0],
   acceptsDelivery: true,
   acceptsPickup: true,

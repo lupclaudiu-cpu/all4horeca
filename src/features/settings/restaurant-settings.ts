@@ -6,13 +6,13 @@ import type {
 } from "@/lib/types";
 
 export const defaultSchedule: ScheduleDay[] = [
-  { day: 1, enabled: true, openingTime: "10:00", closingTime: "23:30" },
-  { day: 2, enabled: true, openingTime: "10:00", closingTime: "23:30" },
-  { day: 3, enabled: true, openingTime: "10:00", closingTime: "23:30" },
-  { day: 4, enabled: true, openingTime: "10:00", closingTime: "23:30" },
-  { day: 5, enabled: true, openingTime: "10:00", closingTime: "23:30" },
-  { day: 6, enabled: true, openingTime: "10:00", closingTime: "23:30" },
-  { day: 0, enabled: true, openingTime: "10:00", closingTime: "23:30" },
+  { day: 1, enabled: true, openingTime: "10:00", closingTime: "09:59" },
+  { day: 2, enabled: true, openingTime: "10:00", closingTime: "09:59" },
+  { day: 3, enabled: true, openingTime: "10:00", closingTime: "09:59" },
+  { day: 4, enabled: true, openingTime: "10:00", closingTime: "09:59" },
+  { day: 5, enabled: true, openingTime: "10:00", closingTime: "09:59" },
+  { day: 6, enabled: true, openingTime: "10:00", closingTime: "09:59" },
+  { day: 0, enabled: true, openingTime: "10:00", closingTime: "09:59" },
 ];
 
 export const defaultDeliveryZones: DeliveryZone[] = [
@@ -58,7 +58,7 @@ export const restaurantSettings: RestaurantSettings = {
   ordersPausedUntil: null,
   deliveryZones: defaultDeliveryZones,
   openingTime: "10:00",
-  closingTime: "23:30",
+  closingTime: "09:59",
   notificationsEnabled: true,
   soundEnabled: true,
   highlightDelayedOrders: true,
