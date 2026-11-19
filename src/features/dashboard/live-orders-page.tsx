@@ -1,5 +1,6 @@
 "use client";
 
+import { orderStatusLabel } from "@/lib/order-status-label";
 import { useEffect, useState } from "react";
 import {
   CloseIcon,
@@ -89,7 +90,7 @@ export function LiveOrdersPage() {
       <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <LiveMetric label="Comenzi Noi" value={newOrders.length} tone="red" />
         <LiveMetric label="În Preparare" value={preparingOrders.length} tone="orange" />
-        <LiveMetric label="În Livrare" value={deliveringOrders.length} tone="violet" />
+        <LiveMetric label="Livrare / ridicare" value={deliveringOrders.length} tone="violet" />
         <LiveMetric label="Finalizate Azi" value={completedToday.length} tone="green" />
       </section>
 
@@ -224,7 +225,7 @@ function LiveOrderCard({
           <span
             className={`inline-block rounded-full px-3 py-2 text-[11px] font-black ${statusStyles[order.status]}`}
           >
-            {order.status}
+            {orderStatusLabel(order)}
           </span>
           <p
             className={`mt-2 flex items-center justify-end gap-1 text-xs font-black ${
@@ -406,7 +407,7 @@ function OrderDetailsModal({
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-2xl font-black">{order.orderNumber}</h2>
               <span className={`rounded-full px-3 py-1.5 text-[10px] font-black ${statusStyles[order.status]}`}>
-                {order.status}
+                {orderStatusLabel(order)}
               </span>
             </div>
             <p className="mt-1 text-xs font-bold text-[#4A5A52]">

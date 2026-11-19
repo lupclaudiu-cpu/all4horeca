@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { OrdersIcon } from "@/components/icons";
 import { SafeImage } from "@/components/safe-image";
 import { formatPrice } from "@/data/restaurant";
+import { orderStatusLabel } from "@/lib/order-status-label";
 import { useOrders } from "@/features/orders/order-context";
 import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import type { OrderStatus, PaymentMethod } from "@/lib/types";
@@ -169,7 +170,7 @@ export function OrdersPage({
                     className={`rounded-full px-3 py-2 text-[11px] font-black ${statusStyles[order.status]}`}
                   >
                     <span aria-hidden="true">{statusIcons[order.status]}</span>{" "}
-                    {order.status}
+                    {orderStatusLabel(order)}
                   </span>
                 </div>
 
