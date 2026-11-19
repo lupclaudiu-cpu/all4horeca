@@ -36,8 +36,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const activeRestaurantId = restaurantId ?? items[0]?.product.restaurantId;
   const [isOpen, setIsOpen] = useState(false);
-  const [hydratedFor, setHydratedFor] = useState<string | null>(null);
-  const hydrated = hydratedFor !== null && hydratedFor === restaurantId;
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     publishDataFlowDebug({
@@ -57,13 +56,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       lastStep: isOpen ? "Cart open" : "Cart closed",
     });
   }, [activeRestaurantId, hydrated, isOpen, items.length]);
-
-  useEffect(() => {
-    if (!restaurantId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHydratedFor(null);
-    }
-  }, [restaurantId]);
 
   useEffect(() => {
     if (restaurantLoading || !restaurantId) {
@@ -99,17 +91,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       } catch {
         window.localStorage.removeItem(STORAGE_KEY);
       } finally {
-        setHydratedFor(restaurantId);
+        setHydrated(true);
       }
     }, 0);
     return () => window.clearTimeout(timer);
   }, [restaurantId, restaurantLoading]);
 
-  useEffect(() => {
-    if (hydrated && restaurantId) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  // Coșul se salvează doar la acțiunile clientului (adaugă / modifică / șterge),
+  // niciodată automat la încărcarea paginii, ca să nu se suprascrie cu unul gol.
+  const persist = useCallback((next: CartItem[]) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // ignorat: spațiu de stocare indisponibil
     }
-  }, [hydrated, items, restaurantId]);
+    return next;
+  }, []);
 
   const addItem = useCallback((
     product: Product,
@@ -124,32 +121,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       );
       const existing = restaurantItems.find((item) => item.lineId === lineId);
       if (existing) {
-        return restaurantItems.map((item) =>
-          item.lineId === lineId ?
-             { ...item, quantity: item.quantity + quantity }
-            : item,
+        return persist(
+          restaurantItems.map((item) =>
+            item.lineId === lineId ?
+               { ...item, quantity: item.quantity + quantity }
+              : item,
+          ),
         );
       }
-      return [
+      return persist([
         ...restaurantItems,
         { lineId, product, quantity, selectedOptions, unitPrice },
-      ];
+      ]);
     });
-  }, []);
+  }, [persist]);
 
   const updateQuantity = useCallback((lineId: string, quantity: number) => {
     setItems((current) =>
-      quantity <= 0 ?
-         current.filter((item) => item.lineId !== lineId)
-        : current.map((item) =>
-            item.lineId === lineId ? { ...item, quantity } : item,
-          ),
+      persist(
+        quantity <= 0 ?
+           current.filter((item) => item.lineId !== lineId)
+          : current.map((item) =>
+              item.lineId === lineId ? { ...item, quantity } : item,
+            ),
+      ),
     );
-  }, []);
+  }, [persist]);
 
   const removeItem = useCallback((lineId: string) => {
-    setItems((current) => current.filter((item) => item.lineId !== lineId));
-  }, []);
+    setItems((current) =>
+      persist(current.filter((item) => item.lineId !== lineId)),
+    );
+  }, [persist]);
+
+  const clearCart = useCallback(() => {
+    setItems(persist([]));
+  }, [persist]);
 
   const value = useMemo(
     () => {
@@ -167,12 +174,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addItem,
         updateQuantity,
         removeItem,
-        clearCart: () => setItems([]),
+        clearCart,
         openCart: () => setIsOpen(true),
         closeCart: () => setIsOpen(false),
       };
     },
-    [items, activeRestaurantId, isOpen, addItem, updateQuantity, removeItem],
+    [
+      items,
+      activeRestaurantId,
+      isOpen,
+      addItem,
+      updateQuantity,
+      removeItem,
+      clearCart,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
