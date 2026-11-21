@@ -9,6 +9,9 @@ import { orderStatusLabel } from "@/lib/order-status-label";
 import { useOrders } from "@/features/orders/order-context";
 import { useRestaurant } from "@/features/restaurant/restaurant-context";
 import type { OrderStatus, PaymentMethod } from "@/lib/types";
+import { StoriesOrderTracker } from "@/features/stories-ui/stories-order-tracker";
+import { isTrackableOrder } from "@/lib/order-progress";
+import { usesStoriesUi } from "@/lib/ui-variant";
 
 const statusStyles: Record<OrderStatus, string> = {
   "Nouă": "bg-[#EFE8DA] text-[#7A5620]",
@@ -44,6 +47,9 @@ export function OrdersPage({
   const { currentRestaurant } = useRestaurant();
   const menuUrl = currentRestaurant ? `/clienti/${currentRestaurant.slug}` : "/";
   const renderLoading = !hydrated && orders.length === 0;
+  const trackedOrder = usesStoriesUi(currentRestaurant?.slug) ?
+      orders.find(isTrackableOrder)
+    : undefined;
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") return;
@@ -90,6 +96,8 @@ export function OrdersPage({
             </p>
           </div>
         )}
+
+        {trackedOrder && <StoriesOrderTracker order={trackedOrder} />}
 
         {error && (
           <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">

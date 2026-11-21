@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PublicRestaurantPage } from "@/features/public-restaurant/public-restaurant-page";
+import { StoriesRestaurantPage } from "@/features/stories-ui/stories-restaurant-page";
+import { usesStoriesUi } from "@/lib/ui-variant";
 import { getPublicServerClient } from "@/lib/supabase/public-server";
 import { isTrialExpired } from "@/lib/trial";
 import { getPublicCatalog } from "@/services/public-catalog-service";
@@ -87,8 +89,12 @@ export default async function RestaurantPage({
     restaurant.trial_expires_at,
   );
   const status = restaurant.status ?? "active";
+  // Interfața „Stories” e activă doar pentru restaurantele din src/lib/ui-variant.ts.
+  const RestaurantView = usesStoriesUi(restaurant.slug) ?
+      StoriesRestaurantPage
+    : PublicRestaurantPage;
   return (
-    <PublicRestaurantPage
+    <RestaurantView
       restaurant={{
         id: restaurant.id,
         slug: restaurant.slug,
