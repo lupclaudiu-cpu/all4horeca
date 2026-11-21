@@ -29,6 +29,8 @@ import { useAuth } from "@/features/auth/auth-context";
 import { TRIAL_ORDER_MESSAGE, isTestAccountPhone } from "@/lib/trial";
 import { useOrderDiscount } from "@/features/cart/use-order-discount";
 import { PhoneLogin } from "@/features/auth/phone-login";
+import { StoriesCheckoutSteps } from "@/features/stories-ui/stories-checkout-steps";
+import { usesStoriesUi } from "@/lib/ui-variant";
 import { useCatalog } from "@/features/catalog/catalog-context";
 import {
   getDatabaseCustomerProfile,
@@ -366,6 +368,10 @@ export function CheckoutPage() {
           </div>
         </div>
       </header>
+
+      {usesStoriesUi(currentRestaurant?.slug) && (
+        <StoriesCheckoutSteps loggedIn={Boolean(user)} />
+      )}
 
       {!authLoading && !user && (
         <div className="mx-auto max-w-md px-4 py-6">

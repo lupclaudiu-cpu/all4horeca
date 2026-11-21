@@ -12,7 +12,11 @@ type InstallPromptEvent = Event & {
 
 const DISMISSED_KEY = "all4horeca-install-dismissed";
 
-export function InstallApp() {
+export function InstallApp({
+  bottomClassName = "bottom-[86px]",
+}: {
+  bottomClassName?: string;
+} = {}) {
   const { currentRestaurant } = useRestaurant();
   const appName = currentRestaurant?.name ?? "";
   const logoUrl = currentRestaurant?.logoUrl ?? null;
@@ -80,7 +84,7 @@ export function InstallApp() {
 
   return (
     <>
-      <aside className="fixed bottom-[86px] left-3 right-3 z-30 mx-auto max-w-md rounded-[1.5rem] border border-[#D9CFBC] bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.2)]">
+      <aside className={`fixed ${bottomClassName} left-3 right-3 z-30 mx-auto max-w-md rounded-[1.5rem] border border-[#D9CFBC] bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.2)]`}>
         <button
           onClick={dismiss}
           aria-label="Închide"

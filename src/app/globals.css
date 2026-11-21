@@ -72,3 +72,38 @@ button { cursor: pointer; }
 }
 
 h1, h2, .font-display { font-family: var(--font-fraunces), Fraunces, Georgia, serif; }
+
+/* Interfața „Stories” pentru clienți (activă doar pentru restaurantele din src/lib/ui-variant.ts) */
+@keyframes stories-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes stories-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes stories-sheet-in { from { transform: translateY(100%); } 70% { transform: translateY(-1.5%); } to { transform: translateY(0); } }
+@keyframes stories-sheet-out { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@keyframes stories-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes stories-pop { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes stories-bump { 0% { transform: scale(1) rotate(0); } 30% { transform: scale(1.22) rotate(-8deg); } 60% { transform: scale(.95) rotate(4deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes stories-spin { to { transform: rotate(360deg); } }
+@keyframes stories-progress { from { width: 0%; } to { width: 100%; } }
+@keyframes stories-zoom { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes stories-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes stories-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes stories-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(227,179,60,.55); } 100% { box-shadow: 0 0 0 10px rgba(227,179,60,0); } }
+.stories-fade-in { animation: stories-fade-in 200ms ease-out both; }
+.stories-fade-out { animation: stories-fade-out 200ms ease-in both; }
+.stories-sheet-in { animation: stories-sheet-in 380ms cubic-bezier(.2,.9,.3,1) both; }
+.stories-sheet-out { animation: stories-sheet-out 220ms ease-in both; }
+.stories-rise { animation: stories-rise 420ms cubic-bezier(.2,.8,.2,1) both; }
+.stories-pop { animation: stories-pop 320ms ease-out; display: inline-flex; }
+.stories-bump { animation: stories-bump 520ms ease-out; }
+.stories-progress { animation-name: stories-progress; animation-timing-function: linear; animation-fill-mode: forwards; }
+.stories-zoom { animation: stories-zoom 6s ease-out both; }
+.stories-breathe { animation: stories-breathe 2.6s ease-in-out infinite; }
+.stories-pulse { animation: stories-pulse 1.8s ease-in-out infinite; }
+.stories-pulse-ring { animation: stories-pulse-ring 1.4s ease-out infinite; }
+.stories-ring {
+  position: relative;
+  background: conic-gradient(from 200deg, #B88A44, #E3B33C, var(--stories-accent, #173A2E), #B88A44);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stories-fade-in, .stories-fade-out, .stories-sheet-in, .stories-sheet-out, .stories-rise, .stories-pop,
+  .stories-bump, .stories-zoom, .stories-breathe, .stories-pulse, .stories-pulse-ring { animation: none !important; }
+}
